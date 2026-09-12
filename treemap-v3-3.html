@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEEHIVE — NZ Political Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  svg text,.cell-meta,.th-val,.date-dim,.date-chip { font-variant-numeric:tabular-nums; }
+  html, body { width:100%; height:100%; overflow:hidden; background:#05070a;
+    font-family:'Chakra Petch', sans-serif; }
+  /* text tiers: #f2f4f7 / #9aa7b4 / #6b7684 */
+  .view { position:fixed; inset:0; display:none; }
+  .view.active { display:block; }
+
+  /* ---------- TREEMAP VIEW ---------- */
+  #treemap-view { }
+  #grid { position:absolute; inset:0; }
+  .cell {
+    position:absolute; overflow:hidden; cursor:pointer;
+    display:flex; flex-direction:column;
+    padding:clamp(8px, 1.4vw, 18px);
+    transition:background-color .12s ease-out, box-shadow .12s ease-out;
+  }
+  .cell.p1:hover { background:#161d26 !important; }
+  .cell.p2:hover { background:#1b2531 !important; }
+  .cell.p3:hover { background:#26313f !important; }
+  .cell.p0:hover { background:#0d1117 !important; }
+  .cell:hover { box-shadow: inset 0 0 0 1px rgba(229,72,77,.6); }
+  .cell.p0 { background:#0a0d11; box-shadow: inset 0 0 0 1.5px rgba(229,72,77,.85); }
+  .cell.p0:hover { background:#0d1117; }
+  .cell.p1 { background:#10151c; }
+  .cell.p2 { background:#171f29; }
+  .cell.p3 { background:#232e3d; }
+  .badge-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .red-badge { font-size:10px; font-weight:700; letter-spacing:.12em; color:#e5484d;
+    text-transform:uppercase; border-left:3px solid #e5484d; padding-left:6px; }
+  .dim-badge { font-size:10px; font-weight:600; letter-spacing:.12em; color:#9aa7b4;
+    text-transform:uppercase; border-left:3px solid #3a4552; padding-left:6px; }
+  .date-dim { font-size:10px; color:#77828f; letter-spacing:.05em; }
+  .cell-title { color:#f2f4f7; font-weight:700; line-height:1.30; overflow-wrap:break-word; }
+  .p0 .cell-title { line-height:1.22 !important; } .p2 .cell-title, .p3 .cell-title { line-height:1.38 !important; }
+  .cell.p0 .cell-title { font-size:clamp(16px, 1.7vw, 24px); letter-spacing:-0.01em; }
+  .cell.p1 .cell-title { font-size:13px; font-weight:600; }
+  .cell.p2 .cell-title { font-size:11px; font-weight:600; }
+  .cell.p3 .cell-title { font-size:10px; color:#c7cfd8; }
+  .cell-meta { margin-top:auto; display:flex; gap:8px; align-items:center;
+    font-size:10px; color:#6b7684; }
+  .p-badge { color:#9aa7b4; } .p-badge.high { color:#e5484d; font-weight:700; }
+  /* election chart area */
+  .election-chart { flex:1; min-height:0; margin:8px 0 4px 0; }
+  .election-chart svg { width:100%; height:100%; display:block; }
+  .legend-row { display:flex; gap:14px; flex-wrap:wrap; margin:4px 0 8px 0; }
+  .legend-row .li { display:flex; align-items:center; gap:5px; font-size:11px; color:#9aa7b4; }
+  .legend-row .dot { width:6px; height:6px; border-radius:50%; }
+  .gap-callout { display:flex; align-items:baseline; gap:10px; margin:6px 0 8px 0; }
+  .gap-callout span { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:#9aa7b4; }
+  .gap-callout b { font-size:16px; color:#f2f4f7; font-variant-numeric:tabular-nums; }
+  .spark-mini { margin-top:6px; height:34px; }
+  .spark-mini svg { width:100%; height:100%; display:block; }
+  .thresholds { margin-top:4px; }
+  .th-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+  .th-name { width:64px; font-size:10px; color:#9aa7b4; text-align:right; flex-shrink:0; }
+  .th-track { flex:1; height:4px; background:rgba(255,255,255,0.05); position:relative; }
+  .th-bar { height:100%; }
+  .th-bar.below { opacity:.45; }
+  .th-line { position:absolute; top:-4px; bottom:-4px; width:0; border-left:1px dashed #ffffff59; }
+  .th-label { position:absolute; top:-14px; left:0; font-size:9px; color:#9aa7b4; }
+  .th-val { width:38px; font-size:10px; color:#6b7684; flex-shrink:0; }
+  .mmp-note { font-size:9px; color:#6b7684; margin-top:6px; }
+  /* logo lives in smallest cell */
+  .logo-cell { justify-content:flex-end; align-items:flex-start; }
+  .logo { font-weight:700; letter-spacing:.14em; font-size:11px; color:#f2f4f7; }
+  .logo b { color:#e5484d; }
+  .logo-sub { font-size:8px; color:#77828f; letter-spacing:.18em; margin-top:2px; }
+
+  /* ---------- ARTICLE VIEW ---------- */
+  #article-view { background:#0a0d11; overflow-y:auto; }
+  .article { max-width:680px; margin:0 auto; padding:48px 24px 80px; }
+  .back { font-size:13px; color:#9aa7b4; cursor:pointer; display:inline-block; margin-bottom:28px; }
+  .back:hover { color:#f2f4f7; }
+  .a-badge { font-size:10px; font-weight:700; letter-spacing:.08em; color:#e5484d;
+    text-transform:uppercase; border-left:3px solid #e5484d; padding-left:8px; margin-bottom:14px; }
+  .a-title { font-size:28px; font-weight:700; color:#f2f4f7; line-height:1.25; margin-bottom:10px; }
+  .a-date { font-size:13px; color:#6b7684; margin-bottom:32px; }
+  .a-chart { margin:0 0 8px 0; border:1px solid #1e2733; padding:12px; background:#0d1117; }
+  .a-chart svg { width:100%; height:260px; display:block; }
+  .a-caption { font-size:11px; color:#6b7684; margin-bottom:32px; }
+  .a-body p { font-size:16px; line-height:1.7; color:#c7cfd8; margin-bottom:22px; }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ================= TREEMAP VIEW ================= -->
+<div class="view active" id="treemap-view"><div id="grid"></div></div>
+
+<!-- ================= ARTICLE VIEW ================= -->
+<div class="view" id="article-view">
+  <div class="article">
+    <span class="back" onclick="showTreemap()">← 返回 TreeMap</span>
+    <div class="a-badge" id="a-badge">ELECTION 2026</div>
+    <h1 class="a-title" id="a-title"></h1>
+    <div class="a-date" id="a-date"></div>
+    <div class="a-chart" id="a-chart"></div>
+    <div class="a-caption">示例数据 · Beehive poll aggregate · 5% = MMP threshold</div>
+    <div class="a-body" id="a-body"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ── Party colors (data-encoding only) ─────────────────────── */
+var PARTY = {
+  national:{ name:'National', color:'#5a94d4', poll:38.5, reached:true },
+  labour:  { name:'Labour',   color:'#D82A20', poll:28.2, reached:true },
+  green:   { name:'Green',    color:'#3d9e5c', poll:11.4, reached:true },
+  act:     { name:'ACT',      color:'#c9b026', poll:13.1, reached:true },
+  nzfirst: { name:'NZ First', color:'#8895a7', poll:4.2,  reached:false }
+};
+var POLL_HISTORY = {
+  national:[34,35,33,36,34,37,35,38,37,38.5],
+  labour:[30,29,28,30,28,29,27,28,29,28.2],
+  green:[9,10,11,10,12,11,11,12,11,11.4],
+  act:[12,11,13,12,14,13,12,14,13,13.1],
+  nzfirst:[7,6,8,7,5,6,5,4.8,4.5,4.2]
+};
+
+/* ── Treemap data: black gradient by priority ──────────────── */
+var CELLS = [
+  { id:'election', tier:0, priority:'HIGH', date:'12 SEP 2026',
+    title:'ELECTION 2026 — Polls & the 5% Threshold', full:true },
+  { id:'s02', tier:1, priority:'HIGH', date:'11 SEP', title:'Fuel Tax Retreat: The $1.4B Land Transport Fund Hole' },
+  { id:'s03', tier:1, priority:'HIGH', date:'11 SEP', title:'NZ First Immigration Platform Lands' },
+  { id:'s04', tier:2, date:'10 SEP', title:'Labour Guarantees Graduate Nurse Jobs' },
+  { id:'s05', tier:2, date:'10 SEP', title:'ACT Fiscal Plan: $1B in Savings' },
+  { id:'s06', tier:2, date:'09 SEP', title:'Coalition Terms Begin to Surface' },
+  { id:'s07', tier:2, date:'09 SEP', title:'MMP Threshold Review Reopened' },
+  { id:'s08', tier:3, date:'08 SEP', title:'Green Net Zero Roadmap Tightened' },
+  { id:'s09', tier:3, date:'08 SEP', title:'Housing Affordability Worsens' },
+  { id:'s10', tier:3, date:'07 SEP', title:'Health Wait Times at Record' },
+  { id:'s11', tier:3, date:'07 SEP', title:'Cabinet Reshuffle Rumours' },
+  { id:'s12', tier:3, date:'06 SEP', title:'Regional Infrastructure Scrutiny' },
+  { id:'s13', tier:3, date:'06 SEP', title:'Justice Reform at Select Committee' },
+  { id:'logo', tier:3, logo:true }
+];
+
+/* ── Charts ────────────────────────────────────────────────── */
+function drawPollChart(container, h) {
+  /* Cover card: brief-page main chart DNA — TWO MAJOR PARTIES ONLY (National vs Labour),
+     model lines + confidence bands + poll dots + right-edge name/value labels,
+     dashed % gridlines, Today anchor, teal under-5% zone. Mini-sparkline projection style. */
+  var w = container.clientWidth || 400;
+  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h)
+    .attr('preserveAspectRatio','none');
+  var labelW = 92;
+  var x = d3.scaleLinear().domain([0, 9]).range([10, w-labelW]);
+  var y = d3.scaleLinear().domain([20, 42]).range([h-16, 8]);
+  // dashed gridlines with % labels on right (house style) — domain fits the two majors
+  [20,25,30,35,40].forEach(function(v){
+    svg.append('line').attr('x1',10).attr('x2',w-labelW).attr('y1',y(v)).attr('y2',y(v))
+      .attr('stroke','rgba(255,255,255,0.14)').attr('stroke-dasharray','2,4');
+    svg.append('text').attr('x',w-labelW+8).attr('y',y(v)+3)
+      .attr('font-size',9).attr('fill','#6b7684').text(v+'%');
+  });
+  svg.append('line').attr('x1',x(8.6)).attr('x2',x(8.6)).attr('y1',6).attr('y2',h-16)
+    .attr('stroke','rgba(255,255,255,0.5)');
+  svg.append('text').attr('x',x(8.6)).attr('y',4).attr('text-anchor','middle')
+    .attr('font-size',8).attr('letter-spacing','0.1em').attr('fill','#9aa7b4').text('TODAY');
+  ['national','labour'].forEach(function(k){
+    var c = PARTY[k].color;
+    var data = POLL_HISTORY[k];
+    svg.append('path').datum(data)
+      .attr('d', d3.area().x(function(d,i){return x(i);})
+        .y0(function(d){return y(d-1.3);}).y1(function(d){return y(d+1.3);})
+        .curve(d3.curveMonotoneX))
+      .attr('fill',c).attr('opacity',0.16);
+    svg.selectAll(null).data(data).enter().append('circle')
+      .attr('cx',function(d,i){return x(i);}).attr('cy',function(d){return y(d);})
+      .attr('r',2.2).attr('fill',c).attr('opacity',0.45);
+    svg.append('path').datum(data)
+      .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
+        .curve(d3.curveMonotoneX))
+      .attr('fill','none').attr('stroke',c).attr('stroke-width',2);
+    var last = data[data.length-1];
+    var ly = y(last);
+    svg.append('circle').attr('cx',x(9)).attr('cy',ly).attr('r',3.2).attr('fill',c);
+    svg.append('line').attr('x1',x(9)+5).attr('y1',ly).attr('x2',w-labelW+6).attr('y2',ly)
+      .attr('stroke',c).attr('stroke-dasharray','2,3').attr('opacity',0.8);
+    svg.append('text').attr('x',w-labelW+10).attr('y',ly-2)
+      .attr('font-size',10).attr('font-weight',600).attr('fill',c).text(PARTY[k].name);
+    svg.append('text').attr('x',w-labelW+10).attr('y',ly+9)
+      .attr('font-size',9.5).attr('fill','#c7cfd8').text(last+'%');
+  });
+  var months = ['May','Jul','Sep','Nov','Jan','Mar','May','Jul'];
+  months.forEach(function(m,i){
+    svg.append('text').attr('x', x(i*9/(months.length-1))).attr('y', h-4)
+      .attr('font-size',8).attr('fill','#6b7684').attr('text-anchor','middle').text(m);
+  });
+}
+
+function drawMiniSpark(container, partyKey, h) {
+  var data = POLL_HISTORY[partyKey] || POLL_HISTORY.national;
+  var w = container.clientWidth || 120;
+  var c = PARTY[partyKey] ? PARTY[partyKey].color : '#8895a7';
+  var svg = d3.select(container).append('svg').attr('viewBox','0 0 '+w+' '+h)
+    .attr('preserveAspectRatio','none');
+  var x = d3.scaleLinear().domain([0, data.length-1]).range([2, w-14]);
+  var lo = Math.min.apply(null, data) - 1.5, hi = Math.max.apply(null, data) + 1.5;
+  var y = d3.scaleLinear().domain([lo, hi]).range([h-3, 3]);
+  svg.append('path').datum(data)
+    .attr('d', d3.area().x(function(d,i){return x(i);})
+      .y0(function(d){return y(d-0.9);}).y1(function(d){return y(d+0.9);})
+      .curve(d3.curveMonotoneX))
+    .attr('fill',c).attr('opacity',0.10);
+  svg.append('path').datum(data)
+    .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
+      .curve(d3.curveMonotoneX))
+    .attr('fill','none').attr('stroke',c).attr('stroke-width',1.25);
+  var last = data[data.length-1];
+  svg.append('circle').attr('cx',x(data.length-1)).attr('cy',y(last)).attr('r',2.4).attr('fill',c);
+  svg.append('text').attr('x',w-1).attr('y',y(last)+3).attr('text-anchor','end')
+    .attr('font-size',9).attr('font-weight',700).attr('fill',c).text(last+'%');
+}
+
+function thresholdBars(container) {
+  var html = '<div class="th-line" style="left:'+(5/45*100)+'%"></div>' +
+    '<div class="th-label" style="left:'+(5/45*100)+'%">5%</div>';
+  Object.keys(PARTY).forEach(function(k){
+    var p = PARTY[k];
+    var w = Math.min(100, p.poll/45*100);
+    html += '<div class="th-row"><div class="th-name">'+p.name+'</div>' +
+      '<div class="th-track"><div class="th-bar'+(p.reached?'':' below')+
+      '" style="width:'+w+'%; background:'+p.color+'"></div></div>' +
+      '<div class="th-val">'+p.poll+'%</div></div>';
+  });
+  html += '<div class="mmp-note">MMP: a party enters Parliament by clearing 5% party vote OR winning one electorate seat.</div>';
+  container.innerHTML = html;
+}
+
+function legendRow() {
+  var html = '';
+  Object.keys(PARTY).forEach(function(k){
+    html += '<span class="li"><span class="dot" style="background:'+PARTY[k].color+'"></span>'+PARTY[k].name+'</span>';
+  });
+  return html;
+}
+
+/* ── Treemap layout ────────────────────────────────────────── */
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function renderGrid() {
+  var grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  var W = grid.clientWidth, H = grid.clientHeight;
+  var root = d3.hierarchy({children: CELLS.map(function(c,i){
+    return { i:i, v: c.logo ? 6 : Math.pow(100 - c.tier*22, 1.3) };
+  })}).sum(function(d){ return d.v || 0; });
+  d3.treemap().tile(d3.treemapResquarify).size([W,H]).paddingInner(3).paddingOuter(0)(root);
+  var leaves = root.leaves();
+  CELLS.forEach(function(c, i){
+    var n = leaves[i];
+    var el = document.createElement('div');
+    el.className = 'cell p' + c.tier;
+    el.style.left = n.x0+'px'; el.style.top = n.y0+'px';
+    el.style.width = (n.x1-n.x0)+'px'; el.style.height = (n.y1-n.y0)+'px';
+    if (c.logo) {
+      el.classList.add('logo-cell');
+      el.innerHTML = '<div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
+      grid.appendChild(el);
+      return;
+    }
+    var w = n.x1-n.x0, h = n.y1-n.y0;
+    var big = c.full && w >= 420 && h >= 320;
+    var sparkParty = { s02:'nzfirst', s03:'act', s04:'labour', s05:'act', s06:'national',
+      s07:'green', s08:'green', s09:'national', s10:'labour', s11:'national',
+      s12:'nzfirst', s13:'act' }[c.id];
+    var pr = c.priority || (c.tier===1?'HIGH':c.tier===2?'MEDIUM':'LOW');
+    var badgeCls = (c.tier===0 || pr==='HIGH') ? 'red-badge' : 'dim-badge';
+    var html = '<div class="badge-row"><span class="'+badgeCls+'">'+(c.tier===0?'ELECTION 2026':pr)+'</span>' +
+      '<span class="date-dim">'+(c.date||'')+'</span></div>' +
+      '<div class="cell-title">'+c.title+'</div>';
+    if (big) {
+      html += '<div class="election-chart"></div>' +
+        '<div class="gap-callout"><span>NATIONAL-LET GAP</span><b>10.3 pts</b><span>Labour 28.2 · National 38.5</span></div>' +
+        '<div class="thresholds"></div>';
+    } else if (w >= 170 && h >= 130 && sparkParty) {
+      html += '<div class="spark-mini"></div>' +
+        '<div class="cell-meta"><span class="p-badge'+(pr==='HIGH'?' high':'')+'">'+pr+'</span></div>';
+    } else if (c.tier <= 2) {
+      html += '<div class="cell-meta"><span class="p-badge'+(pr==='HIGH'?' high':'')+'">'+pr+'</span></div>';
+    }
+    el.innerHTML = html;
+    el.addEventListener('click', function(){ openArticle(c); });
+    grid.appendChild(el);
+    if (big) {
+      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.44));
+      thresholdBars(el.querySelector('.thresholds'));
+    } else if (sparkParty && el.querySelector('.spark-mini')) {
+      try { drawMiniSpark(el.querySelector('.spark-mini'), sparkParty, 34); }
+      catch(e) { document.title = 'SPARKERR ' + c.id + ': ' + e.message; }
+    }
+  });
+}
+
+/* ── Article view ──────────────────────────────────────────── */
+function openArticle(c) {
+  document.getElementById('treemap-view').classList.remove('active');
+  var av = document.getElementById('article-view');
+  av.classList.add('active');
+  av.querySelector('.a-badge').textContent = c.tier===0 ? 'ELECTION 2026' : (c.priority || 'STORY');
+  document.getElementById('a-title').textContent = c.title;
+  document.getElementById('a-date').textContent = (c.date||'') + ' · Beehive Political Intelligence · Sample article';
+  var bodyEl = document.getElementById('a-body');
+  if (c.full) {
+    bodyEl.innerHTML =
+      '<p>With the campaign underway, the polling aggregate places National on 38.5 per cent and Labour on 28.2 — a nine-point gap that has held for three consecutive months. The centre-right bloc (National, ACT, NZ First) sits on roughly 55.8 per cent of the party vote, against 39.6 for the left (Labour, Green), leaving the kingmaker arithmetic resting with whichever minor party clears the threshold.</p>' +
+      '<p>The 5 per cent threshold remains the sharpest instrument in the room. ACT (13.1) and the Greens (11.4) are comfortably returned. NZ First, on 4.2 per cent, is the story: below the line in the polls, but historically rescued by an electorate seat. Te Pāti Māori is not modelled here — its pathway runs through the Māori electorates, not the party vote — but it functions as the same kind of jitter in the maths.</p>' +
+      '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
+    var ch = document.getElementById('a-chart');
+    ch.innerHTML = '';
+    requestAnimationFrame(function(){ drawPollChart(ch, 260); });
+  } else {
+    bodyEl.innerHTML =
+      '<p>[Placeholder article — full reporting to be produced by the editorial pipeline.]</p>' +
+      '<p>This story is tracked by the Beehive discovery pipeline and will receive a full evidence-led briefing when the news cycle warrants it.</p>';
+    document.getElementById('a-chart').style.display = 'none';
+  }
+  av.scrollTop = 0;
+}
+function showTreemap() {
+  document.getElementById('article-view').classList.remove('active');
+  document.getElementById('treemap-view').classList.add('active');
+  document.getElementById('a-chart').style.display = '';
+}
+
+/* ── Boot ──────────────────────────────────────────────────── */
+renderGrid();
+var rs;
+window.addEventListener('resize', function(){
+  clearTimeout(rs);
+  rs = setTimeout(function(){
+    if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
+  }, 200);
+});
+</script>
+</body>
+</html>
