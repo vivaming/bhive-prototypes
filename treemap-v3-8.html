@@ -348,10 +348,10 @@ function renderGrid(cat) {
   grid.innerHTML = '';
   var narrow = window.innerWidth < 480 || /[?&]narrow=1/.test(location.search);
     var W = grid.clientWidth, H = grid.clientHeight;
+  var heroStory = narrow ? items.filter(function(c){ return c.full; })[0] : null;
   var heroH = 340;
   if (narrow && heroStory) H = Math.max(240, H - heroH);
   else heroH = 0;
-  var heroStory = narrow ? items.filter(function(c){ return c.full; })[0] : null;
   var heroEl = null;
   var layoutItems = narrow ? items.filter(function(c){ return !c.full; }) : items;
   if (narrow && !heroStory) { /* category w/o election: no reservation */ }
