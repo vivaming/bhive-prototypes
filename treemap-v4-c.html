@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEEHIVE — Paper Grid</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<style>
+:root {
+  /* house data tokens (from chart-samples, Astra §1) */
+  --nat:#33478c; --lab:#d23528; --grn:#3f7d5c; --act:#c08a2d; --nzf:#4a5058;
+  --ink:#1f2328; --muted:#62676f; --grid:#c8ccd3; --card:#f8f7f4; --page:#e8e7e3;
+  --teal:#7bd4cc;
+  /* shell variables per version */
+  --shell:#f2efe9; --gap:0px; --card-radius:0px;
+  --card-shadow:none; --hairline:#d8d3ca;
+  --hero-border:none; --shell-top-highlight:none;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; background:var(--shell);
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; color:var(--ink); }
+.view { position:fixed; inset:0; display:none; }
+.view.active { display:block; }
+#grid { position:absolute; inset:0; }
+
+.cell { position:absolute; overflow:hidden; background:var(--card);
+  border-radius:var(--card-radius); box-shadow:var(--card-shadow);
+  display:flex; flex-direction:column; padding:clamp(12px,1.6vw,20px);
+  transition:box-shadow .15s ease; cursor:pointer; }
+.cell { border:1px solid var(--hairline); border-radius:0; box-shadow:none; }
+.cell.p0 { border-top:4px solid #d23528; }
+.cell:hover { background:#faf8f4; box-shadow:none; }
+.cell:hover { box-shadow:0 0 0 9999px rgba(31,35,40,0), inset 0 0 0 1.5px var(--hairline); }
+
+.badge-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.kicker { font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted); display:flex; align-items:center; gap:7px; }
+.kicker::before { content:''; display:inline-block; width:3px; height:12px;
+  background:#d23528; }
+.date-chip { font-size:10px; color:var(--muted); background:rgba(255,255,255,.58);
+  border:1px solid rgba(31,35,40,.08); border-radius:16px; padding:3px 10px; }
+.cell-title { font-weight:700; line-height:1.22; color:var(--ink);
+  display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.p0 .cell-title { font-family:'Fraunces', Georgia, serif; font-weight:900;
+  font-size:clamp(24px,2.4vw,34px); letter-spacing:-0.02em; -webkit-line-clamp:1; }
+.p1 .cell-title { font-size:16px; }
+.p2 .cell-title { font-size:13px; }
+.p3 .cell-title { font-size:12px; color:#4e545d; }
+.cell-meta { margin-top:auto; font-size:10px; color:var(--muted);
+  letter-spacing:.1em; text-transform:uppercase; }
+
+.hero-chart { flex:1; min-height:0; margin:10px 0 6px 0; }
+.hero-chart svg { width:100%; height:100%; display:block; }
+.legend-row { display:flex; gap:12px; flex-wrap:wrap; margin:6px 0 10px 0; }
+.legend-row .li { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); }
+.legend-row .dot { width:7px; height:7px; border-radius:50%; }
+
+.thresholds { position:relative; padding-top:12px; }
+.th-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+.th-name { width:58px; font-size:10px; color:var(--muted); text-align:right; flex-shrink:0; }
+.th-track { flex:1; height:5px; background:rgba(31,35,40,0.06); position:relative; }
+.th-line { position:absolute; top:-5px; bottom:-5px; width:0;
+  border-left:1.5px dashed #888; }
+.th-label { position:absolute; top:-13px; left:0; font-size:9px; color:var(--muted); }
+.th-bar { height:100%; }
+.th-bar.below { opacity:.5; }
+.th-val { width:40px; font-size:10px; color:var(--muted); flex-shrink:0; }
+.mmp-note { font-size:9px; color:var(--muted); margin-top:7px; }
+
+.logo-cell { justify-content:flex-end; align-items:flex-start;  }
+.logo { font-weight:700; letter-spacing:.14em; font-size:12px; color:var(--ink); }
+.logo b { color:#d23528; }
+.logo-sub { font-size:8px; letter-spacing:.1em; color:var(--muted); margin-top:3px; }
+
+/* article view */
+#article-view { background:var(--shell); overflow-y:auto; }
+.article { max-width:720px; margin:0 auto; padding:48px 24px 80px;
+  background:var(--shell); min-height:100%; }
+.a-body p { font-family:Georgia, serif; font-size:17px; }
+.back { font-size:13px; color:var(--muted); cursor:pointer; display:inline-block; margin-bottom:26px; }
+.back:hover { color:var(--ink); }
+.a-badge { font-size:10px; font-weight:600; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted); border-left:3px solid #d23528; padding-left:8px; margin-bottom:14px; }
+.a-title { font-family:'Fraunces', Georgia, serif; font-weight:900; font-size:28px;
+  letter-spacing:-0.02em; line-height:1.2; color:var(--ink); margin-bottom:10px; }
+.a-date { font-size:13px; color:var(--muted); margin-bottom:30px; }
+.a-chart { background:var(--card); border-radius:var(--card-radius);
+  box-shadow:var(--card-shadow); padding:14px; margin-bottom:8px; }
+.a-chart svg { width:100%; height:280px; display:block; }
+.a-caption { font-size:12px; color:var(--muted); margin-bottom:30px; }
+.a-body p { font-size:16px; line-height:1.7; color:#4e545d; margin-bottom:22px; }
+@media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+</head>
+<body>
+<div class="view active" id="treemap-view"><div id="grid"></div></div>
+<div class="view" id="article-view">
+  <div class="article">
+    <span class="back" onclick="showTreemap()">← Treemap</span>
+    <div class="a-badge" id="a-badge"></div>
+    <h1 class="a-title" id="a-title"></h1>
+    <div class="a-date" id="a-date"></div>
+    <div class="a-chart" id="a-chart"></div>
+    <div class="a-caption" id="a-caption"></div>
+    <div class="a-body" id="a-body"></div>
+  </div>
+</div>
+<script>
+"use strict";
+var PARTY = {
+  national:{ name:'National', color:'#33478c', poll:38.5, reached:true },
+  labour:{ name:'Labour', color:'#d23528', poll:28.2, reached:true },
+  green:{ name:'Green', color:'#3f7d5c', poll:11.4, reached:true },
+  act:{ name:'ACT', color:'#c08a2d', poll:13.1, reached:true },
+  nzfirst:{ name:'NZ First', color:'#4a5058', poll:4.2, reached:false }
+};
+var POLL_HIST = {
+  national:[34,35,33,36,34,37,35,38,37,38.5],
+  labour:[30,29,28,30,28,29,27,28,29,28.2],
+  green:[9,10,11,10,12,11,11,12,11,11.4],
+  act:[12,11,13,12,14,13,12,14,13,13.1],
+  nzfirst:[7,6,8,7,5,6,5,4.8,4.5,4.2]
+};
+var POLLDOTS = {
+  national:[34,33,35,36,35,37,36,38.5],
+  labour:[30,28,29,30,28,27,29,28.2],
+  green:[9,11,10,12,11,11,12,11.4],
+  act:[12,13,12,14,13,12,14,13.1],
+  nzfirst:[7,8,6,5,6,5,4.8,4.2]
+};
+
+var CELLS = [
+  { id:'election', tier:0, kicker:'Election 2026', date:'12 Sep 2026',
+    title:'ELECTION 2026 — Polls & the 5% Threshold', full:true },
+  { id:'s02', tier:1, kicker:'HIGH', date:'11 Sep', title:'Fuel Tax Retreat: The $1.4B Land Transport Fund Hole' },
+  { id:'s03', tier:1, kicker:'HIGH', date:'11 Sep', title:'NZ First Immigration Platform Lands' },
+  { id:'s04', tier:2, kicker:'MEDIUM', date:'10 Sep', title:'Labour Guarantees Graduate Nurse Jobs' },
+  { id:'s05', tier:2, kicker:'MEDIUM', date:'10 Sep', title:'ACT Fiscal Plan: $1B in Savings' },
+  { id:'s06', tier:2, kicker:'MEDIUM', date:'09 Sep', title:'Coalition Terms Begin to Surface' },
+  { id:'s07', tier:2, kicker:'MEDIUM', date:'09 Sep', title:'MMP Threshold Review Reopened' },
+  { id:'s08', tier:3, kicker:'LOW', date:'08 Sep', title:'Green Net Zero Roadmap Tightened' },
+  { id:'s09', tier:3, kicker:'LOW', date:'08 Sep', title:'Housing Affordability Worsens' },
+  { id:'s10', tier:3, kicker:'LOW', date:'07 Sep', title:'Health Wait Times at Record' },
+  { id:'s11', tier:3, kicker:'LOW', date:'07 Sep', title:'Cabinet Reshuffle Rumours' },
+  { id:'s12', tier:3, kicker:'LOW', date:'06 Sep', title:'Regional Infrastructure Scrutiny' },
+  { id:'s13', tier:3, kicker:'LOW', date:'06 Sep', title:'Justice Reform at Select Committee' },
+  { id:'logo', tier:3, logo:true }
+];
+
+function drawHouseTrend(container, h, opts) {
+  opts = opts || {};
+  var w = container.clientWidth || 400;
+  var compact = !!opts.compact;
+  var svg = d3.select(container).append('svg').attr('viewBox','0 0 '+w+' '+h)
+    .attr('preserveAspectRatio','none');
+  var rightPad = compact ? 34 : 120;
+  var x = d3.scaleLinear().domain([0,9]).range([6, w-rightPad]);
+  var y = d3.scaleLinear().domain([0,50]).range([h-8, 8]);
+  [25,50].forEach(function(v){
+    svg.append('line').attr('x1',6).attr('x2',w-rightPad).attr('y1',y(v)).attr('y2',y(v))
+      .attr('stroke','var(--grid)').attr('stroke-width',0.75);
+  });
+  // teal danger zone under 5%
+  if (!compact) {
+    svg.append('rect').attr('x',6).attr('y',y(5)).attr('width',w-rightPad-6).attr('height',y(0)-y(5))
+      .attr('fill','#7bd4cc').attr('opacity',0.5);
+  }
+  svg.append('line').attr('x1',6).attr('x2',w-rightPad).attr('y1',y(5)).attr('y2',y(5))
+    .attr('stroke','#888').attr('stroke-width',1.5).attr('stroke-dasharray','5,4');
+  if (!compact) {
+    svg.append('text').attr('x',w-rightPad-4).attr('y',y(5)-5).attr('text-anchor','end')
+      .attr('font-size',10).attr('fill','var(--muted)').text('5% threshold');
+  }
+  Object.keys(POLL_HIST).forEach(function(k){
+    var c = PARTY[k].color;
+    if (!compact) {
+      // confidence band
+      svg.append('path').datum(POLL_HIST[k])
+        .attr('d', d3.area().x(function(d,i){return x(i);})
+          .y0(function(d){return y(d-1.2);}).y1(function(d){return y(d+1.2);})
+          .curve(d3.curveMonotoneX))
+        .attr('fill',c).attr('opacity',0.14);
+      // poll dots
+      svg.selectAll(null).data(POLLDOTS[k]).enter().append('circle')
+        .attr('cx',function(d,i){return x(i*9/7);}).attr('cy',function(d){return y(d);})
+        .attr('r',3).attr('fill',c).attr('opacity',0.24);
+    }
+    svg.append('path').datum(POLL_HIST[k])
+      .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
+        .curve(d3.curveMonotoneX))
+      .attr('fill','none').attr('stroke',c).attr('stroke-width', compact?1.75:2);
+    if (!compact) {
+      var last = POLL_HIST[k][POLL_HIST[k].length-1];
+      svg.append('circle').attr('cx',x(9)).attr('cy',y(last)).attr('r',3.5).attr('fill',c);
+      svg.append('line').attr('x1',x(9)).attr('y1',y(last)).attr('x2',w-4).attr('y2',y(last))
+        .attr('stroke','#888').attr('stroke-dasharray','3,3');
+      svg.append('text').attr('x',w-2).attr('y',y(last)+4).attr('text-anchor','end')
+        .attr('font-size',11).attr('font-weight',700).attr('fill',c)
+        .text(PARTY[k].name.split(' ')[0].toUpperCase()+' '+last+'%');
+    }
+  });
+  if (!compact) {
+    // latest-survey anchor line
+    svg.append('line').attr('x1',x(9)).attr('x2',x(9)).attr('y1',4).attr('y2',h-8)
+      .attr('stroke','var(--ink)').attr('stroke-width',1.5);
+    svg.append('path').attr('d','M '+(x(9)-4)+' 4 L '+(x(9)+4)+' 4 L '+x(9)+' 10 Z')
+      .attr('fill','var(--ink)');
+  }
+}
+
+function thresholdBars(container) {
+  var pct = function(v){ return Math.min(100, v/45*100); };
+  var html = '<div class="th-line" style="left:'+(pct(5))+'%"></div>' +
+    '<div class="th-label" style="left:'+(pct(5)+0.5)+'%">5%</div>';
+  Object.keys(PARTY).forEach(function(k){
+    var p = PARTY[k];
+    html += '<div class="th-row"><div class="th-name">'+p.name+'</div>' +
+      '<div class="th-track"><div class="th-bar'+(p.reached?'':' below')+
+      '" style="width:'+pct(p.poll)+'%; background:'+p.color+'"></div>' +
+      '<div class="th-line" style="left:'+pct(5)+'%; top:-2px; bottom:-2px;"></div></div>' +
+      '<div class="th-val">'+p.poll+'%</div></div>';
+  });
+  html += '<div class="mmp-note">MMP: 5% party vote or one electorate seat returns list seats. Teal zone = below-threshold risk.</div>';
+  container.innerHTML = html;
+}
+
+function legendRow() {
+  var html = '';
+  Object.keys(PARTY).forEach(function(k){
+    html += '<span class="li"><span class="dot" style="background:'+PARTY[k].color+'"></span>'+PARTY[k].name+'</span>';
+  });
+  return html;
+}
+
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function renderGrid() {
+  var grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  var W = grid.clientWidth, H = grid.clientHeight;
+  var root = d3.hierarchy({children: CELLS.map(function(c){
+    return { v: c.logo ? 6 : Math.pow(100 - c.tier*22, 1.3) };
+  })}).sum(function(d){ return d.v || 0; });
+  d3.treemap().tile(d3.treemapResquarify).size([W,H]).paddingInner(0).paddingOuter(0)(root);
+  var leaves = root.leaves();
+  CELLS.forEach(function(c, i){
+    var n = leaves[i];
+    var el = document.createElement('div');
+    el.className = 'cell p' + c.tier;
+    el.style.left = n.x0+'px'; el.style.top = n.y0+'px';
+    el.style.width = (n.x1-n.x0)+'px'; el.style.height = (n.y1-n.y0)+'px';
+    if (c.logo) {
+      el.classList.add('logo-cell');
+      el.innerHTML = '<div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
+      grid.appendChild(el);
+      return;
+    }
+    var w = n.x1-n.x0, h = n.y1-n.y0;
+    var big = c.full && w >= 560 && h >= 400;
+    var html = '<div class="badge-row"><span class="kicker">'+c.kicker+'</span>' +
+      '<span class="date-chip">'+c.date+'</span></div>' +
+      '<div class="cell-title">'+c.title+'</div>';
+    if (big) {
+      html += '<div class="hero-chart"></div>' +
+        '<div class="legend-row">'+legendRow()+'</div>' +
+        '<div class="thresholds"></div>';
+    }
+    el.innerHTML = html;
+    el.addEventListener('click', function(){ openArticle(c); });
+    grid.appendChild(el);
+    if (big) {
+      var hc = el.querySelector('.hero-chart');
+      (function(hc, h){ requestAnimationFrame(function(){
+        drawHouseTrend(hc, Math.max(160, h*0.42));
+      }); })(hc, h);
+      thresholdBars(el.querySelector('.thresholds'));
+    }
+  });
+}
+
+function openArticle(c) {
+  document.getElementById('treemap-view').classList.remove('active');
+  var av = document.getElementById('article-view');
+  av.classList.add('active');
+  av.querySelector('.a-badge').textContent = c.kicker;
+  document.getElementById('a-title').textContent = c.title;
+  document.getElementById('a-date').textContent = (c.date||'') + ' · Beehive Political Intelligence · Sample article';
+  var capEl = document.getElementById('a-caption');
+  var chEl = document.getElementById('a-chart');
+  var bodyEl = document.getElementById('a-body');
+  if (c.full) {
+    bodyEl.innerHTML =
+      '<p>With the campaign underway, the polling aggregate places National on 38.5 per cent and Labour on 28.2 — a nine-point gap that has held for three consecutive months. The centre-right bloc (National, ACT, NZ First) sits on roughly 55.8 per cent of the party vote, against 39.6 for the left, leaving the kingmaker arithmetic resting with whichever minor party clears the threshold.</p>' +
+      '<p>The 5 per cent threshold remains the sharpest instrument in the room. ACT (13.1) and the Greens (11.4) are comfortably returned. NZ First, on 4.2 per cent, is the story: below the line in the aggregate, but historically rescued by an electorate seat. The distinction matters — the threshold is a cliff, not a slope, and the teal zone in the chart marks exactly where list seats fall to zero.</p>' +
+      '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair. (Reid Research aggregate, n=1000, ±3.1pp — illustrative.)</p>';
+    chEl.innerHTML = '';
+    chEl.style.display = '';
+    requestAnimationFrame(function(){ drawHouseTrend(chEl, 280); });
+    capEl.textContent = 'Illustrative poll aggregate · Beehive poll of polls · 5% = MMP threshold';
+  } else {
+    bodyEl.innerHTML =
+      '<p>[Placeholder article — full reporting to be produced by the editorial pipeline.]</p>' +
+      '<p>This story is tracked by the Beehive discovery pipeline and will receive a full evidence-led briefing when the news cycle warrants it.</p>';
+    chEl.style.display = 'none';
+    capEl.textContent = '';
+  }
+  av.scrollTop = 0;
+}
+function showTreemap() {
+  document.getElementById('article-view').classList.remove('active');
+  document.getElementById('treemap-view').classList.add('active');
+}
+
+renderGrid();
+window.addEventListener('load', function(){ requestAnimationFrame(function(){ requestAnimationFrame(renderGrid); }); });
+var rs;
+window.addEventListener('resize', function(){
+  clearTimeout(rs);
+  rs = setTimeout(function(){
+    if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
+  }, 200);
+});
+</script>
+</body>
+</html>
