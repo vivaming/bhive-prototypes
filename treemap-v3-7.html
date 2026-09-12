@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script>window.onerror=function(m,s,l){document.title="ERR:"+m+"@"+l};</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEEHIVE — NZ Political Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  svg text,.th-val,.date-dim,.date-chip { font-variant-numeric:tabular-nums; }
+  html, body { width:100%; height:100%; overflow:hidden; background:#05070a;
+    font-family:'Chakra Petch', sans-serif; }
+  /* text tiers: #f2f4f7 / #9aa7b4 / #6b7684 */
+  .view { position:fixed; inset:0; display:none; }
+  .view.active { display:flex; flex-direction:column; }
+
+  /* ---------- TREEMAP VIEW ---------- */
+  #treemap-view { }
+  #grid { position:relative; flex:1; min-height:0; }
+  .cell {
+    position:absolute; overflow:hidden; cursor:pointer;
+    display:flex; flex-direction:column;
+    padding:clamp(8px, 1.4vw, 18px);
+    transition:background-color .12s ease-out, box-shadow .12s ease-out;
+  }
+  .cell.p1:hover { background:#161d26 !important; }
+  .cell.p2:hover { background:#1b2531 !important; }
+  .cell.p3:hover { background:#26313f !important; }
+  .cell.p0:hover { background:#0d1117 !important; }
+  .cell:hover { box-shadow: inset 0 0 0 1px rgba(229,72,77,.6); }
+  .cell:hover .cell-title { color:#ffffff; transform:translateY(-1px); }
+  .cell.p0 { background:#0a0d11; box-shadow: inset 0 0 0 1.5px rgba(229,72,77,.85);
+    border-left:4px solid #d23528; }
+  .cell.p0:hover { background:#0d1117; }
+  .cell.p1 { background:#10151c; border-left:4px solid #7a2a22; }
+  .cell.p2 { background:#171f29; border-left:4px solid #3a2a26; }
+  .cell.p3 { background:#232e3d; border-left:4px solid #232a33; }
+  .badge-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .red-badge { font-size:10px; font-weight:700; letter-spacing:.12em; color:#e5484d;
+    text-transform:uppercase; border-left:3px solid #e5484d; padding-left:6px; }
+  .badge-row.date-only { justify-content:flex-end; }
+  .tag-row { display:flex; flex-wrap:wrap; gap:4px 8px; margin-top:4px; font-size:10px;
+    font-weight:600; letter-spacing:.06em; color:#9aa7b4; }
+  .date-dim { font-size:10px; color:#77828f; letter-spacing:.05em; }
+  .cell-title { transition:color .18s ease-out, transform .18s ease-out; color:#f2f4f7; font-weight:700; line-height:1.30; overflow-wrap:normal; word-break:normal; hyphens:manual; }
+  .p0 .cell-title { line-height:1.22 !important; } .p2 .cell-title, .p3 .cell-title { line-height:1.38 !important; }
+  .cell.p0 .cell-title { font-size:clamp(16px, 1.7vw, 24px); letter-spacing:-0.01em; }
+  .cell.p1 .cell-title { font-size:13px; font-weight:600; }
+  .cell.p2 .cell-title { font-size:11px; font-weight:600; }
+  .cell.p3 .cell-title { font-size:10px; color:#c7cfd8; }
+  /* election chart area */
+  .election-chart { flex:1; min-height:0; margin:8px 0 4px 0; }
+  .election-chart svg { width:100%; height:100%; display:block; }
+  .legend-row { display:flex; gap:14px; flex-wrap:wrap; margin:4px 0 8px 0; }
+  .legend-row .li { display:flex; align-items:center; gap:5px; font-size:11px; color:#9aa7b4; }
+  .legend-row .dot { width:6px; height:6px; border-radius:50%; }
+  .gap-callout { display:flex; align-items:baseline; gap:10px; margin:6px 0 8px 0; }
+  .gap-callout span { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:#9aa7b4; }
+  .gap-callout b { font-size:16px; color:#f2f4f7; font-variant-numeric:tabular-nums; }
+  .spark-mini { margin-top:6px; height:48px; }
+  .spark-mini svg { width:100%; height:100%; display:block; }
+  .thresholds { margin-top:4px; }
+  .th-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
+  .th-name { width:64px; font-size:10px; color:#9aa7b4; text-align:right; flex-shrink:0; }
+  .th-track { flex:1; height:4px; background:rgba(255,255,255,0.05); position:relative; }
+  .th-bar { height:100%; }
+  .th-bar.below { opacity:.45; }
+  .th-line { position:absolute; top:-4px; bottom:-4px; width:0; border-left:1px dashed #ffffff59; }
+  .th-label { position:absolute; top:-14px; left:0; font-size:9px; color:#9aa7b4; }
+  .th-val { width:38px; font-size:10px; color:#6b7684; flex-shrink:0; }
+  .mmp-note { font-size:9px; color:#6b7684; margin-top:6px; }
+  /* logo lives in smallest cell */
+  .logo-cell { justify-content:flex-end; align-items:flex-start; }
+  .logo { font-weight:700; letter-spacing:.14em; font-size:11px; color:#f2f4f7; }
+  .logo b { color:#e5484d; }
+  .logo-sub { font-size:8px; color:#77828f; letter-spacing:.18em; margin-top:2px; }
+  /* category pills — float above the treemap */
+  .cat-bar { position:static; transform:none; display:flex; gap:2px; background:#171a20cc;
+    border-radius:18px; padding:4px; max-width:calc(100vw - 16px); margin:8px auto 0 auto;
+    overflow-x:auto; scrollbar-width:none; }
+  .cat-pill { font-family:inherit; font-size:11px; font-weight:600; letter-spacing:.08em;
+    text-transform:uppercase; color:#9aa7b4; background:none; border:none; border-radius:14px;
+    padding:6px 12px; cursor:pointer; position:relative; white-space:nowrap; }
+  .cat-pill:hover { color:#f2f4f7; }
+  .cat-pill.active { color:#f2f4f7; }
+  .cat-pill.active::after { content:''; position:absolute; left:12px; right:12px; bottom:3px;
+    height:2px; background:#e5484d; border-radius:1px; }
+  @media (max-width:640px) {
+    .cat-bar { top:10px; }
+    .cat-pill { font-size:10px; padding:5px 8px; letter-spacing:.04em; }
+  }
+  /* pagination capsule — floats bottom-right, above cells */
+  .pager { position:static; align-self:center; display:flex; align-items:center; gap:6px;
+    background:#171a20cc; border-radius:16px; padding:6px 10px; margin:6px 0 calc(10px + env(safe-area-inset-bottom));
+    font-size:11px; color:#9aa7b4; letter-spacing:.08em; }
+  .pg-btn { font-family:inherit; font-size:13px; line-height:1; color:#9aa7b4; background:none;
+    border:none; cursor:pointer; padding:2px 6px; }
+  .pg-btn:hover { color:#f2f4f7; }
+  .pg-btn.disabled { opacity:.3; pointer-events:none; }
+  .pg-num { font-variant-numeric:tabular-nums; }
+
+  /* ---------- ARTICLE VIEW ---------- */
+  #article-view { background:#0a0d11; overflow-y:auto; }
+  .article { max-width:680px; margin:0 auto; padding:48px 24px 80px; }
+  .back { font-size:13px; color:#9aa7b4; cursor:pointer; display:inline-block; margin-bottom:28px; }
+  .back:hover { color:#f2f4f7; }
+  .a-badge { font-size:10px; font-weight:700; letter-spacing:.08em; color:#e5484d;
+    text-transform:uppercase; border-left:3px solid #e5484d; padding-left:8px; margin-bottom:14px; }
+  .a-title { font-size:28px; font-weight:700; color:#f2f4f7; line-height:1.25; margin-bottom:10px; }
+  .a-date { font-size:13px; color:#6b7684; margin-bottom:32px; }
+  .a-chart { margin:0 0 8px 0; border:1px solid #1e2733; padding:12px; background:#0d1117; }
+  .a-chart svg { width:100%; height:260px; display:block; }
+  .a-caption { font-size:11px; color:#6b7684; margin-bottom:32px; }
+  .a-body p { font-size:16px; line-height:1.7; color:#c7cfd8; margin-bottom:22px; }
+  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+</style>
+</head>
+<body>
+
+<!-- ================= TREEMAP VIEW ================= -->
+<div class="view active" id="treemap-view"><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
+<div class="pager" id="pager"><button type="button" class="pg-btn" id="pg-prev">‹</button><span class="pg-num" id="pg-num">1 / 2</span><button type="button" class="pg-btn" id="pg-next">›</button></div></div>
+
+<!-- ================= ARTICLE VIEW ================= -->
+<div class="view" id="article-view">
+  <div class="article">
+    <span class="back" onclick="showTreemap()">← 返回 TreeMap</span>
+    <div class="a-badge" id="a-badge">ELECTION 2026</div>
+    <h1 class="a-title" id="a-title"></h1>
+    <div class="a-date" id="a-date"></div>
+    <div class="a-chart" id="a-chart"></div>
+    <div class="a-caption">示例数据 · Beehive poll aggregate · 5% = MMP threshold</div>
+    <div class="a-body" id="a-body"></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ── Party colors (data-encoding only) ─────────────────────── */
+var PARTY = {
+  national:{ name:'National', color:'#5a94d4', poll:38.5, reached:true },
+  labour:  { name:'Labour',   color:'#D82A20', poll:28.2, reached:true },
+  green:   { name:'Green',    color:'#3d9e5c', poll:11.4, reached:true },
+  act:     { name:'ACT',      color:'#c9b026', poll:13.1, reached:true },
+  nzfirst: { name:'NZ First', color:'#8895a7', poll:4.2,  reached:false }
+};
+var POLL_HISTORY = {
+  national:[34,35,33,36,34,37,35,38,37,38.5],
+  labour:[30,29,28,30,28,29,27,28,29,28.2],
+  green:[9,10,11,10,12,11,11,12,11,11.4],
+  act:[12,11,13,12,14,13,12,14,13,13.1],
+  nzfirst:[7,6,8,7,5,6,5,4.8,4.5,4.2]
+};
+
+/* ── Treemap data: black gradient by priority ──────────────── */
+var CELLS = [
+  { id:'election', tier:0, priority:'HIGH', date:'12 SEP 2026',
+    cat:'politics', tags:['#Polls','#MMP'], title:'ELECTION 2026 — Polls & the 5% Threshold', full:true },
+  { id:'s02', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Coalition'], title:'Fuel Tax Retreat: The $1.4B Land Transport Fund Hole' },
+  { id:'s03', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Immigration Platform Lands' },
+  { id:'s04', tier:2, date:'10 SEP', cat:'politics', tags:['#Health','#Jobs'], title:'Labour Guarantees Graduate Nurse Jobs' },
+  { id:'s05', tier:2, date:'10 SEP', cat:'finance', tags:['#Economy','#Tax'], title:'ACT Fiscal Plan: $1B in Savings' },
+  { id:'s06', tier:2, date:'09 SEP', cat:'politics', tags:['#Coalition','#MMP'], title:'Coalition Terms Begin to Surface' },
+  { id:'s07', tier:2, date:'09 SEP', cat:'politics', tags:['#MMP','#Election'], title:'MMP Threshold Review Reopened' },
+  { id:'s08', tier:3, date:'08 SEP', cat:'international', tags:['#Climate','#NetZero'], title:'Green Net Zero Roadmap Tightened' },
+  { id:'s09', tier:3, date:'08 SEP', cat:'economy', tags:['#Housing','#Economy'], title:'Housing Affordability Worsens' },
+  { id:'s10', tier:3, date:'07 SEP', cat:'politics', tags:['#Health'], title:'Health Wait Times at Record' },
+  { id:'s11', tier:3, date:'07 SEP', cat:'politics', tags:['#Politics'], title:'Cabinet Reshuffle Rumours' },
+  { id:'s12', tier:3, date:'06 SEP', cat:'economy', tags:['#Infrastructure','#Regions'], title:'Regional Infrastructure Scrutiny' },
+  { id:'s13', tier:3, date:'06 SEP', cat:'politics', tags:['#Justice'], title:'Justice Reform at Select Committee' },
+  { id:'s14', tier:3, cat:'politics', tags:['#OrangaTamariki','#SocialPolicy'], date:'05 SEP', title:'Oranga Tamariki Placements Under Review' },
+  { id:'s15', tier:3, cat:'economy', tags:['#Dairy','#Export'], date:'05 SEP', title:'Dairy Payout Forecast Trimmed' },
+  { id:'s16', tier:3, cat:'finance', tags:['#RBNZ','#Appointment'], date:'04 SEP', title:'RBNZ Deputy Governor Named' },
+  { id:'s17', tier:3, cat:'international', tags:['#APEC','#Trade'], date:'04 SEP', title:'APEC Trade Delegation Confirmed' },
+  { id:'s18', tier:3, cat:'economy', tags:['#Transport','#Auckland'], date:'04 SEP', title:'Bus Route Cuts Spark Backlash' },
+  { id:'s19', tier:3, cat:'politics', tags:['#Enrolment','#Election'], date:'03 SEP', title:'Electoral Enrolment Drive Extended' },
+  { id:'s20', tier:3, cat:'international', tags:['#Pacific','#Aid'], date:'03 SEP', title:'Pacific Reset Funding Questioned' },
+  { id:'s21', tier:3, cat:'politics', tags:['#Energy','#Winter'], date:'30 AUG', title:'Winter Energy Payment Debate Returns' },
+  { id:'s22', tier:3, cat:'finance', tags:['#KiwiSaver'], date:'29 AUG', title:'KiwiSaver Default Review Opens' },
+  { id:'s23', tier:3, cat:'international', tags:['#Trade','#China'], date:'28 AUG', title:'China FTA Upgrade Talks Stall' },
+  { id:'s24', tier:3, cat:'economy', tags:['#Housing','#Consents'], date:'27 AUG', title:'Building Consent Backlog Grows' },
+  { id:'s25', tier:3, cat:'politics', tags:['#MMP','#LocalGov'], date:'26 AUG', title:'Māori Wards Bill Passes First Reading' },
+  { id:'s26', tier:3, cat:'international', tags:['#Fisheries'], date:'25 AUG', title:'Fisheries Quota Dispute Escalates' },
+  { id:'s27', tier:3, cat:'politics', tags:['#Health','#Pharmac'], date:'24 AUG', title:'Pharmac Funding Boost Welcomed' },
+  { id:'s28', tier:3, cat:'economy', tags:['#Tourism'], date:'23 AUG', title:'Tourism Recovery Slows' },
+  { id:'s29', tier:3, cat:'finance', tags:['#RBNZ','#Capital'], date:'22 AUG', title:'Bank Capital Rules Consulted' },
+  { id:'s30', tier:3, cat:'international', tags:['#Climate','#UN'], date:'21 AUG', title:'UN Climate Pledge Submission Filed' },
+  { id:'s31', tier:3, cat:'economy', tags:['#Education','#Property'], date:'20 AUG', title:'School Property Budget Overrun' },
+  { id:'s32', tier:3, cat:'politics', tags:['#Intelligence'], date:'19 AUG', title:'Spy Agency Oversight Review' },
+  { id:'s33', tier:3, cat:'international', tags:['#Trade','#EU'], date:'18 AUG', title:'EU Free Trade Deal Ratified' },
+  { id:'s34', tier:3, cat:'economy', tags:['#Wages'], date:'17 AUG', title:'Minimum Wage Review Announced' },
+  { id:'s35', tier:3, cat:'finance', tags:['#RBNZ','#Reform'], date:'16 AUG', title:'Reserve Bank Act Review Scoped' },
+  { id:'s36', tier:3, cat:'international', tags:['#Antarctica'], date:'15 AUG', title:'Antarctic Treaty Meeting Concludes' },
+  { id:'s37', tier:3, cat:'economy', tags:['#Broadband','#Rural'], date:'14 AUG', title:'Rural Broadband Rollout Slips' },
+  { id:'s38', tier:3, cat:'politics', tags:['#Election','#Fines'], date:'13 AUG', title:'Electoral Commission Fines Party' },
+  { id:'s39', tier:3, cat:'economy', tags:['#Supermarkets'], date:'12 AUG', title:'Grocery Code Consultation Opens' },
+  { id:'s40', tier:3, cat:'international', tags:['#Migration','#Pacific'], date:'12 AUG', title:'Pacific Labour Scheme Extended' },
+  { id:'logo', tier:3, logo:true }
+];
+
+/* ── Charts ────────────────────────────────────────────────── */
+function drawPollChart(container, h) {
+  /* Cover card: brief-page main chart DNA — TWO MAJOR PARTIES ONLY (National vs Labour),
+     model lines + confidence bands + poll dots + right-edge name/value labels,
+     dashed % gridlines, Today anchor, teal under-5% zone. Mini-sparkline projection style. */
+  var w = container.clientWidth || 400;
+  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h)
+    .attr('preserveAspectRatio','none');
+  var labelW = w < 340 ? 56 : 92;
+  var x = d3.scaleLinear().domain([0, 9]).range([8, w-labelW]);
+  var y = d3.scaleLinear().domain([20, 42]).range([h-16, 8]);
+  // dashed gridlines with % labels on right (house style) — domain fits the two majors
+  [20,25,30,35,40].forEach(function(v){
+    svg.append('line').attr('x1',10).attr('x2',w-labelW).attr('y1',y(v)).attr('y2',y(v))
+      .attr('stroke','rgba(255,255,255,0.14)').attr('stroke-dasharray','2,4');
+    svg.append('text').attr('x',w-labelW+6).attr('y',y(v)+3)
+      .attr('font-size',8).attr('fill','#6b7684').text(v+'%');
+  });
+  svg.append('line').attr('x1',x(8.6)).attr('x2',x(8.6)).attr('y1',6).attr('y2',h-16)
+    .attr('stroke','rgba(255,255,255,0.5)');
+  svg.append('text').attr('x',x(8.6)).attr('y',4).attr('text-anchor','middle')
+    .attr('font-size',8).attr('letter-spacing','0.1em').attr('fill','#9aa7b4').text('TODAY');
+  ['national','labour'].forEach(function(k){
+    var c = PARTY[k].color;
+    var data = POLL_HISTORY[k];
+    svg.append('path').datum(data)
+      .attr('d', d3.area().x(function(d,i){return x(i);})
+        .y0(function(d){return y(d-1.3);}).y1(function(d){return y(d+1.3);})
+        .curve(d3.curveMonotoneX))
+      .attr('fill',c).attr('opacity',0.16);
+    svg.selectAll(null).data(data).enter().append('circle')
+      .attr('cx',function(d,i){return x(i);}).attr('cy',function(d){return y(d);})
+      .attr('r',2.2).attr('fill',c).attr('opacity',0.45);
+    svg.append('path').datum(data)
+      .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
+        .curve(d3.curveMonotoneX))
+      .attr('fill','none').attr('stroke',c).attr('stroke-width',2);
+    var last = data[data.length-1];
+    var ly = y(last);
+    svg.append('circle').attr('cx',x(9)).attr('cy',ly).attr('r',3.2).attr('fill',c);
+    svg.append('line').attr('x1',x(9)+5).attr('y1',ly).attr('x2',w-labelW+6).attr('y2',ly)
+      .attr('stroke',c).attr('stroke-dasharray','2,3').attr('opacity',0.8);
+    var nameFs = w < 340 ? 8 : 10;
+    var valFs = w < 340 ? 8.5 : 9.5;
+    svg.append('text').attr('x',w-labelW+6).attr('y',ly-2)
+      .attr('font-size',nameFs).attr('font-weight',600).attr('fill',c).text(PARTY[k].name);
+    svg.append('text').attr('x',w-labelW+6).attr('y',ly+9)
+      .attr('font-size',valFs).attr('fill','#c7cfd8').text(last+'%');
+  });
+  var months = ['May','Jul','Sep','Nov','Jan','Mar','May','Jul'];
+  months.forEach(function(m,i){
+    svg.append('text').attr('x', x(i*9/(months.length-1))).attr('y', h-4)
+      .attr('font-size',8).attr('fill','#6b7684').attr('text-anchor','middle').text(m);
+  });
+}
+
+function drawMiniSpark(container, partyKey, h) {
+  var data = POLL_HISTORY[partyKey] || POLL_HISTORY.national;
+  var w = container.clientWidth || 120;
+  var c = PARTY[partyKey] ? PARTY[partyKey].color : '#8895a7';
+  var svg = d3.select(container).append('svg').attr('viewBox','0 0 '+w+' '+h)
+    .attr('preserveAspectRatio','none');
+  var x = d3.scaleLinear().domain([0, data.length-1]).range([2, w-14]);
+  var lo = Math.min.apply(null, data) - 1.5, hi = Math.max.apply(null, data) + 1.5;
+  var y = d3.scaleLinear().domain([lo, hi]).range([h-3, 3]);
+  svg.append('path').datum(data)
+    .attr('d', d3.area().x(function(d,i){return x(i);})
+      .y0(function(d){return y(d-0.9);}).y1(function(d){return y(d+0.9);})
+      .curve(d3.curveMonotoneX))
+    .attr('fill',c).attr('opacity',0.10);
+  svg.append('path').datum(data)
+    .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
+      .curve(d3.curveMonotoneX))
+    .attr('fill','none').attr('stroke',c).attr('stroke-width',1.25);
+  var last = data[data.length-1];
+  svg.append('circle').attr('cx',x(data.length-1)).attr('cy',y(last)).attr('r',2.4).attr('fill',c);
+  svg.append('text').attr('x',w-1).attr('y',y(last)+3).attr('text-anchor','end')
+    .attr('font-size',9).attr('font-weight',700).attr('fill',c).text(last+'%');
+}
+
+function thresholdBars(container) {
+  var html = '<div class="th-line" style="left:'+(5/45*100)+'%"></div>' +
+    '<div class="th-label" style="left:'+(5/45*100)+'%">5%</div>';
+  Object.keys(PARTY).forEach(function(k){
+    var p = PARTY[k];
+    var w = Math.min(100, p.poll/45*100);
+    html += '<div class="th-row"><div class="th-name">'+p.name+'</div>' +
+      '<div class="th-track"><div class="th-bar'+(p.reached?'':' below')+
+      '" style="width:'+w+'%; background:'+p.color+'"></div></div>' +
+      '<div class="th-val">'+p.poll+'%</div></div>';
+  });
+  html += '<div class="mmp-note">MMP: a party enters Parliament by clearing 5% party vote OR winning one electorate seat.</div>';
+  container.innerHTML = html;
+}
+
+function legendRow() {
+  var html = '';
+  Object.keys(PARTY).forEach(function(k){
+    html += '<span class="li"><span class="dot" style="background:'+PARTY[k].color+'"></span>'+PARTY[k].name+'</span>';
+  });
+  return html;
+}
+
+/* ── Treemap layout ────────────────────────────────────────── */
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+var activeCat = 'all';
+var PAGE_SIZE = 20, pageNum = 1, flipping = false;
+function pageSize(){ return document.getElementById('grid').clientWidth < 480 ? 9 : PAGE_SIZE; }
+function catStories() {
+  var s = CELLS.filter(function(c){ return !c.logo && (activeCat === 'all' || c.cat === activeCat); });
+  s.sort(function(a, b){ return a.tier - b.tier; }); /* stable: hot-first array order within tier */
+  return s;
+}
+function pageCount() { return Math.max(1, Math.ceil(catStories().length / pageSize())); }
+function pageItems() {
+  var s = catStories().slice((pageNum - 1) * pageSize(), pageNum * pageSize());
+  return (pageNum === 1 && document.getElementById('grid').clientWidth >= 480) ? s.concat(CELLS.filter(function(c){ return c.logo; })) : s;
+}
+function updatePager() {
+  var pc = pageCount();
+  var pager = document.getElementById('pager');
+  pager.style.display = (pc > 1) ? 'flex' : 'none';
+  pager.querySelector('#pg-num').textContent = pageNum + ' / ' + pc;
+  pager.querySelector('#pg-prev').classList.toggle('disabled', pageNum <= 1);
+  pager.querySelector('#pg-next').classList.toggle('disabled', pageNum >= pc);
+}
+document.getElementById('pg-prev').addEventListener('click', function(){ goToPage(pageNum - 1, -1); });
+document.getElementById('pg-next').addEventListener('click', function(){ goToPage(pageNum + 1, 1); });
+document.addEventListener('keydown', function(e){
+  if (e.key === 'ArrowLeft') goToPage(pageNum - 1, -1);
+  if (e.key === 'ArrowRight') goToPage(pageNum + 1, 1);
+});
+var touchX = null;
+document.addEventListener('touchstart', function(e){ touchX = e.touches[0].clientX; }, {passive:true});
+document.addEventListener('touchend', function(e){
+  if (touchX === null) return;
+  var dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 60) goToPage(pageNum + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+  touchX = null;
+}, {passive:true});
+function renderGrid(cat) {
+  if (cat !== undefined) activeCat = cat;
+  var items = pageItems();
+  var grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  var narrow = grid.clientWidth < 480;
+  var W = grid.clientWidth, H = grid.clientHeight;
+  var heroH = 248;
+  if (narrow) H = Math.max(240, H - heroH);
+  var heroStory = narrow ? items.filter(function(c){ return c.full; })[0] : null;
+  var layoutItems = narrow ? items.filter(function(c){ return !c.full; }) : items;
+  var root = d3.hierarchy({children: layoutItems.map(function(c,i){
+    return { i:i, v: (c.logo && narrow) ? 0 : (c.logo ? 6 : Math.pow(100 - c.tier*22, 1.3)) };
+  })}).sum(function(d){ return d.v || 0; });
+  root.sort(function(a,b){ return b.value - a.value; });
+  d3.treemap().tile(d3.treemapSquarify).size([W,H]).paddingInner(3).paddingOuter(0)(root);
+  var rect = {};
+  root.leaves().forEach(function(n){ rect[n.data.i] = n; });
+  items.forEach(function(c, i){
+    var n = rect[i];
+    if (!n) return;
+    var el = document.createElement('div');
+    el.className = 'cell p' + c.tier;
+    el.setAttribute('data-id', c.id);
+    el.style.left = n.x0+'px'; el.style.top = n.y0+'px';
+    el.style.width = (n.x1-n.x0)+'px'; el.style.height = (n.y1-n.y0)+'px';
+    if (c.full && narrow) {
+      heroEl = el;
+      el.style.left='0px'; el.style.top='0px';
+      el.style.width=W+'px'; el.style.height=heroH+'px';
+      var n = { x0:0, y0:0, x1:W, y1:heroH };
+      var nhtml = '<div class="badge-row"><span class="red-badge">ELECTION 2026</span>' +
+        '<span class="date-chip">'+c.date+'</span></div>' +
+        '<div class="cell-title" style="font-size:18px;"><span style="color:#ff6b70">ELECTION 2026</span>'+c.title.replace('ELECTION 2026 —','—')+'</div>' +
+        '<div class="election-chart"></div>';
+      el.innerHTML = nhtml;
+      el.addEventListener('click', function(){ openArticle(c); });
+      grid.appendChild(el);
+      var ec = el.querySelector('.election-chart');
+      ec.style.height = '120px'; ec.style.flex = 'none';
+      drawPollChart(ec, 120);
+      return;
+    }
+    if (narrow) {
+      el.style.top = (parseFloat(el.style.top||n.y0)+heroH)+'px';
+    }
+    if (c.logo) {
+      if (narrow || (n.x1-n.x0) < 96) {
+        el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">BEEHIVE</div>';
+        grid.appendChild(el);
+        return;
+      }
+      if ((n.x1-n.x0) < 96) {
+        el.innerHTML = '<div class="cell-title" style="white-space:nowrap;text-overflow:ellipsis;display:block;-webkit-line-clamp:unset;">'+c.title+'</div>';
+        el.addEventListener('click', function(){ openArticle(c); });
+        grid.appendChild(el);
+        return;
+      }
+      el.classList.add('logo-cell');
+      el.innerHTML = '<div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
+      grid.appendChild(el);
+      return;
+    }
+    var w = n.x1-n.x0, h = n.y1-n.y0;
+    var big = c.full && !narrow;
+    var sparkParty = { s02:'nzfirst', s03:'act', s04:'labour', s05:'act', s06:'national',
+      s07:'green', s08:'green', s09:'national', s10:'labour', s11:'national',
+      s12:'nzfirst', s13:'act' }[c.id];
+    var xs = w < 110;
+    if (xs) el.classList.add('xs');
+    var html = (w >= 110 ? '<div class="badge-row date-only"><span class="date-dim">'+(c.date||'')+'</span></div>' : '') +
+      (c.tier===0?'<span class="red-badge">ELECTION 2026</span>':'') +
+      '<span class="date-dim">'+(c.date||'')+'</span></div>' +
+      '<div class="cell-title clamp">'+c.title+'</div>' +
+      (w >= 150 ? '<div class="tag-row">'+(c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' : '');
+    if (big) {
+      html += '<div class="election-chart"></div>' +
+        '<div class="gap-callout"><span>NATIONAL-LET GAP</span><b>10.3 pts</b><span>Labour 28.2 · National 38.5</span></div>' +
+        '<div class="thresholds"></div>';
+    } else if (w >= 170 && h >= 130 && sparkParty) {
+      html += '<div class="spark-mini"></div>';
+    }
+    el.innerHTML = html;
+    var fs = xs ? 10 : (w >= 150 ? 13 : 11);
+    var lines = Math.min(3, Math.max(1, Math.floor((h-20)/(fs*1.35))));
+    var tEl = el.querySelector('.cell-title');
+    if (tEl) { tEl.style.webkitLineClamp = lines; tEl.style.display='-webkit-box'; tEl.style.webkitBoxOrient='vertical'; tEl.style.overflow='hidden'; }
+    el.addEventListener('click', function(){ openArticle(c); });
+    grid.appendChild(el);
+    if (big) {
+      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55));
+      thresholdBars(el.querySelector('.thresholds'));
+    } else if (sparkParty && el.querySelector('.spark-mini')) {
+      try { drawMiniSpark(el.querySelector('.spark-mini'), sparkParty, 48); }
+      catch(e) { document.title = 'SPARKERR ' + c.id + ': ' + e.message; }
+    }
+  });
+  updatePager();
+}
+
+/* ── Article view ──────────────────────────────────────────── */
+function openArticle(c) {
+  document.getElementById('treemap-view').classList.remove('active');
+  var av = document.getElementById('article-view');
+  av.classList.add('active');
+  av.querySelector('.a-badge').textContent = c.tier===0 ? 'ELECTION 2026' : (c.priority || 'STORY');
+  document.getElementById('a-title').textContent = c.title;
+  document.getElementById('a-date').textContent = (c.date||'') + ' · Beehive Political Intelligence · Sample article';
+  var bodyEl = document.getElementById('a-body');
+  if (c.full) {
+    bodyEl.innerHTML =
+      '<p>With the campaign underway, the polling aggregate places National on 38.5 per cent and Labour on 28.2 — a nine-point gap that has held for three consecutive months. The centre-right bloc (National, ACT, NZ First) sits on roughly 55.8 per cent of the party vote, against 39.6 for the left (Labour, Green), leaving the kingmaker arithmetic resting with whichever minor party clears the threshold.</p>' +
+      '<p>The 5 per cent threshold remains the sharpest instrument in the room. ACT (13.1) and the Greens (11.4) are comfortably returned. NZ First, on 4.2 per cent, is the story: below the line in the polls, but historically rescued by an electorate seat. Te Pāti Māori is not modelled here — its pathway runs through the Māori electorates, not the party vote — but it functions as the same kind of jitter in the maths.</p>' +
+      '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
+    var ch = document.getElementById('a-chart');
+    ch.innerHTML = '';
+    requestAnimationFrame(function(){ drawPollChart(ch, 260); });
+  } else {
+    bodyEl.innerHTML =
+      '<p>[Placeholder article — full reporting to be produced by the editorial pipeline.]</p>' +
+      '<p>This story is tracked by the Beehive discovery pipeline and will receive a full evidence-led briefing when the news cycle warrants it.</p>';
+    document.getElementById('a-chart').style.display = 'none';
+  }
+  av.scrollTop = 0;
+}
+function showTreemap() {
+  document.getElementById('article-view').classList.remove('active');
+  document.getElementById('treemap-view').classList.add('active');
+  document.getElementById('a-chart').style.display = '';
+}
+
+/* ── Category filter ───────────────────────────────────────── */
+var CATS = [
+  { key:'all', label:'All' },
+  { key:'politics', label:'Politics' },
+  { key:'economy', label:'Economy' },
+  { key:'finance', label:'Finance' },
+  { key:'international', label:'International' }
+];
+var catTimer = null;
+function setCat(cat) {
+  pageNum = 1;
+  document.querySelectorAll('.cat-pill').forEach(function(p){
+    p.classList.toggle('active', p.dataset.cat === cat);
+  });
+  var fading = 0;
+  if (cat !== 'all' && !reduced) {
+    document.querySelectorAll('#grid .cell').forEach(function(el){
+      var c = CELLS.filter(function(x){ return x.id === el.dataset.id; })[0];
+      if (c && !c.logo && c.cat !== cat) {
+        el.style.transition = 'opacity .18s ease-out';
+        el.style.opacity = '0';
+        el.style.pointerEvents = 'none';
+        fading++;
+      }
+    });
+  }
+  clearTimeout(catTimer);
+  catTimer = setTimeout(function(){ renderGrid(cat); }, fading ? 160 : 0);
+}
+(function initCatBar(){
+  var bar = document.getElementById('cat-bar');
+  bar.innerHTML = CATS.map(function(c){
+    return '<button type="button" class="cat-pill'+(c.key==='all'?' active':'')+
+      '" data-cat="'+c.key+'">'+c.label+'</button>';
+  }).join('');
+  bar.querySelectorAll('.cat-pill').forEach(function(p){
+    p.addEventListener('click', function(){
+      if (p.dataset.cat !== activeCat) setCat(p.dataset.cat);
+    });
+  });
+})();
+
+/* ── Pagination: GSAP page-flip ────────────────────────────── */
+function goToPage(np, dir) {
+  if (flipping || np === pageNum || np < 1 || np > pageCount()) return;
+  pageNum = np;
+  flipping = true;
+  updatePager();
+  var animate = !reduced && !!window.gsap;
+  if (animate) {
+    /* exit: whole batch slides out toward -dir, 12ms stagger */
+    gsap.to(document.querySelectorAll('#grid .cell'),
+      { x: -40 * dir, opacity: 0, duration: 0.18, stagger: 0.012, ease: 'power2.in' });
+  }
+  /* state transitions run on timers so the flip never stalls,
+     even where rAF is throttled (hidden tabs); GSAP is paint only */
+  setTimeout(function() {
+    renderGrid();
+    if (animate) {
+      var fresh = document.querySelectorAll('#grid .cell');
+      /* enter: new batch slides in from +dir, 12ms stagger */
+      gsap.fromTo(fresh,
+        { x: 40 * dir, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.2, stagger: 0.012, ease: 'power2.out' });
+      /* settle guard: where the GSAP ticker never ticks (headless capture,
+         hidden tabs) the enter tween's immediateRender leaves cells at
+         opacity 0 — strip inline animation styles once the tween window
+         has passed; a no-op in browsers where the tween completed */
+      setTimeout(function() {
+        fresh.forEach(function(el) { el.style.transform = ''; el.style.opacity = ''; });
+      }, 560);
+    }
+    setTimeout(function() { flipping = false; }, animate ? 480 : 0);
+  }, animate ? 240 : 0);
+}
+(function initPager(){
+  document.getElementById('pg-prev').addEventListener('click', function(){ goToPage(pageNum - 1, -1); });
+  document.getElementById('pg-next').addEventListener('click', function(){ goToPage(pageNum + 1, 1); });
+  window.addEventListener('keydown', function(e) {
+    if (!document.getElementById('treemap-view').classList.contains('active')) return;
+    if (e.key === 'ArrowRight') goToPage(pageNum + 1, 1);
+    else if (e.key === 'ArrowLeft') goToPage(pageNum - 1, -1);
+  });
+  var tsX = null, tsY = null;
+  document.getElementById('grid').addEventListener('touchstart', function(e) {
+    tsX = e.touches[0].clientX; tsY = e.touches[0].clientY;
+  }, { passive: true });
+  document.getElementById('grid').addEventListener('touchend', function(e) {
+    if (tsX === null) return;
+    var dx = e.changedTouches[0].clientX - tsX;
+    var dy = e.changedTouches[0].clientY - tsY;
+    tsX = null;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) goToPage(pageNum + 1, 1); else goToPage(pageNum - 1, -1);
+    }
+  }, { passive: true });
+  /* demo/test hook: ?flip=1 auto-flips to page 2 after load */
+  if (/[?&]flip=1(\b|$)/.test(location.search)) {
+    setTimeout(function(){ goToPage(2, 1); }, 900);
+  }
+})();
+
+/* ── Boot ──────────────────────────────────────────────────── */
+renderGrid();
+var rs;
+window.addEventListener('resize', function(){
+  clearTimeout(rs);
+  rs = setTimeout(function(){
+    if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
+  }, 200);
+});
+</script>
+</body>
+</html>
