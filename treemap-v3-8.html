@@ -362,6 +362,7 @@ function renderGrid(cat) {
   d3.treemap().tile(d3.treemapSquarify).size([W,H]).paddingInner(3).paddingOuter(0)(root);
   var rect = {};
   root.leaves().forEach(function(n){ rect[n.data.i] = n; });
+
   items.forEach(function(c, i){
     var n = rect[i];
     if (!n) return;
