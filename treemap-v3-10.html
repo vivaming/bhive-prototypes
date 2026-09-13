@@ -22,6 +22,7 @@
     color:#ffffff; }
   .mq-text { flex:none; }
   .mq-gap { width:28px; flex:none; }
+  @keyframes mqscrollR { from { transform: translateX(0); } to { transform: translateX(50%); } }
 
   #grid.desktop .cell-title { display:flex; flex-direction:column; justify-content:center; }
   #grid.desktop .badge-row, #grid.desktop .tag-row { flex-shrink:0; }
@@ -204,7 +205,7 @@
     ti.style.color = 'transparent'; /* hide original; ::after underline stays */
     ov.appendChild(tr);
     ti.appendChild(ov);
-    gsap.fromTo(tr, { x: -P }, { x: 0, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
+    gsap.fromTo(tr, { x: 0 }, { x: P, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
   }
   /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
   function wireCard(el, story) {
