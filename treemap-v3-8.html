@@ -308,7 +308,7 @@ var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 var activeCat = 'all';
 var PAGE_SIZE = 20, pageNum = 1, flipping = false;
-function pageSize(){ return window.innerWidth < 480 ? 9 : PAGE_SIZE; }
+function pageSize(){ var n = window.innerWidth < 480 || /[?&]narrow=1/.test(location.search); return n ? 9 : PAGE_SIZE; }
 function catStories() {
   var s = CELLS.filter(function(c){ return !c.logo && (activeCat === 'all' || c.cat === activeCat); });
   s.sort(function(a, b){ return a.tier - b.tier; }); /* stable: hot-first array order within tier */
@@ -363,7 +363,31 @@ function renderGrid(cat) {
   var rect = {};
   root.leaves().forEach(function(n){ rect[n.data.i] = n; });
 
-  items.forEach(function(c, i){
+  if (heroStory) {
+    var hel = document.createElement('div');
+    hel.className = 'cell p0';
+    hel.style.left='0px'; hel.style.top='0px';
+    hel.style.width=W+'px'; hel.style.height=heroH+'px';
+    hel.innerHTML = '<div class="badge-row"><span class="red-badge">ELECTION 2026</span>' +
+      '<span class="date-chip">'+(heroStory.date||'')+'</span></div>' +
+      '<div class="cell-title" style="font-size:17px;"><span style="color:#ff6b70">ELECTION 2026</span>'+
+      (heroStory.title||'').replace('ELECTION 2026 —','—')+'</div>' +
+      '<div class="tag-row">'+(heroStory.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
+      '<div class="election-chart"></div>' +
+      '<div class="gap-callout"><span>GAP</span><b>10.3 pts</b><span>NAT 38.5 · LAB 28.2</span></div>' +
+      '<div class="thresholds"></div>';
+    hel.addEventListener('click', function(){ openArticle(heroStory); });
+    grid.appendChild(hel);
+    var ec = hel.querySelector('.election-chart');
+    ec.style.height = '110px'; ec.style.flex = 'none';
+    drawPollChart(ec, 110);
+    thresholdBars(hel.querySelector('.thresholds'));
+  }
+
+
+
+
+  layoutItems.forEach(function(c, i){
     var n = rect[i];
     if (!n) return;
     var el = document.createElement('div');
