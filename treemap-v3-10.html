@@ -19,9 +19,10 @@
   .mq-overlay { position:absolute; overflow:hidden; pointer-events:none; display:flex;
     align-items:flex-start; z-index:5; }
   .mq-track { display:inline-flex; flex:none; will-change:transform; white-space:nowrap;
-    color:#ffffff; }
+    color:#ffffff; animation: mqscroll var(--mq-dur) linear infinite; }
   .mq-text { flex:none; }
   .mq-gap { width:28px; flex:none; }
+  @keyframes mqscroll { from { transform: translateX(0); } to { transform: translateX(50%); } }
   @keyframes mqscrollR { from { transform: translateX(0); } to { transform: translateX(50%); } }
 
   #grid.desktop .cell-title { display:flex; flex-direction:column; justify-content:center; }
@@ -167,7 +168,7 @@
   function clearMq(el) {
     if (!el) return;
     var ov = el.querySelector('.mq-overlay');
-    if (ov) { if (window.gsap) gsap.killTweensOf(ov.querySelector('.mq-track')); ov.remove(); }
+    if (ov) { ov.remove(); }
     var ti = el.querySelector('.cell-title');
     if (ti && ti.style.color === 'transparent') ti.style.color = '';
     el.classList.remove('armed');
@@ -176,7 +177,7 @@
     clearMq(document.querySelector('.cell.armed'));
     el.classList.add('armed'); armTime = performance.now();
     armedId = el.dataset.id;
-    if (reduced || !window.gsap) return; /* static selection: ring only */
+    if (reduced) return; /* reduced-motion: static ring selection */
     var ti = el.querySelector('.cell-title'); if (!ti) return;
     ti.style.width = 'max-content';
     var textW = ti.scrollWidth;
@@ -683,7 +684,7 @@ function goToPage(np, dir) {
   pageNum = np;
   flipping = true;
   updatePager();
-  var animate = !reduced && !!window.gsap;
+  var animate = !reduced;
   if (animate) {
     /* exit: whole batch slides out toward -dir, 12ms stagger */
     gsap.to(document.querySelectorAll('#grid .cell'),
