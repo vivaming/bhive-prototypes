@@ -22,7 +22,7 @@
     font-size:11px; font-weight:600; color:#ffffff; }
   .mq-text { flex:none; }
   .mq-gap { width:28px; flex:none; }
-  @keyframes mqscroll { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+  @keyframes mqscrollR { from { transform: translateX(0); } to { transform: translateX(50%); } }
   .mq-hide { visibility: hidden; }
 
   /* ---------- TREEMAP VIEW ---------- */
@@ -68,9 +68,6 @@
   .cell-title::after { content:''; position:absolute; left:0; right:0; bottom:-2px; height:2px;
     background:#f2f4f7; transform:scaleX(0); transform-origin:left; transition:transform .28s cubic-bezier(.22,.61,.36,1); }
   .cell.armed .cell-title::after { transform:scaleX(1); }
-  .cell-title.mq { display:flex; align-items:center; overflow:hidden; white-space:nowrap; }
-  .mq-track { display:inline-flex; flex:none; will-change:transform; }
-  .mq-gap { width:28px; flex:none; }
   /* election chart area */
   .election-chart { flex:1; min-height:0; margin:8px 0 4px 0; }
   .election-chart svg { width:100%; height:100%; display:block; }
@@ -174,13 +171,12 @@
     armedId = el.dataset.id;
     clearTimeout(armTimer);
     armTimer = setTimeout(function(){ clearMq(el); if (armedId === el.dataset.id) armedId = null; }, ARM_TTL);
-    var ti = el.querySelector('.cell-title'); if (!ti) return;
+    var ti = el.querySelector('.cell-title'); if (!ti || reduced) return; /* reduced-motion: static selection only */
     /* measure overflow: only marquee if single-line width exceeds box */
     ti.style.width = 'max-content';
     var textW = ti.scrollWidth;
     ti.style.width = '';
     var boxW = ti.clientWidth;
-    if (textW <= boxW + 12 && !/[?&]mq=all/.test(location.search)) return; /* fits: static selection */
     /* hide original, build overlay clone on top (zero layout shift) */
     ti.classList.add('mq-hide');
     var ov = document.createElement('div');
@@ -194,14 +190,12 @@
     tr.innerHTML = '<span class="mq-text">' + ti.innerHTML + '</span><span class="mq-gap"></span><span class="mq-text">' + ti.innerHTML + '</span>';
     ov.appendChild(tr);
     el.appendChild(ov);
-    var textW2 = textW, P = textW2 + 28;
-    var useGsap = !!window.gsap;
-    if (useGsap) {
-      gsap.set(tr, { x: -P });
-      gsap.to(tr, { x: 0, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
+    var P = textW + 28;
+    if (window.gsap) {
+      /* L→R: track slides rightward — copy1 exits right, copy2 wraps in from left */
+      gsap.fromTo(tr, { x: 0 }, { x: P, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
     } else {
-      /* CSS fallback: no gsap -> keyframes via injected style */
-      tr.style.animation = 'mqscroll ' + (P / 28) + 's linear infinite';
+      tr.style.animation = 'mqscrollR ' + (P / 28) + 's linear infinite';
     }
   }
   /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
