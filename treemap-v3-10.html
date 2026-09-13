@@ -196,7 +196,8 @@
     ov.style.width = boxW + 'px';
     ov.style.height = lineH + 'px';
     ov.style.alignItems = 'flex-start';
-    ov.style.top = narrow ? '0px' : ((ti.clientHeight - lineH) / 2) + 'px';
+    var mqNarrow = window.innerWidth < 480 || /[?&]narrow=1/.test(location.search);
+    ov.style.top = mqNarrow ? '0px' : ((ti.clientHeight - lineH) / 2) + 'px';
     var tr = document.createElement('span');
     tr.className = 'mq-track';
     var oneCopy = '<span class="mq-text">' + ti.innerHTML + '</span><span class="mq-gap"></span>';
@@ -206,7 +207,8 @@
     ti.style.color = 'transparent'; /* hide original; ::after underline stays */
     ov.appendChild(tr);
     ti.appendChild(ov);
-    gsap.fromTo(tr, { x: 0 }, { x: P, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
+    tr.style.setProperty('--mq-dur', (P / 28) + 's');
+
   }
   /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
   function wireCard(el, story) {
