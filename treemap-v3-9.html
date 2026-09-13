@@ -16,6 +16,15 @@
   .view { position:fixed; inset:0; display:none; }
   .view.active { display:flex; flex-direction:column; }
 
+  .mq-overlay { position:absolute; overflow:hidden; pointer-events:none; display:flex;
+    align-items:center; z-index:5; }
+  .mq-track { display:inline-flex; flex:none; will-change:transform; white-space:nowrap;
+    font-size:11px; font-weight:600; color:#ffffff; }
+  .mq-text { flex:none; }
+  .mq-gap { width:28px; flex:none; }
+  @keyframes mqscroll { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+  .mq-hide { visibility: hidden; }
+
   /* ---------- TREEMAP VIEW ---------- */
   #treemap-view { }
   #grid { position:relative; flex:1; min-height:0; }
@@ -126,7 +135,7 @@
   .a-chart svg { width:100%; height:260px; display:block; }
   .a-caption { font-size:11px; color:#6b7684; margin-bottom:32px; }
   .a-body p { font-size:16px; line-height:1.7; color:#c7cfd8; margin-bottom:22px; }
-  @media (prefers-reduced-motion: reduce) { * { transition:none !important; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; animation:none !important; } }
 </style>
 </head>
 <body>
@@ -153,10 +162,10 @@
   var armedId = null, armTime = 0, armTimer = null, MQ_SPEED = 28, MQ_GAP = 28, ARM_TTL = 10000;
   function clearMq(el) {
     if (!el) return;
-    var t = el.querySelector('.mq-track');
-    if (t) { if (window.gsap) gsap.killTweensOf(t); t.remove(); }
+    var ov = el.querySelector('.mq-overlay');
+    if (ov) { if (window.gsap) gsap.killTweensOf(ov.firstChild); ov.remove(); }
     var ti = el.querySelector('.cell-title');
-    if (ti && ti._orig) { ti.innerHTML = ti._orig; ti.classList.remove('mq'); ti.style.height=''; delete ti._orig; }
+    if (ti) { ti.style.visibility = ''; ti.classList.remove('mq-hide'); }
     el.classList.remove('armed');
   }
   function armCard(el) {
@@ -165,17 +174,35 @@
     armedId = el.dataset.id;
     clearTimeout(armTimer);
     armTimer = setTimeout(function(){ clearMq(el); if (armedId === el.dataset.id) armedId = null; }, ARM_TTL);
-    if (reduced || !window.gsap) return;
     var ti = el.querySelector('.cell-title'); if (!ti) return;
-    ti._orig = ti.innerHTML; var h0 = ti.offsetHeight;
-    ti.innerHTML = ''; ti.style.height = h0 + 'px'; ti.classList.add('mq');
-    var tr = document.createElement('span'); tr.className = 'mq-track';
-    tr.innerHTML = ti._orig + '<span class="mq-gap"></span>' + ti._orig;
-    ti.appendChild(tr);
-    var W = (tr.scrollWidth - MQ_GAP) / 2;
-    if (W <= ti.clientWidth + 12 && !/[?&]mq=all/.test(location.search)) return;
-    var P = W + MQ_GAP;
-    if (window.gsap) gsap.fromTo(tr, { x: -P }, { x: 0, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
+    /* measure overflow: only marquee if single-line width exceeds box */
+    ti.style.width = 'max-content';
+    var textW = ti.scrollWidth;
+    ti.style.width = '';
+    var boxW = ti.clientWidth;
+    if (textW <= boxW + 12 && !/[?&]mq=all/.test(location.search)) return; /* fits: static selection */
+    /* hide original, build overlay clone on top (zero layout shift) */
+    ti.classList.add('mq-hide');
+    var ov = document.createElement('div');
+    ov.className = 'mq-overlay';
+    ov.style.top = ti.offsetTop + 'px';
+    ov.style.left = ti.offsetLeft + 'px';
+    ov.style.width = ti.clientWidth + 'px';
+    ov.style.height = ti.offsetHeight + 'px';
+    var tr = document.createElement('span');
+    tr.className = 'mq-track';
+    tr.innerHTML = '<span class="mq-text">' + ti.innerHTML + '</span><span class="mq-gap"></span><span class="mq-text">' + ti.innerHTML + '</span>';
+    ov.appendChild(tr);
+    el.appendChild(ov);
+    var textW2 = textW, P = textW2 + 28;
+    var useGsap = !!window.gsap;
+    if (useGsap) {
+      gsap.set(tr, { x: -P });
+      gsap.to(tr, { x: 0, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
+    } else {
+      /* CSS fallback: no gsap -> keyframes via injected style */
+      tr.style.animation = 'mqscroll ' + (P / 28) + 's linear infinite';
+    }
   }
   /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
   function wireCard(el, story) {
@@ -218,19 +245,16 @@
     var bad = [];
     grid.querySelectorAll('.cell').forEach(function(el){
       var t = el.querySelector('.cell-title'), tr = el.querySelector('.tag-row');
-      if (!t || !el.dataset.id) return;
+      if (!t || !el.dataset.id) return; /* logo cell carries neither title nor date */
       var cb = el.getBoundingClientRect().bottom;
       if (t.scrollHeight > t.clientHeight + 1) bad.push(el.dataset.id);                    /* title does not fit */
       else if (tr && tr.getBoundingClientRect().bottom > cb - 2) bad.push(el.dataset.id);  /* tag row cropped */
-    });
-    if (/[?&]audit=1/.test(location.search)) {
-      grid.querySelectorAll('.cell').forEach(function(el){
-        if (!el.dataset.id) return;
+      if (/[?&]audit=1/.test(location.search)) {
         var n = el.querySelectorAll('span[class*=date]').length;
         var wpx = parseFloat(el.style.width) || 0;
         if (n !== (wpx < 70 ? 0 : 1)) console.warn('[audit] ' + el.dataset.id + ': ' + n + ' date node(s), expected ' + (wpx < 70 ? 0 : 1));
-      });
-    }
+      }
+    });
     if (bad.length) demote(bad);
   }
 /* ── Party colors (data-encoding only) ─────────────────────── */
