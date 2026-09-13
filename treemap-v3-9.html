@@ -24,6 +24,7 @@
     display:flex; flex-direction:column;
     padding:clamp(8px, 1.4vw, 18px);
     transition:background-color .12s ease-out, box-shadow .12s ease-out;
+    touch-action:manipulation; -webkit-tap-highlight-color:transparent; user-select:none;
   }
   .cell.p1:hover { background:#161d26 !important; }
   .cell.p2:hover { background:#1b2531 !important; }
@@ -44,12 +45,23 @@
   .tag-row { display:flex; flex-wrap:wrap; gap:3px 7px; margin-top:4px; font-size:8.5px;
     font-weight:600; letter-spacing:.05em; color:#9aa7b4; }
   .date-dim { font-size:10px; color:#77828f; letter-spacing:.05em; white-space:nowrap; }
-  .cell-title { transition:color .18s ease-out, transform .18s ease-out; color:#f2f4f7; font-weight:700; line-height:1.30; overflow-wrap:normal; word-break:normal; hyphens:manual; }
+  .cell-title { position:relative; flex:1 1 auto; min-height:0; overflow:hidden; transition:color .18s ease-out, transform .18s ease-out; color:#f2f4f7; font-weight:700; line-height:1.30; overflow-wrap:normal; word-break:normal; hyphens:manual; }
   .p0 .cell-title { line-height:1.22 !important; } .p2 .cell-title, .p3 .cell-title { line-height:1.38 !important; }
   .cell.p0 .cell-title { font-size:clamp(16px, 1.7vw, 24px); letter-spacing:-0.01em; }
   .cell.p1 .cell-title { font-size:13px; font-weight:600; }
   .cell.p2 .cell-title { font-size:11px; font-weight:600; }
   .cell.p3 .cell-title { font-size:10px; color:#c7cfd8; }
+  .badge-row, .tag-row { flex-shrink:0; }
+  .date-chip { font-size:10px; color:#77828f; letter-spacing:.05em; white-space:nowrap; }
+  /* selection (V41.2): neutral white only — red is p0 priority encoding, gold is ACT */
+  .cell.armed { box-shadow: inset 0 0 0 2px #f2f4f7 !important; }
+  .cell.armed .cell-title { color:#fff; }
+  .cell-title::after { content:''; position:absolute; left:0; right:0; bottom:-2px; height:2px;
+    background:#f2f4f7; transform:scaleX(0); transform-origin:left; transition:transform .28s cubic-bezier(.22,.61,.36,1); }
+  .cell.armed .cell-title::after { transform:scaleX(1); }
+  .cell-title.mq { display:flex; align-items:center; overflow:hidden; white-space:nowrap; }
+  .mq-track { display:inline-flex; flex:none; will-change:transform; }
+  .mq-gap { width:28px; flex:none; }
   /* election chart area */
   .election-chart { flex:1; min-height:0; margin:8px 0 4px 0; }
   .election-chart svg { width:100%; height:100%; display:block; }
@@ -164,6 +176,62 @@
     if (W <= ti.clientWidth + 12 && !/[?&]mq=all/.test(location.search)) return;
     var P = W + MQ_GAP;
     if (window.gsap) gsap.fromTo(tr, { x: -P }, { x: 0, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
+  }
+  /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
+  function wireCard(el, story) {
+    el.setAttribute('tabindex', '0'); /* Enter walks the same state machine */
+    var activate = function () {
+      if (el.classList.contains('armed')) {
+        if (performance.now() - armTime < 250) return; /* <250ms second tap is not a confirm */
+        clearMq(el); openArticle(story); return;
+      }
+      armCard(el);
+    };
+    el.addEventListener('click', activate);
+    el.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') { e.preventDefault(); activate(); }
+    });
+  }
+  /* single date emission point — every visible date goes through this helper */
+  function dateHtml(c, cls) { return '<span class="'+cls+'">'+(c.date||'')+'</span>'; }
+  /* demote overflowing ids to the head of the next page (new page if the last overflows) */
+  function demote(ids) {
+    var pages = pagesFor(activeCat), pi = pageNum - 1, changed = false;
+    ids.forEach(function(id){
+      var pg = pages[pi] || [];
+      var ix = pg.indexOf(id);
+      if (ix < 0) return;
+      if (demotedIds[id]) { console.warn('[fit] ' + id + ' still overflows after one demotion — kept in place'); return; }
+      pg.splice(ix, 1);
+      if (pi + 1 < pages.length) pages[pi + 1].unshift(id);
+      else pages.push([id]);
+      demotedIds[id] = true;
+      changed = true;
+    });
+    if (!changed) return;
+    if (!pages[pi] || !pages[pi].length) pages.splice(pi, 1); /* current page emptied by demotion */
+    if (pageNum > pages.length) pageNum = pages.length;
+    renderGrid();
+  }
+  /* fit audit: no clipped titles, no cropped tag rows, exactly one date node per card */
+  function fitAudit(grid) {
+    var bad = [];
+    grid.querySelectorAll('.cell').forEach(function(el){
+      var t = el.querySelector('.cell-title'), tr = el.querySelector('.tag-row');
+      if (!t || !el.dataset.id) return;
+      var cb = el.getBoundingClientRect().bottom;
+      if (t.scrollHeight > t.clientHeight + 1) bad.push(el.dataset.id);                    /* title does not fit */
+      else if (tr && tr.getBoundingClientRect().bottom > cb - 2) bad.push(el.dataset.id);  /* tag row cropped */
+    });
+    if (/[?&]audit=1/.test(location.search)) {
+      grid.querySelectorAll('.cell').forEach(function(el){
+        if (!el.dataset.id) return;
+        var n = el.querySelectorAll('span[class*=date]').length;
+        var wpx = parseFloat(el.style.width) || 0;
+        if (n !== (wpx < 70 ? 0 : 1)) console.warn('[audit] ' + el.dataset.id + ': ' + n + ' date node(s), expected ' + (wpx < 70 ? 0 : 1));
+      });
+    }
+    if (bad.length) demote(bad);
   }
 /* ── Party colors (data-encoding only) ─────────────────────── */
 var PARTY = {
@@ -335,15 +403,28 @@ var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 var activeCat = 'all';
 var PAGE_SIZE = 20, pageNum = 1, flipping = false;
+/* pageMap: per-category array of pages (id arrays) — demotion moves ids between pages */
+var pageMap = {}, demotedIds = {}, lastPageSize = 0;
 function pageSize(){ var n = window.innerWidth < 480 || /[?&]narrow=1/.test(location.search); return n ? 6 : PAGE_SIZE; }
-function catStories() {
-  var s = CELLS.filter(function(c){ return !c.logo && (activeCat === 'all' || c.cat === activeCat); });
+function catStories(cat) {
+  var k = cat === undefined ? activeCat : cat;
+  var s = CELLS.filter(function(c){ return !c.logo && (k === 'all' || c.cat === k); });
   s.sort(function(a, b){ return a.tier - b.tier; }); /* stable: hot-first array order within tier */
   return s;
 }
-function pageCount() { return Math.max(1, Math.ceil(catStories().length / pageSize())); }
+function pagesFor(cat) {
+  if (pageSize() !== lastPageSize) { pageMap = {}; demotedIds = {}; lastPageSize = pageSize(); } /* granularity changed (resize): rebuild */
+  if (!pageMap[cat]) {
+    var s = catStories(cat), ps = pageSize(), pages = [];
+    for (var i = 0; i < s.length; i += ps) pages.push(s.slice(i, i + ps).map(function(c){ return c.id; }));
+    pageMap[cat] = pages.length ? pages : [[]];
+  }
+  return pageMap[cat];
+}
+function pageCount() { return pagesFor(activeCat).length; }
 function pageItems() {
-  var s = catStories().slice((pageNum - 1) * pageSize(), pageNum * pageSize());
+  var ids = pagesFor(activeCat)[pageNum - 1] || [];
+  var s = ids.map(function(id){ return CELLS.filter(function(c){ return c.id === id; })[0]; }).filter(Boolean);
   return (pageNum === 1 && document.getElementById('grid').clientWidth >= 480) ? s.concat(CELLS.filter(function(c){ return c.logo; })) : s;
 }
 function updatePager() {
@@ -354,23 +435,10 @@ function updatePager() {
   pager.querySelector('#pg-prev').classList.toggle('disabled', pageNum <= 1);
   pager.querySelector('#pg-next').classList.toggle('disabled', pageNum >= pc);
 }
-document.getElementById('pg-prev').addEventListener('click', function(){ goToPage(pageNum - 1, -1); });
-document.getElementById('pg-next').addEventListener('click', function(){ goToPage(pageNum + 1, 1); });
-document.addEventListener('keydown', function(e){
-  if (e.key === 'ArrowLeft') goToPage(pageNum - 1, -1);
-  if (e.key === 'ArrowRight') goToPage(pageNum + 1, 1);
-});
-var touchX = null;
-document.addEventListener('touchstart', function(e){ touchX = e.touches[0].clientX; }, {passive:true});
-document.addEventListener('touchend', function(e){
-  if (touchX === null) return;
-  var dx = e.changedTouches[0].clientX - touchX;
-  if (Math.abs(dx) > 60) goToPage(pageNum + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
-  touchX = null;
-}, {passive:true});
 function renderGrid(cat) {
   clearTimeout(armTimer); clearMq(document.querySelector('.cell.armed')); armedId = null;
   if (cat !== undefined) activeCat = cat;
+  var pc = pageCount(); if (pageNum > pc) pageNum = pc; /* pageMap rebuild (resize) may shrink page count */
   var items = pageItems();
   var grid = document.getElementById('grid');
   grid.innerHTML = '';
@@ -380,11 +448,13 @@ function renderGrid(cat) {
   var heroH = 340;
   if (narrow && heroStory) H = Math.max(240, H - heroH);
   else heroH = 0;
-  var heroEl = null;
   var layoutItems = narrow ? items.filter(function(c){ return !c.full; }) : items;
   if (narrow && !heroStory) { /* category w/o election: no reservation */ }
+  var decayN = layoutItems.filter(function(c){ return !c.logo; }).length; /* story cells joining the decay ladder */
+  var q = decayN > 1 ? Math.pow(0.45, 1/(decayN-1)) : 1;                 /* last rank lands on 0.45 — strict big→small */
+  var r = 0;
   var root = d3.hierarchy({children: layoutItems.map(function(c,i){
-    return { i:i, v: (c.logo && narrow) ? 0 : (c.logo ? 6 : Math.pow(100 - c.tier*22, 2.2)) };
+    return { i:i, v: (c.logo && narrow) ? 0 : (c.logo ? 6 : Math.pow(100 - c.tier*22, 2.2) * Math.pow(q, r++)) };
   })}).sum(function(d){ return d.v || 0; });
   root.sort(function(a,b){ return b.value - a.value; });
   d3.treemap().tile(d3.treemapSquarify).size([W,H]).paddingInner(3).paddingOuter(0)(root);
@@ -395,25 +465,23 @@ function renderGrid(cat) {
     var hel = document.createElement('div');
     hel.className = 'cell p0';
     hel.style.left='0px'; hel.style.top='0px';
+    hel.setAttribute('data-id', heroStory.id);
     hel.style.width=W+'px'; hel.style.height=heroH+'px';
     hel.innerHTML = '<div class="badge-row"><span class="red-badge">ELECTION 2026</span>' +
-      '<span class="date-chip">'+(heroStory.date||'')+'</span></div>' +
+      dateHtml(heroStory, 'date-chip') + '</div>' +
       '<div class="cell-title" style="font-size:17px;"><span style="color:#ff6b70">ELECTION 2026</span>'+
       (heroStory.title||'').replace('ELECTION 2026 —','—')+'</div>' +
       '<div class="tag-row">'+(heroStory.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
       '<div class="election-chart"></div>' +
       '<div class="gap-callout"><span>GAP</span><b>10.3 pts</b><span>NAT 38.5 · LAB 28.2</span></div>' +
       '<div class="thresholds"></div>';
-    hel.addEventListener('click', function(){ openArticle(heroStory); });
+    wireCard(hel, heroStory);
     grid.appendChild(hel);
     var ec = hel.querySelector('.election-chart');
     ec.style.height = '110px'; ec.style.flex = 'none';
     drawPollChart(ec, 110);
     thresholdBars(hel.querySelector('.thresholds'));
   }
-
-
-
 
   layoutItems.forEach(function(c, i){
     var n = rect[i];
@@ -423,39 +491,12 @@ function renderGrid(cat) {
     el.setAttribute('data-id', c.id);
     el.style.left = n.x0+'px'; el.style.top = n.y0+'px';
     el.style.width = (n.x1-n.x0)+'px'; el.style.height = (n.y1-n.y0)+'px';
-    if (c.full && narrow) {
-      heroEl = el;
-      el.style.left='0px'; el.style.top='0px';
-      el.style.width=W+'px'; el.style.height=heroH+'px';
-      var n = { x0:0, y0:0, x1:W, y1:heroH };
-      var nhtml = '<div class="badge-row"><span class="red-badge">ELECTION 2026</span>' +
-        '<span class="date-chip">'+c.date+'</span></div>' +
-        '<div class="cell-title" style="font-size:17px;"><span style="color:#ff6b70">ELECTION 2026</span>'+c.title.replace('ELECTION 2026 —','—')+'</div>' +
-        '<div class="tag-row">'+(c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
-        '<div class="election-chart"></div>' +
-        '<div class="gap-callout"><span>GAP</span><b>10.3 pts</b><span>NAT 38.5 · LAB 28.2</span></div>' +
-        '<div class="thresholds"></div>';
-      el.innerHTML = nhtml;
-      el.addEventListener('click', function(){ openArticle(c); });
-      grid.appendChild(el);
-      var ec = el.querySelector('.election-chart');
-      ec.style.height = '110px'; ec.style.flex = 'none';
-      drawPollChart(ec, 110);
-      thresholdBars(el.querySelector('.thresholds'));
-      return;
-    }
     if (narrow) {
       el.style.top = (parseFloat(el.style.top||n.y0)+heroH)+'px';
     }
     if (c.logo) {
       if (narrow || (n.x1-n.x0) < 96) {
-        el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">BEEHIVE</div>';
-        grid.appendChild(el);
-        return;
-      }
-      if ((n.x1-n.x0) < 96) {
-        el.innerHTML = '<div class="cell-title" style="white-space:nowrap;text-overflow:ellipsis;display:block;-webkit-line-clamp:unset;">'+c.title+'</div>';
-        el.addEventListener('click', function(){ openArticle(c); });
+        el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;">BEEHIVE</div>';
         grid.appendChild(el);
         return;
       }
@@ -469,11 +510,9 @@ function renderGrid(cat) {
     var sparkParty = { s02:'nzfirst', s03:'act', s04:'labour', s05:'act', s06:'national',
       s07:'green', s08:'green', s09:'national', s10:'labour', s11:'national',
       s12:'nzfirst', s13:'act' }[c.id];
-    var xs = w < 110;
-    if (xs) el.classList.add('xs');
     var tagsHtml = (c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('');
-    var html = '<div class="badge-row date-only"><span class="date-dim">'+(c.date||'')+'</span></div>' +
-      '<div class="cell-title clamp">'+c.title+'</div>' +
+    var html = (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim') + '</div>' : '') +
+      '<div class="cell-title">'+c.title+'</div>' +
       '<div class="tag-row">'+tagsHtml+'</div>';
     if (big) {
       html += '<div class="election-chart"></div>' +
@@ -483,7 +522,7 @@ function renderGrid(cat) {
       html += '<div class="spark-mini"></div>';
     }
     el.innerHTML = html;
-    el.addEventListener('click', function(){ openArticle(c); });
+    wireCard(el, c);
     grid.appendChild(el);
     if (big) {
       drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55));
@@ -494,6 +533,7 @@ function renderGrid(cat) {
     }
   });
   updatePager();
+  requestAnimationFrame(function(){ fitAudit(grid); });
 }
 
 /* ── Article view ──────────────────────────────────────────── */
