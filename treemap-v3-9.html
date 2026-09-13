@@ -17,13 +17,11 @@
   .view.active { display:flex; flex-direction:column; }
 
   .mq-overlay { position:absolute; overflow:hidden; pointer-events:none; display:flex;
-    align-items:center; z-index:5; }
+    align-items:flex-start; z-index:5; }
   .mq-track { display:inline-flex; flex:none; will-change:transform; white-space:nowrap;
     color:#ffffff; }
   .mq-text { flex:none; }
   .mq-gap { width:28px; flex:none; }
-  @keyframes mqscrollR { from { transform: translateX(0); } to { transform: translateX(50%); } }
-  .mq-hide { visibility: hidden; }
 
   /* ---------- TREEMAP VIEW ---------- */
   #treemap-view { }
@@ -160,45 +158,45 @@
   function clearMq(el) {
     if (!el) return;
     var ov = el.querySelector('.mq-overlay');
-    if (ov) { if (window.gsap) gsap.killTweensOf(ov.firstChild); ov.remove(); }
+    if (ov) { if (window.gsap) gsap.killTweensOf(ov.querySelector('.mq-track')); ov.remove(); }
     var ti = el.querySelector('.cell-title');
-    if (ti) { ti.style.visibility = ''; ti.classList.remove('mq-hide'); }
+    if (ti && ti.style.color === 'transparent') ti.style.color = '';
     el.classList.remove('armed');
   }
   function armCard(el) {
     clearMq(document.querySelector('.cell.armed'));
     el.classList.add('armed'); armTime = performance.now();
     armedId = el.dataset.id;
-    /* NOTE: no auto-clear timer — marquee runs until user clicks elsewhere/other card */
     if (reduced || !window.gsap) return; /* static selection: ring only */
     var ti = el.querySelector('.cell-title'); if (!ti) return;
-    /* measure REAL single-line width first (max-content) */
     ti.style.width = 'max-content';
     var textW = ti.scrollWidth;
     ti.style.width = '';
-    var cs = getComputedStyle(ti);
     var boxW = ti.clientWidth;
-    var needsMq = textW > boxW + 12 || /[?&]mq=all/.test(location.search);
-    if (!needsMq) return; /* short title: static ring selection, zero DOM change */
-    /* build overlay AFTER decision — exact geometry + font from computed style */
+    /* first-line height via Range (Astra spec #2) */
+    var range = document.createRange();
+    range.selectNodeContents(ti);
+    var lineH = range.getClientRects().length ? range.getClientRects()[0].height
+              : (parseFloat(getComputedStyle(ti).lineHeight) || 14);
+    var P = textW + 28;
+    var N = Math.max(2, Math.ceil((boxW + P) / P));
     var ov = document.createElement('div');
     ov.className = 'mq-overlay';
-    ov.style.top = ti.offsetTop + 'px';
-    ov.style.left = ti.offsetLeft + 'px';
-    ov.style.width = ti.clientWidth + 'px';
-    ov.style.height = ti.offsetHeight + 'px';
-    ov.style.font = cs.font;
-    ov.style.letterSpacing = cs.letterSpacing;
-    ov.style.fontWeight = cs.fontWeight;
+    ov.style.top = '0px';
+    ov.style.left = '0px';
+    ov.style.width = boxW + 'px';
+    ov.style.height = lineH + 'px';
+    ov.style.alignItems = 'flex-start';
     var tr = document.createElement('span');
     tr.className = 'mq-track';
-    tr.style.fontSize = cs.fontSize;
-    tr.innerHTML = '<span class="mq-text">' + ti.innerHTML + '</span><span class="mq-gap"></span><span class="mq-text">' + ti.innerHTML + '</span>';
-    ti.style.visibility = 'hidden';
+    var oneCopy = '<span class="mq-text">' + ti.innerHTML + '</span><span class="mq-gap"></span>';
+    var copies = '';
+    for (var ci = 0; ci < N + 1; ci++) copies += oneCopy;
+    tr.innerHTML = copies;
+    ti.style.color = 'transparent'; /* hide original; ::after underline stays */
     ov.appendChild(tr);
-    el.appendChild(ov);
-    var P = textW + 28;
-    gsap.fromTo(tr, { x: 0 }, { x: P, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
+    ti.appendChild(ov);
+    gsap.fromTo(tr, { x: -P }, { x: 0, duration: P / MQ_SPEED, ease: 'none', repeat: -1 });
   }
   /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
   function wireCard(el, story) {
