@@ -702,8 +702,6 @@ function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
   var last = hist[hist.length - 1];
   var ly = y(last);
   svg.append('circle').attr('cx', x(hist.length - 1)).attr('cy', ly).attr('r', 3.2).attr('fill', color);
-  svg.append('line').attr('x1', x(hist.length - 1) + 5).attr('y1', ly).attr('x2', w - labelW + 6).attr('y2', ly)
-    .attr('stroke', color).attr('stroke-dasharray', '2,3').attr('opacity', 0.8);
   svg.append('text').attr('x', w - labelW + 6).attr('y', ly - 2)
     .attr('font-size', 10).attr('font-weight', 600).attr('fill', color).text(partyLabel);
   svg.append('text').attr('x', w - labelW + 6).attr('y', ly + 9)
