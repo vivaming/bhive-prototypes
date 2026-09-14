@@ -152,12 +152,12 @@
 <!-- ================= ARTICLE VIEW ================= -->
 <div class="view" id="article-view">
   <div class="article">
-    <span class="back" onclick="showTreemap()">← 返回 TreeMap</span>
+    <span class="back" onclick="showTreemap()">← Back to TreeMap</span>
     <div class="a-badge" id="a-badge">ELECTION 2026</div>
     <h1 class="a-title" id="a-title"></h1>
     <div class="a-date" id="a-date"></div>
     <div class="a-chart" id="a-chart"></div>
-    <div class="a-caption">示例数据 · Beehive poll aggregate · 5% = MMP threshold</div>
+    <div class="a-caption">Sample data · Beehive poll aggregate · 5% = MMP threshold</div>
     <div class="a-body" id="a-body"></div>
   </div>
 </div>
@@ -252,6 +252,7 @@
     grid.querySelectorAll('.cell').forEach(function(el){
       var t = el.querySelector('.cell-title'), tr = el.querySelector('.tag-row');
       if (!t || !el.dataset.id) return; /* logo cell carries neither title nor date */
+      if (el.classList.contains('p0')) return; /* hero card: fixed full-width headline, never demoted */
       var cb = el.getBoundingClientRect().bottom;
       if (t.scrollHeight > t.clientHeight + 1) bad.push(el.dataset.id);                    /* title does not fit */
       else if (tr && tr.getBoundingClientRect().bottom > cb - 2) bad.push(el.dataset.id);  /* tag row cropped */
@@ -353,10 +354,12 @@ var CELLS = [
 ];
 
 /* ── Charts ────────────────────────────────────────────────── */
-function drawPollChart(container, h) {
+function drawPollChart(container, h, opts) {
   /* Cover card: brief-page main chart DNA — TWO MAJOR PARTIES ONLY (National vs Labour),
      model lines + confidence bands + poll dots + right-edge name/value labels,
-     dashed % gridlines, Today anchor, teal under-5% zone. Mini-sparkline projection style. */
+     dashed % gridlines, Today anchor, teal under-5% zone. Mini-sparkline projection style.
+     opts.nogrid: skip dashed gridlines (narrow hero — they read as clutter at 110px). */
+  opts = opts || {};
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h)
     .attr('preserveAspectRatio','none');
@@ -364,7 +367,7 @@ function drawPollChart(container, h) {
   var x = d3.scaleLinear().domain([0, 9]).range([8, w-labelW]);
   var y = d3.scaleLinear().domain([20, 42]).range([h-16, 8]);
   // dashed gridlines with % labels on right (house style) — domain fits the two majors
-  [20,25,30,35,40].forEach(function(v){
+  if (!opts.nogrid) [20,25,30,35,40].forEach(function(v){
     svg.append('line').attr('x1',10).attr('x2',w-labelW).attr('y1',y(v)).attr('y2',y(v))
       .attr('stroke','rgba(255,255,255,0.14)').attr('stroke-dasharray','2,4');
     svg.append('text').attr('x',w-labelW+6).attr('y',y(v)+3)
@@ -392,8 +395,6 @@ function drawPollChart(container, h) {
     var last = data[data.length-1];
     var ly = y(last);
     svg.append('circle').attr('cx',x(9)).attr('cy',ly).attr('r',3.2).attr('fill',c);
-    svg.append('line').attr('x1',x(9)+5).attr('y1',ly).attr('x2',w-labelW+6).attr('y2',ly)
-      .attr('stroke',c).attr('stroke-dasharray','2,3').attr('opacity',0.8);
     var nameFs = w < 340 ? 8 : 10;
     var valFs = w < 340 ? 8.5 : 9.5;
     svg.append('text').attr('x',w-labelW+6).attr('y',ly-2)
@@ -463,7 +464,7 @@ var activeCat = 'all';
 var PAGE_SIZE = 30, pageNum = 1, flipping = false;
 /* pageMap: per-category array of pages (id arrays) — demotion moves ids between pages */
 var pageMap = {}, demotedIds = {}, lastPageSize = 0;
-function pageSize(){ var n = window.innerWidth < 480 || /[?&]narrow=1/.test(location.search); return n ? 6 : PAGE_SIZE; }
+function pageSize(){ var n = window.innerWidth < 480 || /[?&]narrow=1/.test(location.search); return n ? 9 : PAGE_SIZE; }
 function catStories(cat) {
   var k = cat === undefined ? activeCat : cat;
   var s = CELLS.filter(function(c){ return !c.logo && (k === 'all' || c.cat === k); });
@@ -504,7 +505,7 @@ function renderGrid(cat) {
   grid.classList.toggle('desktop', !narrow);
     var W = grid.clientWidth, H = grid.clientHeight;
   var heroStory = narrow ? items.filter(function(c){ return c.full; })[0] : null;
-  var heroH = 340;
+  var heroH = 300;
   if (narrow && heroStory) H = Math.max(240, H - heroH);
   else heroH = 0;
   var layoutItems = narrow ? items.filter(function(c){ return !c.full; }) : items;
@@ -517,7 +518,7 @@ function renderGrid(cat) {
   var leaves = layoutItems.map(function(c,i){
     return { i:i, v: (c.logo && narrow) ? 0 : (c.logo ? 6 : Math.pow(100 - c.tier*22, exp) * Math.pow(q, r++)) };
   });
-  if (!narrow) { /* V44 §1 (V43 §四): logo value floor — reserve a ≥72×28 slot so the leaf never collapses to zero width */
+  if (!narrow) { /* V44 s1 (V43 s4): logo value floor - reserve a >=72x28 slot so the leaf never collapses to zero width */
     var tot = 0;
     leaves.forEach(function(d){ if (!layoutItems[d.i].logo) tot += d.v; });
     leaves.forEach(function(d){ if (layoutItems[d.i].logo) d.v = Math.max(6, 72*28/(W*H)*tot); });
@@ -540,7 +541,7 @@ function renderGrid(cat) {
     hel.style.width=W+'px'; hel.style.height=heroH+'px';
     hel.innerHTML = '<div class="badge-row"><span class="red-badge">ELECTION 2026</span>' +
       dateHtml(heroStory, 'date-chip') + '</div>' +
-      '<div class="cell-title" style="font-size:17px;"><span style="color:#ff6b70">ELECTION 2026</span>'+
+      '<div class="cell-title" style="font-size:17px;">'+
       (heroStory.title||'').replace('ELECTION 2026 —','—')+'</div>' +
       '<div class="tag-row">'+(heroStory.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
       '<div class="election-chart"></div>' +
@@ -550,7 +551,7 @@ function renderGrid(cat) {
     grid.appendChild(hel);
     var ec = hel.querySelector('.election-chart');
     ec.style.height = '110px'; ec.style.flex = 'none';
-    drawPollChart(ec, 110);
+    drawPollChart(ec, 110, { nogrid: true });
     thresholdBars(hel.querySelector('.thresholds'));
   }
 
@@ -714,6 +715,125 @@ function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
   });
 }
 
+/* 538-style frame: dashed grid + baseline + source row (reused by charts) */
+function draw538Grid(svg, w, h, yTicks, labelW) {
+  yTicks.forEach(function (v) {
+    svg.append('line').attr('x1', 10).attr('x2', w - labelW).attr('y1', v.y).attr('y2', v.y)
+      .attr('stroke', 'rgba(255,255,255,0.14)').attr('stroke-dasharray', '2,4');
+    svg.append('text').attr('x', w - labelW + 6).attr('y', v.y + 3)
+      .attr('font-size', 8).attr('fill', '#6b7684').text(v.label);
+  });
+}
+
+/* INZ accountability: horizontal bars, 538 style — muted palette, gridlines, direct labels */
+function drawInzBars(container, h) {
+  var w = container.clientWidth || 400;
+  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
+    .attr('preserveAspectRatio', 'none');
+  var rows = [
+    { label: 'Forecast savings (2024 biz case)', value: 453, color: '#5a94d4' },
+    { label: 'Benefits now ruled unlikely', value: 134, color: '#d23528' },
+    { label: 'OFS cost to date', value: 336, color: '#8895a7' },
+    { label: 'BCU cost (axed after 7 yrs)', value: 36, color: '#6b7684' }
+  ];
+  var max = 460;
+  var barH = 14, gap = 12, top = 8;
+  var labelW = w < 380 ? 118 : 168;
+  rows.forEach(function (r, i) {
+    var yy = top + i * (barH + gap);
+    svg.append('text').attr('x', 0).attr('y', yy + barH / 2 + 3)
+      .attr('font-size', 8).attr('fill', '#9aa7b4').text(r.label.slice(0, w < 380 ? 20 : 30));
+    svg.append('rect').attr('x', labelW).attr('y', yy)
+      .attr('width', (r.value / max) * (w - labelW - 40)).attr('height', barH)
+      .attr('fill', r.color).attr('opacity', 0.85);
+    svg.append('text').attr('x', labelW + (r.value / max) * (w - labelW - 40) + 4)
+      .attr('y', yy + barH / 2 + 3).attr('font-size', 9).attr('font-weight', 600)
+      .attr('fill', '#c7cfd8').text('$' + r.value + 'm');
+  });
+  svg.append('line').attr('x1', 0).attr('x2', w).attr('y1', h - 3).attr('y2', h - 3)
+    .attr('stroke', 'rgba(255,255,255,0.14)');
+  svg.append('text').attr('x', 0).attr('y', h - 4).attr('font-size', 8)
+    .attr('fill', '#6b7684').text('Source: Cabinet paper via RNZ · Beehive chart');
+}
+
+/* Threshold arithmetic chart (for Act list article):
+   party bars with 5% threshold dashed line, seats projection right labels */
+function drawThresholdArithmetic(container, h) {
+  var w = container.clientWidth || 400;
+  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
+    .attr('preserveAspectRatio', 'none');
+  var parties = [
+    { key: 'national', name: 'NAT', poll: 38.5, color: '#5a94d4' },
+    { key: 'labour', name: 'LAB', poll: 28.2, color: '#D82A20' },
+    { key: 'green', name: 'GRN', poll: 11.4, color: '#3d9e5c' },
+    { key: 'act', name: 'ACT', poll: 13.1, color: '#c9b026' },
+    { key: 'nzfirst', name: 'NZF', poll: 4.2, color: '#8895a7' }
+  ];
+  var max = 42;
+  var barH = 12, gap = 10, top = 8;
+  var labelW = w < 380 ? 100 : 140;
+  var thresholdX = labelW + (5 / max) * (w - labelW - 40);
+  parties.forEach(function (p, i) {
+    var yy = top + i * (barH + gap);
+    var below = p.poll < 5;
+    svg.append('text').attr('x', 0).attr('y', yy + barH / 2 + 3)
+      .attr('font-size', 8.5).attr('font-weight', 600)
+      .attr('fill', below ? '#6b7684' : '#c7cfd8').text(p.name);
+    svg.append('rect').attr('x', labelW).attr('y', yy)
+      .attr('width', (p.poll / max) * (w - labelW - 40)).attr('height', barH)
+      .attr('fill', p.color).attr('opacity', below ? 0.35 : 0.85);
+    svg.append('text').attr('x', labelW + (p.poll / max) * (w - labelW - 40) + 4)
+      .attr('y', yy + barH / 2 + 3).attr('font-size', 9).attr('font-weight', 600)
+      .attr('fill', below ? '#6b7684' : '#c7cfd8').text(p.poll + '%');
+  });
+  svg.append('line').attr('x1', thresholdX).attr('x2', thresholdX)
+    .attr('y1', top - 4).attr('y2', top + parties.length * (barH + gap))
+    .attr('stroke', '#d23528').attr('stroke-dasharray', '3,3').attr('stroke-width', 1.2);
+  svg.append('text').attr('x', thresholdX + 3).attr('y', top + 2)
+    .attr('font-size', 7.5).attr('fill', '#d23528').text('5% THRESHOLD');
+  svg.append('text').attr('x', 0).attr('y', h - 3).attr('font-size', 8)
+    .attr('fill', '#6b7684').text('Party vote, latest polls · dimmed = below threshold · Beehive chart');
+}
+
+/* Poll-table mini chart: Labour volatile 2026 (Feb 37.4 peak, May 26.5 trough, Jun 35.3) */
+function drawLabourVolatility(container, h) {
+  var w = container.clientWidth || 400;
+  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
+    .attr('preserveAspectRatio', 'none');
+  var points = [
+    { m: 'Feb', v: 37.4 }, { m: 'Mar', v: 34.0 }, { m: 'Apr', v: 34.0 },
+    { m: 'May', v: 26.5 }, { m: 'Jun', v: 35.3 }
+  ];
+  var labelW = w < 340 ? 56 : 92;
+  var lo = 24, hi = 40;
+  var x = d3.scaleLinear().domain([0, points.length - 1]).range([14, w - labelW]);
+  var y = d3.scaleLinear().domain([lo, hi]).range([h - 18, 10]);
+  draw538Grid(svg, w, h, [25, 30, 35].map(function (v) {
+    return { y: y(v), label: v + '%' };
+  }), labelW);
+  var color = PARTY.labour.color;
+  svg.append('path').datum(points)
+    .attr('d', d3.line().x(function (d, i) { return x(i); }).y(function (d) { return y(d.v); })
+      .curve(d3.curveMonotoneX))
+    .attr('fill', 'none').attr('stroke', color).attr('stroke-width', 2);
+  svg.selectAll(null).data(points).enter().append('circle')
+    .attr('cx', function (d, i) { return x(i); }).attr('cy', function (d) { return y(d.v); })
+    .attr('r', 3).attr('fill', color);
+  points.forEach(function (d, i) {
+    svg.append('text').attr('x', x(i)).attr('y', y(d.v) - 7)
+      .attr('font-size', 8.5).attr('font-weight', 600).attr('text-anchor', 'middle')
+      .attr('fill', '#c7cfd8').text(d.v + '%');
+    svg.append('text').attr('x', x(i)).attr('y', h - 4)
+      .attr('font-size', 8).attr('fill', '#6b7684').attr('text-anchor', 'middle').text(d.m);
+  });
+  svg.append('text').attr('x', w - labelW + 6).attr('y', 16)
+    .attr('font-size', 9.5).attr('font-weight', 600).attr('fill', color).text('LAB');
+  svg.append('text').attr('x', w - labelW + 6).attr('y', 27)
+    .attr('font-size', 9).attr('fill', '#c7cfd8').text('35.3%');
+  svg.append('text').attr('x', 0).attr('y', h - 14).attr('font-size', 8)
+    .attr('fill', '#6b7684').text('Volatile, not collapsed: Jun rebound above Apr level · Beehive chart');
+}
+
 /* INZ accountability: house-style horizontal bar table (forecast vs reality) */
 function drawInzBars(container, h) {
   var w = container.clientWidth || 400;
@@ -765,9 +885,17 @@ function openArticle(c) {
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
     if (c.wp6 === 'wp6-1') {
-      drawPartyTrend(ch, 'labour', 'Labour', 35.3, 260);
+      drawPartyTrend(ch, 'labour', 'Labour', 35.3, 200);
+      var ch2 = document.createElement('div');
+      ch2.style.marginTop = '8px';
+      ch.parentNode.insertBefore(ch2, ch.nextSibling);
+      drawLabourVolatility(ch2, 180);
     } else if (c.wp6 === 'wp6-3') {
-      drawPartyTrend(ch, 'act', 'ACT', 13.1, 260);
+      drawPartyTrend(ch, 'act', 'ACT', 13.1, 180);
+      var ch2 = document.createElement('div');
+      ch2.style.marginTop = '8px';
+      ch.parentNode.insertBefore(ch2, ch.nextSibling);
+      drawThresholdArithmetic(ch2, 200);
     } else {
       drawInzBars(ch, 180);
     }
