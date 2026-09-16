@@ -861,6 +861,59 @@ function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
       .attr('font-size', 8).attr('fill', '#6b7684').attr('text-anchor', 'middle').text(m);
   });
 }
+function drawKiwiSaverTrend(container, h) {
+  var w = container.clientWidth || 400;
+  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h)
+    .attr('preserveAspectRatio','none');
+  var labelW = w < 340 ? 56 : 92;
+  var years = [2021,2022,2023,2024,2025,2026];
+  var values = [78.1,83.4,91.0,100.3,123.1,124.5];
+  var lo = 70, hi = 130;
+  var x = d3.scaleLinear().domain([0, years.length-1]).range([8, w-labelW]);
+  var y = d3.scaleLinear().domain([lo, hi]).range([h-16, 8]);
+  var color = '#5a94d4'; // KiwiSaver blue
+  // dashed gridlines and right labels
+  [80,90,100,110,120,130].forEach(function(v){
+    svg.append('line').attr('x1',10).attr('x2',w-labelW).attr('y1',y(v)).attr('y2',y(v))
+      .attr('stroke','rgba(255,255,255,0.14)').attr('stroke-dasharray','2,4');
+    svg.append('text').attr('x',w-labelW+6).attr('y',y(v)+3)
+      .attr('font-size',8).attr('fill','#6b7684').text(v);
+  });
+  // area band (±0.5)
+  svg.append('path').datum(values)
+    .attr('d', d3.area().x(function(d,i){return x(i);})
+      .y0(function(d){return y(d-0.5);}).y1(function(d){return y(d+0.5);})
+      .curve(d3.curveMonotoneX))
+    .attr('fill',color).attr('opacity',0.16);
+  // line
+  svg.append('path').datum(values)
+    .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
+      .curve(d3.curveMonotoneX))
+    .attr('fill','none').attr('stroke',color).attr('stroke-width',2);
+  // points
+  svg.selectAll(null).data(values).enter().append('circle')
+    .attr('cx',function(d,i){return x(i);}).attr('cy',function(d){return y(d);})
+    .attr('r',2.2).attr('fill',color).attr('opacity',0.45);
+  // latest point highlight
+  var last = values[values.length-1];
+  var ly = y(last);
+  svg.append('circle').attr('cx',x(values.length-1)).attr('cy',ly).attr('r',3.2).attr('fill',color);
+  // right edge labels
+  var nameFs = w < 340 ? 8 : 10;
+  var valFs = w < 340 ? 8.5 : 9.5;
+  svg.append('text').attr('x',w-labelW+6).attr('y',ly-2)
+    .attr('font-size',nameFs).attr('font-weight',600).attr('fill',color).text('$'+last+'B');
+  svg.append('text').attr('x',w-labelW+6).attr('y',ly+9)
+    .attr('font-size',valFs).attr('fill','#c7cfd8').text('FUM · Mar 2026');
+  // x axis year labels
+  years.forEach(function(yv,i){
+    svg.append('text').attr('x',x(i)).attr('y',h-4)
+      .attr('font-size',8).attr('fill','#6b7684').attr('text-anchor','middle').text(yv);
+  });
+  // source row
+  svg.append('text').attr('x',0).attr('y',h-4)
+    .attr('font-size',8).attr('fill','#6b7684').text('Source: FMA / FSC · as of 31 Mar 2026 · Beehive chart');
+}
 
 /* 538-style frame: dashed grid + baseline + source row (reused by charts) */
 function draw538Grid(svg, w, h, yTicks, labelW) {
@@ -1033,11 +1086,7 @@ function openArticle(c) {
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
     if (c.wp6 === 'wp6-1') {
-      drawPartyTrend(ch, 'labour', 'Labour', 35.3, 200);
-      var ch2 = document.createElement('div');
-      ch2.style.marginTop = '8px';
-      ch.parentNode.insertBefore(ch2, ch.nextSibling);
-      drawLabourVolatility(ch2, 180);
+      drawKiwiSaverTrend(ch, 260);
     } else if (c.wp6 === 'wp6-3') {
       drawPartyTrend(ch, 'act', 'ACT', 13.1, 180);
       var ch2 = document.createElement('div');
