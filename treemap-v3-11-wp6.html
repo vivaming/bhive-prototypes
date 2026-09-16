@@ -102,6 +102,19 @@
   .logo { font-weight:700; letter-spacing:.14em; font-size:11px; color:#f2f4f7; }
   .logo b { color:#e5484d; }
   .logo-sub { font-size:8px; color:#77828f; letter-spacing:.18em; margin-top:2px; }
+  .header-logo {
+    height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    margin-bottom: 0;
+  }
+  @media (max-width: 480px) {
+    .header-logo {
+      height: 40px;
+    }
+  }
   /* category pills — float above the treemap */
   .cat-bar { position:static; transform:none; display:flex; gap:2px; background:#171a20cc;
     border-radius:18px; padding:4px; max-width:calc(100vw - 16px); margin:8px auto 0 auto;
@@ -158,7 +171,7 @@
 <body>
 
 <!-- ================= TREEMAP VIEW ================= -->
-<div class="view active" id="treemap-view"><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
+<div class="view active" id="treemap-view"><div class="header-logo"><div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
 <div class="pager" id="pager"><button type="button" class="pg-btn" id="pg-prev">‹</button><span class="pg-num" id="pg-num">1 / 2</span><button type="button" class="pg-btn" id="pg-next">›</button></div></div>
 
 <!-- ================= ARTICLE VIEW ================= -->
