@@ -35,7 +35,7 @@
   #grid.desktop .mmp-note { margin-top:4px; }
   /* ---------- TREEMAP VIEW ---------- */
   #treemap-view { }
-#grid { position:relative; flex:1; min-height:0; display:grid; gap:10px; }
+#grid { position:relative; flex:1; min-height:0; }
   .cell {
     position:absolute; overflow:hidden; cursor:pointer;
     display:flex; flex-direction:column;
@@ -166,21 +166,6 @@
   .a-caption { font-size:11px; color:#6b7684; margin-bottom:32px; }
   .a-body p { font-size:16px; line-height:1.7; color:#c7cfd8; margin-bottom:22px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; animation:none !important; } }
-/* Grid layout for treemap view */
-@media (max-width: 480px) {
-   #grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (min-width: 481px) and (max-width: 768px) {
-   #grid { grid-template-columns: repeat(3, 1fr); }
-}
-@media (min-width: 769px) {
-   #grid { grid-template-columns: repeat(4, 1fr); }
-}
-.cell.p0 {
-   grid-column: 1 / -1;
-   height: auto;
-   min-height: 96px;
-}
 </style>
 </head>
 <body>
@@ -550,61 +535,104 @@ function renderGrid(cat) {
   var grid = document.getElementById('grid');
   grid.innerHTML = '';
   var narrow = window.innerWidth < 480 || /[?&]narrow=1/.test(location.search);
-  // Find the hero story (if any)
-  var heroStory = items.find(function(c){ return c.full; });
-  var layoutItems = items.filter(function(c){ return !c.full; });
+  grid.classList.toggle('desktop', !narrow);
+    var W = grid.clientWidth, H = grid.clientHeight;
+  var heroStory = narrow ? items.filter(function(c){ return c.full; })[0] : null;
+  var heroH = 130;
+  if (narrow && heroStory) H = Math.max(240, H - heroH);
+  else heroH = 0;
+  var layoutItems = narrow ? items.filter(function(c){ return !c.full; }) : items;
+  if (narrow && !heroStory) { /* category w/o election: no reservation */ }
+  var decayN = layoutItems.filter(function(c){ return !c.logo; }).length; /* story cells joining the decay ladder */
+  var exp = narrow ? 2.2 : 1.7;                     /* V44 §1: desktop area ladder flattened (mobile keeps 2.2) */
+  var tail = narrow ? 0.45 : 0.55;                  /* V44 §1: desktop last-rank tail (mobile keeps 0.45) */
+  var q = decayN > 1 ? Math.pow(tail, 1/(decayN-1)) : 1;  /* last rank lands on tail — strict big→small */
+  var r = 0;
+  var leaves = layoutItems.map(function(c,i){
+    return { i:i, v: (c.logo && narrow) ? 0 : (c.logo ? 6 : Math.pow(100 - c.tier*22, exp) * Math.pow(q, r++)) };
+  });
+  if (!narrow) { /* V44 s1 (V43 s4): logo value floor - reserve a >=72x28 slot so the leaf never collapses to zero width */
+    var tot = 0;
+    leaves.forEach(function(d){ if (!layoutItems[d.i].logo) tot += d.v; });
+    leaves.forEach(function(d){ if (layoutItems[d.i].logo) d.v = Math.max(6, 72*28/(W*H)*tot); });
+  }
+  var root = d3.hierarchy({children: leaves}).sum(function(d){ return d.v || 0; });
+  root.sort(function(a,b){ return b.value - a.value; });
+  d3.treemap().tile(d3.treemapSquarify).size([W,H]).paddingInner(3).paddingOuter(0)(root);
+  root.leaves().forEach(function(n){
+    n.px0 = Math.max(0, Math.floor(n.x0)); n.py0 = Math.max(0, Math.floor(n.y0));
+    n.px1 = Math.min(W, Math.ceil(n.x1));  n.py1 = Math.min(H, Math.ceil(n.y1));
+  });
+  var rect = {};
+  root.leaves().forEach(function(n){ rect[n.data.i] = n; });
 
-  // Create hero element if exists
   if (heroStory) {
     var hel = document.createElement('div');
     hel.className = 'cell p0';
+    hel.style.left='0px'; hel.style.top='0px';
     hel.setAttribute('data-id', heroStory.id);
+    hel.style.width=W+'px'; hel.style.height=heroH+'px';
     hel.innerHTML = '<div class="badge-row"><span class="red-badge">ELECTION 2026</span>' +
       dateHtml(heroStory, 'date-chip') + '</div>' +
       '<div class="cell-title" style="font-size:17px;">'+
       (heroStory.title||'').replace('ELECTION 2026 —','—')+'</div>' +
       '<div class="tag-row">'+(heroStory.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
-      '<div class="gap-callout"><span>NAT–LAB GAP</span><b>10.3 pts</b><span>NAT 38.5 · LAB 28.2</span></div>';
+      '<div class="gap-callout"><span>GAP</span><b>10.3 pts</b><span>NAT 38.5 · LAB 28.2</span></div>';
     wireCard(hel, heroStory);
     grid.appendChild(hel);
-  }
+    }
 
-  // Create layout items
   layoutItems.forEach(function(c, i){
+    var n = rect[i];
+    if (!n) return;
     var el = document.createElement('div');
     el.className = 'cell p' + c.tier;
     el.setAttribute('data-id', c.id);
+    el.style.left = n.x0+'px'; el.style.top = n.y0+'px';
+    el.style.width = (n.x1-n.x0)+'px'; el.style.height = (n.y1-n.y0)+'px';
+    if (narrow) {
+      el.style.top = (parseFloat(el.style.top||n.y0)+heroH)+'px';
+    }
     if (c.logo) {
-      if (narrow) {
+      if (narrow || (n.x1-n.x0) < 96) {
         el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;">BEEHIVE</div>';
-      } else {
-        el.classList.add('logo-cell');
-        el.innerHTML = '<div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
+        grid.appendChild(el);
+        return;
       }
+      el.classList.add('logo-cell');
+      el.innerHTML = '<div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
       grid.appendChild(el);
       return;
     }
+    var w = n.x1-n.x0, h = n.y1-n.y0;
+    var big = c.full && !narrow;
     var sparkParty = { s02:'nzfirst', s03:'act', s04:'labour', s05:'act', s06:'national',
       s07:'green', s08:'green', s09:'national', s10:'labour', s11:'national',
       s12:'nzfirst', s13:'act' }[c.id];
     var tagsHtml = (c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('');
-  var html = '<div class="badge-row date-only">' + dateHtml(c, 'date-dim') + '</div>' +
+    var html = (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim') + '</div>' : '') +
       '<div class="cell-title">'+c.title+'</div>' +
       '<div class="tag-row">'+tagsHtml+'</div>';
-    if (sparkParty) {
+    if (big) {
+      html += '<div class="election-chart"></div>' +
+        '<div class="gap-callout"><span>NAT–LAB GAP</span><b>10.3 pts</b><span>NAT 38.5 · LAB 28.2</span></div>' +
+        '<div class="thresholds"></div>';
+    } else if (((!narrow && w >= 180 && h >= 170) || (narrow && w >= 170 && h >= 130)) && sparkParty) {
       html += '<div class="spark-mini"></div>';
     }
     el.innerHTML = html;
     wireCard(el, c);
     grid.appendChild(el);
-    if (sparkParty && el.querySelector('.spark-mini')) {
-      var sparkH = narrow ? 48 : 72;
-      el.querySelector('.spark-mini').style.height = sparkH + 'px';
+    if (big) {
+      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55));
+      thresholdBars(el.querySelector('.thresholds'));
+    } else if (sparkParty && el.querySelector('.spark-mini')) {
+      var sparkH = narrow ? 48 : Math.max(48, Math.min(96, Math.round(h*0.30))); /* V44 §4: 160→48 · 240→72 · 265→80 · ≥320→96 cap */
+      if (!narrow) el.querySelector('.spark-mini').style.height = sparkH + 'px';
       try { drawMiniSpark(el.querySelector('.spark-mini'), sparkParty, sparkH); }
       catch(e) { document.title = 'SPARKERR ' + c.id + ': ' + e.message; }
     }
   });
-
   updatePager();
   requestAnimationFrame(function(){ if (!narrow) fitTitleAll(grid); fitAudit(grid); });
 }
