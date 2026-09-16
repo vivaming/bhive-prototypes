@@ -153,6 +153,8 @@
   .article { max-width:680px; margin:0 auto; padding:48px 24px 80px; }
   .back { font-size:13px; color:#9aa7b4; cursor:pointer; display:inline-block; margin-bottom:28px; }
   .back:hover { color:#f2f4f7; }
+  .a-back { position:absolute; top:12px; left:12px; background:#171a20cc; border-radius:4px; color:#c7cfd8; font-size:11px; padding:6px 12px; cursor:pointer; }
+  .a-back:hover { background:#1f242bcc; }
   .a-badge { font-size:10px; font-weight:700; letter-spacing:.08em; color:#e5484d;
     text-transform:uppercase; border-left:3px solid #e5484d; padding-left:8px; margin-bottom:14px; }
   .a-title { font-size:28px; font-weight:700; color:#f2f4f7; line-height:1.25; margin-bottom:10px; }
@@ -185,7 +187,7 @@
 <!-- ================= ARTICLE VIEW ================= -->
 <div class="view" id="article-view">
   <div class="article">
-    <span class="back" onclick="showTreemap()">← Back to TreeMap</span>
+    <button class="a-back" onclick="showTreemap()">‹ BACK</button>
     <div class="a-badge" id="a-badge">ELECTION 2026</div>
     <h1 class="a-title" id="a-title"></h1>
     <div class="a-date" id="a-date"></div>
@@ -509,10 +511,12 @@ function drawMiniSpark(container, partyKey, h) {
 function thresholdBars(container) {
   var html = '<div class="th-line" style="left:'+(5/45*100)+'%"></div>' +
     '<div class="th-label" style="left:'+(5/45*100)+'%">5%</div>';
+  var abbrMap = {national:'NAT', labour:'LAB', green:'GRN', act:'ACT', nzfirst:'NZF'};
   Object.keys(PARTY).forEach(function(k){
     var p = PARTY[k];
     var w = Math.min(100, p.poll/45*100);
-    html += '<div class="th-row"><div class="th-name">'+p.name+'</div>' +
+    var abbr = abbrMap[k] || k.toUpperCase().substring(0,3);
+    html += '<div class="th-row"><div class="th-name">'+p.name+' <span class="th-abbr">'+abbr+' '+p.poll+'</span></div>' +
       '<div class="th-track"><div class="th-bar'+(p.reached?'':' below')+
       '" style="width:'+w+'%; background:'+p.color+'"></div></div>' +
       '<div class="th-val">'+p.poll+'%</div></div>';
@@ -520,7 +524,6 @@ function thresholdBars(container) {
   html += '<div class="mmp-note">MMP: a party enters Parliament by clearing 5% party vote OR winning one electorate seat.</div>';
   container.innerHTML = html;
 }
-
 function legendRow() {
   var html = '';
   Object.keys(PARTY).forEach(function(k){
@@ -623,7 +626,7 @@ function renderGrid(cat) {
       '<div class="cell-title" style="font-size:17px;">'+
       (heroStory.title||'').replace('ELECTION 2026 —','—')+'</div>' +
       '<div class="tag-row">'+(heroStory.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
-      '<div class="gap-callout"><span>GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span></div>';
+      '<div class="gap-callout"><span>GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span> · Curia 3 Sep</div>';
     wireCard(hel, heroStory);
     grid.appendChild(hel);
     }
@@ -662,7 +665,7 @@ var sparkParty = { s05:'act' }[c.id];
       (showSource ? getSourceHtml(c) : '');
     if (big) {
       html += '<div class="election-chart"></div>' +
-        '<div class="gap-callout"><span>NAT–LAB GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span></div>' +
+        '<div class="gap-callout"><span>NAT–LAB GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span> · Curia 3 Sep</div>' +
         '<div class="thresholds"></div>';
     } else if (((!narrow && w >= 180 && h >= 170) || (narrow && w >= 170 && h >= 130)) && sparkParty) {
       html += '<div class="spark-mini"></div>';
@@ -1136,8 +1139,8 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of 3 Sep 2026';
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of 14 Sep 2026 · Cabinet paper via RNZ';
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1164,8 +1167,8 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of 3 Sep 2026';
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of 14 Sep 2026 · Cabinet paper via RNZ';
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1186,8 +1189,8 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of 3 Sep 2026';
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of 14 Sep 2026 · Cabinet paper via RNZ';
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
