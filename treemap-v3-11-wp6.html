@@ -61,7 +61,9 @@
   .badge-row.date-only { justify-content:flex-end; }
   .tag-row { display:flex; flex-wrap:wrap; gap:3px 7px; margin-top:4px; font-size:8.5px;
     font-weight:600; letter-spacing:.05em; color:#9aa7b4; }
-  .date-dim { font-size:10px; color:#77828f; letter-spacing:.05em; white-space:nowrap; }
+.date-dim { font-size:10px; color:#77828f; letter-spacing:.05em; white-space:nowrap; }
+.date-dim.old-date { opacity:0.45; }
+.source { font-size:8px; color:#6b7684; }
   .cell-title { position:relative; flex:1 1 auto; min-height:0; overflow:hidden; transition:color .18s ease-out, transform .18s ease-out; color:#f2f4f7; font-weight:700; line-height:1.30; overflow-wrap:normal; word-break:normal; hyphens:manual; }
   .p0 .cell-title { line-height:1.22 !important; } .p2 .cell-title, .p3 .cell-title { line-height:1.38 !important; }
   .cell.p0 .cell-title { font-size:clamp(16px, 1.7vw, 24px); letter-spacing:-0.01em; }
@@ -82,8 +84,8 @@
   .legend-row { display:flex; gap:14px; flex-wrap:wrap; margin:4px 0 8px 0; }
   .legend-row .li { display:flex; align-items:center; gap:5px; font-size:11px; color:#9aa7b4; }
   .legend-row .dot { width:6px; height:6px; border-radius:50%; }
-  .gap-callout { display:flex; align-items:baseline; gap:8px; margin:3px 0 4px 0; }
-  .gap-callout span { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:#9aa7b4; }
+.gap-callout { display:flex; align-items:baseline; gap:8px; margin:3px 0 4px 0; flex-wrap:wrap; min-width:0; }
+.gap-callout span { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:#9aa7b4; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
   .gap-callout b { font-size:16px; color:#f2f4f7; font-variant-numeric:tabular-nums; }
   .spark-mini { margin-top:6px; height:48px; }
   .spark-mini svg { width:100%; height:100%; display:block; }
@@ -119,9 +121,12 @@
   .cat-bar { position:static; transform:none; display:flex; gap:2px; background:#171a20cc;
     border-radius:18px; padding:4px; max-width:calc(100vw - 16px); margin:8px auto 0 auto;
     overflow-x:auto; scrollbar-width:none; }
-  .cat-pill { font-family:inherit; font-size:11px; font-weight:600; letter-spacing:.08em;
-    text-transform:uppercase; color:#9aa7b4; background:none; border:none; border-radius:14px;
-    padding:6px 12px; cursor:pointer; position:relative; white-space:nowrap; }
+.cat-bar::-webkit-scrollbar {
+  display: none;
+}
+.cat-pill { font-family:inherit; font-size:11px; font-weight:600; letter-spacing:.08em;
+  text-transform:uppercase; color:#9aa7b4; background:none; border:none; border-radius:14px;
+  padding:6px 12px; cursor:pointer; position:relative; white-space:nowrap; flex-shrink:0; }
   .cat-pill:hover { color:#f2f4f7; }
   .cat-pill.active { color:#f2f4f7; }
   .cat-pill.active::after { content:''; position:absolute; left:12px; right:12px; bottom:3px;
@@ -132,10 +137,10 @@
   }
   /* pagination capsule — floats bottom-right, above cells */
   .pager { position:static; align-self:center; display:flex; align-items:center; gap:6px;
-    background:#171a20cc; border-radius:16px; padding:6px 10px; margin:6px 0 calc(10px + env(safe-area-inset-bottom));
+    background:#171a20cc; border-radius:16px; padding:6px 10px; margin:auto 0 calc(10px + env(safe-area-inset-bottom));
     font-size:11px; color:#9aa7b4; letter-spacing:.08em; }
-  .pg-btn { font-family:inherit; font-size:13px; line-height:1; color:#9aa7b4; background:none;
-    border:none; cursor:pointer; padding:2px 6px; }
+.pg-btn { font-family:inherit; font-size:13px; line-height:1; color:#9aa7b4; background:none;
+  border:none; cursor:pointer; padding:2px 6px; min-width:44px; min-height:44px; }
   .pg-btn:hover { color:#f2f4f7; }
   .pg-btn.disabled { opacity:.3; pointer-events:none; }
   .pg-num { font-variant-numeric:tabular-nums; }
@@ -253,7 +258,38 @@
   }
   /* single date emission point — every visible date goes through this helper */
   function dateHtml(c, cls) { return '<span class="'+cls+'">'+(c.date||'')+'</span>'; }
-  /* demote overflowing ids to the head of the next page (new page if the last overflows) */
+function isOldDate(dateStr) {
+  if (!dateStr) return false;
+  var parts = dateStr.split(' ');
+  if (parts.length !== 2) return false;
+  var day = parseInt(parts[0], 10);
+  var monthStr = parts[1].toUpperCase();
+  var monthMap = {
+    'JAN':0, 'FEB':1, 'MAR':2, 'APR':3, 'MAY':4, 'JUN':5,
+    'JUL':6, 'AUG':7, 'SEP':8, 'OCT':9, 'NOV':10, 'DEC':11
+  };
+  var month = monthMap[monthStr];
+  if (isNaN(day) || month === undefined) return false;
+  var date = new Date(2026, month, day);
+  var ref = new Date(2026, 8, 16); // September is 8 (0-indexed), 16th
+  var diffTime = ref - date;
+  var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays > 7;
+}
+function getSourceHtml(c) {
+  // wp6-1/wp7-1/wp7-3 → via RNZ
+  // wp7-2/wp8-1/wp8-4 → via NZ Herald
+  // wp8-2 → via Curia
+  if (c.wp6 === 'wp6-1' || c.wp7 === 'wp7-1' || c.wp7 === 'wp7-3') {
+    return '<span class="source">via RNZ</span>';
+  } else if (c.wp7 === 'wp7-2' || c.wp8 === 'wp8-1' || c.wp8 === 'wp8-4') {
+    return '<span class="source">via NZ Herald</span>';
+  } else if (c.wp8 === 'wp8-2') {
+    return '<span class="source">via Curia</span>';
+  }
+  return '';
+}
+/* demote overflowing ids to the head of the next page (new page if the last overflows) */
   function demote(ids) {
     var pages = pagesFor(activeCat), pi = pageNum - 1, changed = false;
     ids.forEach(function(id){
@@ -517,6 +553,8 @@ function pageCount() { return pagesFor(activeCat).length; }
 function pageItems() {
   var ids = pagesFor(activeCat)[pageNum - 1] || [];
   var s = ids.map(function(id){ return CELLS.filter(function(c){ return c.id === id; })[0]; }).filter(Boolean);
+  // Remove duplicate filler cards: keep wp articles, remove s02, s03, s04
+  s = s.filter(function(c){ return !['s02','s03','s04'].includes(c.id); });
   return (pageNum === 1 && document.getElementById('grid').clientWidth >= 480) ? s.concat(CELLS.filter(function(c){ return c.logo; })) : s;
 }
 function updatePager() {
@@ -562,6 +600,10 @@ function renderGrid(cat) {
   root.leaves().forEach(function(n){
     n.px0 = Math.max(0, Math.floor(n.x0)); n.py0 = Math.max(0, Math.floor(n.y0));
     n.px1 = Math.min(W, Math.ceil(n.x1));  n.py1 = Math.min(H, Math.ceil(n.y1));
+    // P0-3: right edge card fix for narrow leaves
+    if ((n.px1 - n.px0) < 32 && n.px1 < W) {
+      n.px1 = W;
+    }
   });
   var rect = {};
   root.leaves().forEach(function(n){ rect[n.data.i] = n; });
@@ -606,13 +648,12 @@ function renderGrid(cat) {
     }
     var w = n.x1-n.x0, h = n.y1-n.y0;
     var big = c.full && !narrow;
-    var sparkParty = { s02:'nzfirst', s03:'act', s04:'labour', s05:'act', s06:'national',
-      s07:'green', s08:'green', s09:'national', s10:'labour', s11:'national',
-      s12:'nzfirst', s13:'act' }[c.id];
+var sparkParty = { s05:'act', s08:'green', s11:'national' }[c.id];
     var tagsHtml = (c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('');
-    var html = (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim') + '</div>' : '') +
+    var html = (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' : '') +
       '<div class="cell-title">'+c.title+'</div>' +
-      '<div class="tag-row">'+tagsHtml+'</div>';
+      '<div class="tag-row">'+tagsHtml+'</div>' +
+      getSourceHtml(c);
     if (big) {
       html += '<div class="election-chart"></div>' +
         '<div class="gap-callout"><span>NAT–LAB GAP</span><b>10.3 pts</b><span>NAT 38.5 · LAB 28.2</span></div>' +
