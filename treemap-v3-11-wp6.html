@@ -28,12 +28,15 @@
   #grid.desktop .cell-title { display:flex; flex-direction:column; justify-content:center; }
   #grid.desktop .badge-row, #grid.desktop .tag-row { flex-shrink:0; }
   /* V44 §3: desktop hero rhythm — title hugs content (fitTitle sets flex), chart breathes */
-  #grid.desktop .cell.p0 .cell-title { margin-bottom:6px; }
-  #grid.desktop .election-chart { margin:12px 0 8px; }
+  #grid.desktop .cell.p0 .cell-title { margin-bottom:6px; min-height:22px; }
+  #grid.desktop .election-chart { margin:12px 0 8px; min-height:90px; }
   #grid.desktop .gap-callout { white-space:nowrap; margin:10px 0 8px; }
   #grid.desktop .th-row { margin-bottom:3px; }
   #grid.desktop .mmp-note { margin-top:4px; }
-  /* ---------- TREEMAP VIEW ---------- */
+@media (max-height: 819px) {
+    #grid.desktop .mmp-note { font-size:8px; white-space:normal; }
+}
+/* ---------- TREEMAP VIEW ---------- */
   #treemap-view { }
 #grid { position:relative; flex:1; min-height:0; }
   .cell {
@@ -277,17 +280,17 @@ function isOldDate(dateStr) {
   return diffDays > 7;
 }
 function getSourceHtml(c) {
-  // wp6-1/wp7-1/wp7-3 → via RNZ
-  // wp7-2/wp8-1/wp8-4 → via NZ Herald
+  // wp6-1/wp6-2/wp7-1/wp7-3 → via RNZ
+  // wp6-3/wp7-2/wp8-1/wp8-3/wp8-4 → via NZ Herald
   // wp8-2 → via Curia
-  if (c.wp6 === 'wp6-1' || c.wp7 === 'wp7-1' || c.wp7 === 'wp7-3') {
+  if (c.wp6 === 'wp6-1' || c.wp6 === 'wp6-2' || c.wp7 === 'wp7-1' || c.wp7 === 'wp7-3') {
     return '<span class="source">via RNZ</span>';
-  } else if (c.wp7 === 'wp7-2' || c.wp8 === 'wp8-1' || c.wp8 === 'wp8-4') {
+  } else if (c.wp7 === 'wp7-2' || c.wp8 === 'wp8-1' || c.wp8 === 'wp8-3' || c.wp8 === 'wp8-4' || c.wp6 === 'wp6-3') {
     return '<span class="source">via NZ Herald</span>';
   } else if (c.wp8 === 'wp8-2') {
     return '<span class="source">via Curia</span>';
   }
-  return '';
+  return ''
 }
 /* demote overflowing ids to the head of the next page (new page if the last overflows) */
   function demote(ids) {
@@ -555,7 +558,7 @@ function pageItems() {
   var s = ids.map(function(id){ return CELLS.filter(function(c){ return c.id === id; })[0]; }).filter(Boolean);
   // Remove duplicate filler cards: keep wp articles, remove s02, s03, s04
   s = s.filter(function(c){ return !['s02','s03','s04'].includes(c.id); });
-  return (pageNum === 1 && document.getElementById('grid').clientWidth >= 480) ? s.concat(CELLS.filter(function(c){ return c.logo; })) : s;
+  return (pageNum === 1 && document.getElementById('grid').clientWidth >= 480) ? CELLS.filter(function(c){ return c.logo; }).concat(s) : s;
 }
 function updatePager() {
   var pc = pageCount();
@@ -600,9 +603,10 @@ function renderGrid(cat) {
   root.leaves().forEach(function(n){
     n.px0 = Math.max(0, Math.floor(n.x0)); n.py0 = Math.max(0, Math.floor(n.y0));
     n.px1 = Math.min(W, Math.ceil(n.x1));  n.py1 = Math.min(H, Math.ceil(n.y1));
-    // P0-3: right edge card fix for narrow leaves
-    if ((n.px1 - n.px0) < 32 && n.px1 < W) {
-      n.px1 = W;
+    // P0-3: right edge card fix for narrow leaves (width <60px and near right edge)
+    if ((n.px1 - n.px0) < 60 && n.px1 >= W - 8) {
+        n.px0 = Math.max(0, W - 60);
+        n.px1 = W;
     }
   });
   var rect = {};
@@ -648,7 +652,7 @@ function renderGrid(cat) {
     }
     var w = n.x1-n.x0, h = n.y1-n.y0;
     var big = c.full && !narrow;
-var sparkParty = { s05:'act', s08:'green', s11:'national' }[c.id];
+var sparkParty = { s05:'act' }[c.id];
     var tagsHtml = (c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('');
     var html = (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' : '') +
       '<div class="cell-title">'+c.title+'</div>' +
