@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BEEHIVE — NZ Political Intelligence</title>
+<link rel="icon" href="logo-new.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
@@ -107,6 +108,23 @@
   .logo { font-weight:700; letter-spacing:.14em; font-size:11px; color:#f2f4f7; }
   .logo b { color:#e5484d; }
   .logo-sub { font-size:8px; color:#77828f; letter-spacing:.18em; margin-top:2px; }
+  /* brand mark — source art is 720x1280 with the glyph centred mid-frame (rows 607-721).
+     box 44px tall x 125px wide, background-size:cover -> scale 1.736, visible source window
+     y 360-608; the glyph centre (y 664) must land at box centre (y 22), so offset = 304px
+     = 304/600.3 of the 600px vertical overflow = 50.68% */
+  .brand-mark {
+    display: block;
+    width: auto;
+    height: 44px;
+    border-radius: 4px;
+    background-color: #0a0d11;
+    background-image: url("logo-new.jpg");
+    background-repeat: no-repeat;
+    background-position: 50% 50.68%;
+    background-size: cover;
+    flex-shrink: 0;
+    margin-bottom: 6px;
+  }
   .header-logo {
     height: 48px;
     display: flex;
@@ -176,6 +194,39 @@
   .a-caption { font-size:11px; color:#6b7684; margin-bottom:32px; }
   .a-body p { font-size:16px; line-height:1.7; color:#c7cfd8; margin-bottom:22px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; animation:none !important; } }
+/* Inline charts */
+.a-inline-chart {
+  position: relative;
+  margin: 12px 0;
+}
+.a-inline-chart figcaption {
+  font-size: 12px;
+  color: #9aa7b4;
+  text-align: center;
+  padding: 4px 0;
+  margin-top: 8px;
+}
+/* Reading guide: rendered once at the end of the anchored section by the renderer
+   from chart_refs[].text — never hardcoded in the section paragraph body. */
+.a-chart-ref {
+  font-size: 12.5px;
+  font-style: italic;
+  color: #98a6b5;
+  margin-top: 8px;
+}
+@media (max-width: 768px) {
+  .a-inline-chart {
+    width: 100%;
+    margin: 12px 0;
+  }
+}
+@media (min-width: 769px) {
+  .a-inline-chart {
+    float: right;
+    width: 360px;
+    margin-left: 12px;
+  }
+}
 </style>
 </head>
 <body>
@@ -751,8 +802,23 @@ var ARTICLE_DATA = {
   "sections": [
    { "h": "Two surveys, one electorate", "p": "A Curia Research poll commissioned by Whakaata Māori and reported by 1News on 17 September polled 1,000 Māori adults, split 500 by phone and 500 by online panel, with a margin of error of plus or minus 3.1%. The headline result is not party preference in the general electorate; it is a near-total divergence once the type of electorate enters the picture. Among Māori intending to vote in a Māori electorate, Te Pāti Māori would receive 29% of the party vote. Among Māori intending to vote in a general electorate, that figure falls to 3%." },
    { "h": "The gap is structural", "p": "Twenty-six percentage points separates two groups of voters who are demographically identical in ethnicity but differ only in which electoral roll they choose. The gap exists because Te Pāti Māori runs almost exclusively in Māori seats: its general-rollback electorate strategy is not a strategy, it is a non-event. For Te Pāti Māori the 29% figure is the relevant one. For every other party the 3% figure is the ceiling. The two percentages describe the same electorate split along an institutional line that most mainstream polling never surfaces." },
-   { "h": "The coalition numbers", "p": "The same poll gives the coalition parties a low mark in the Māori electorate: National, ACT and their partners combined take 8% of the Māori electorate party vote, rising to 23% among Māori voting in general electorates. The coalition's position is therefore not a vote share but a geography: it is a party that performs better in the general roll than in the Māori roll, and the two rolls are not interchangeable. Te Pāti Māori's 29% is 21 points ahead of second place in the Māori electorate, and 18 points ahead in the general electorate the other way around." },
+{ "h": "The coalition numbers", "p": "The same poll gives the coalition parties a low mark in the Māori electorate: National, ACT and their partners combined take 8% of the Māori electorate party vote, rising to 23% among Māori voting in general electorates. The coalition's position is therefore not a vote share but a geography: it is a party that performs better in the general roll than in the Māori roll, and the two rolls are not interchangeable. Te Pāti Māori's 29% is 21 points ahead of second place in the Māori electorate, and 18 points ahead in the general electorate the other way around.",
+    "chart_refs": [
+     { "chart_id": "chart-s13-trend", "reference_id": "ref-s13-1", "text": "The poll table next to this section shows the party-vote split as it was read in the Curia fielding." }
+    ]
+},
    { "h": "The 2023 comparison", "p": "Compared with the 2023 Māori electorate result, where Te Pāti Māori took 31 seats, Labour 28 and the Greens 17, the survey suggests Te Pāti Māori's share is holding at 29%, a two-point dip from the 31 seats it secured two years ago. Labour is down from 44 to 28 in the comparison, and the Greens are up from 9 to 17. Whether the dip is real or sampling noise cannot be resolved at plus or minus 3.1%: the margin of error is 10.7% of the measured value, which is too wide to call a trend. The direction is consistent with Te Pāti Māori's narrative that its base has consolidated since it formed its governing relationship with National. Note: the poll was conducted by Curia Research, which left the Research Association in 2024 (1News, 17 September 2026)." }
+  ],
+  "charts": [
+    {
+      "id": "chart-s13-trend",
+      "type": "poll_table",
+      "after_section": 2,
+      "side": "right",
+      "title": "Party vote poll",
+      "caption": "Latest party vote percentages from Curia Research.",
+      "alt": "Table showing party vote percentages."
+    }
   ]
 },
  "art-s14": {
@@ -786,9 +852,25 @@ var ARTICLE_DATA = {
   "title": "Herald Poll of Polls: Coalition at 47.8%",
   "sections": [
    { "h": "The model's headline", "p": "The NZ Herald's Poll of Polls, updated on 16 September, assigns a 47.8% probability to coalition government formation after the next election. The Poll of Polls is a model that aggregates multiple opinion polls into a single probability distribution, weighted by poll quality, fielding date and sample composition. A 47.8% figure is below the 50% threshold the model would need to call an outcome more likely than not, which is the most defensible reading of the number itself." },
-   { "h": "Why it is below 50%", "p": "The model is built on the underlying Curia Research poll, which gave National 29.0%, Labour 25.9%, the Greens 13.9%, ACT at 10.5%, NZ First 8.4%, One NZ 8.4% and the Opposition 4.5%. The probability reflects the gap between National's party vote and the 50% threshold required for a majority, the likelihood of overhang seats expanding or contracting the parliament, and the difficulty of assembling a coalition when no party is close to half the vote. The 47.8% is not a forecast; it is a Bayesian aggregation of the uncertainty in the polling data itself." },
+  { "h": "Why it is below 50%", "p": "The model is built on the underlying Curia Research poll, which gave National 29.0%, Labour 25.9%, the Greens 13.9%, ACT at 10.5%, NZ First 8.4%, One NZ 8.4% and the Opposition 4.5%. The probability reflects the gap between National's party vote and the 50% threshold required for a majority, the likelihood of overhang seats expanding or contracting the parliament, and the difficulty of assembling a coalition when no party is close to half the vote. The 47.8% is not a forecast; it is a Bayesian aggregation of the uncertainty in the polling data itself.",
+    "chart_refs": [
+     { "chart_id": "chart-s18-trend", "reference_id": "ref-s18-1", "text": "The trend chart next to this section traces the National party-vote series as it enters the model's underlying poll feed." }
+    ]
+  },
    { "h": "What the model does not say", "p": "The NZ Herald's full analysis is behind a Premium paywall, and the reasoning behind the 47.8% figure was not available in the open crawl of 16 September. The 47.8% number comes from the page's meta description rather than the article body, which means it has not been verified against the model's published methodology. The model does not publish its sensitivity analysis, the weight it assigns to individual polls, or the confidence interval around the 47.8% figure. These are the details that would distinguish a model-based probability from a rounding of intuition, and they are not accessible." },
    { "h": "What the polls say", "p": "The polling data that feeds the model is clear: National leads by 3.1 points on party vote, the coalition arithmetic requires at least two additional parties to reach a majority, and the overhang mechanism could add seats in a tightly contested result. The 47.8% figure is a summary of that arithmetic, a number that says the coalition outcome is plausible rather than probable, and that the model's confidence in that assessment is not high enough to cross the 50% line. As of 16 September 2026 the Poll of Polls says the outcome is still open (NZ Herald, 16 September 2026, meta description)." }
+  ],
+  "charts": [
+    {
+      "id": "chart-s18-trend",
+      "type": "poll_trend",
+      "after_section": 1,
+      "side": "right",
+      "title": "National party vote trend",
+      "caption": "National party vote percentage over recent months.",
+      "as_of": "2026-09-03",
+      "alt": "Line chart showing National party vote trend."
+    }
   ]
 },
  "art-wp6-1": {
@@ -915,11 +997,10 @@ var ARTICLE_DATA = {
    "sections": [
     { "h": "The target band is no longer doing any work", "p": "Inflation rose 1.5% in the three months to June 2026, taking the 12-month increase to 4.1%. That is the highest annual reading since the December 2024 quarter, when CPI was 4.7%, and it is a full point above the March 2026 figure of 3.1%. The annual series has not printed below 2.2% since the September 2024 quarter, so even the recent low was at the top of the Reserve Bank's 1 to 3% target band. At 4.1% the economy is sitting a full point outside that band." },
     { "h": "One item explains most of the move", "p": "Petrol rose 27.5% in the year to June, contributing 23.5 percentage points of the 4.1-point rise across all groups. Other vehicle fuels and lubricants rose 71.0%, contributing 7.7 points. Household electricity rose 12.0%, contributing 8.4 points. The three together account for almost all of the annual increase and then some, because other items moved the other way. That concentration matters politically: a price print built almost entirely out of fuel and power is not a broad demand inflation, and it will not be turned around by the instrument that turns around broad demand inflation." },
-    { "h": "The quarterly picture is sharper still", "p": "In the quarter itself, petrol rose 20.1%, contributing 49.5 percentage points of the 1.5-point quarterly increase. Other vehicle fuels rose 47.7%, contributing 16.2 points. Household purchasing of housing rose 1.6%, contributing 10.2 points. The offsets were equally specific: fruit fell 8.5%, contributing minus 6.3 points, and domestic accommodation services fell 12.0%, contributing minus 5.6 points. The domestic accommodation fall is the number to note, because it is the opposite of what a demand-led inflation story would predict, and it points at the same property market that REINZ's August data shows carrying 32,908 listings in inventory." },
-    { "h": "Core and tradables", "p": "The underlying measures tell a different story from the headline. CPI excluding food, household energy and vehicle fuels rose 2.5% over the year, which is inside the target band. Tradeables rose 4.9% and non-tradeables 3.4%, so the imported component of the rise remains the faster one. That is the pattern of a terms-of-trade or currency problem rather than a domestic wage spiral: strip out fuel and power and the annual reading stops being 4.1%." },
+{ "h": "The quarterly picture is sharper still", "p": "In the quarter itself, petrol rose 20.1%, contributing 49.5 percentage points of the 1.5-point quarterly increase. Other vehicle fuels rose 47.7%, contributing 16.2 points. Household purchasing of housing rose 1.6%, contributing 10.2 points. The offsets were equally specific: fruit fell 8.5%, contributing minus 6.3 points, and domestic accommodation services fell 12.0%, contributing minus 5.6 points. The domestic accommodation fall is the number to note, because it is the opposite of what a demand-led inflation story would predict, and it points at the same property market that REINZ's August data shows carrying 32,908 listings in inventory." },
     { "h": "What the campaign gets from this quarter", "p": "The political use of 4.1% is a price list, and the price list is a fuel and power bill. The opposition can point at a print that is one third fuel and one third power and ask what a new budget does to it. Neither party gets to claim the print is being handled: the number is outside the target band, it moved up one full point in a single quarter, and its largest components are tax and wholesale energy rather than wages. That is the most uncomfortable shape a price release can take for a campaign running on affordability." },
     { "as_of": true, "p": "As of 15 September 2026. Source: Stats NZ, Consumer Prices Index: June 2026 quarter, published 15 September 2026." }
-   ]
+   ],
   },
   "art-s07": {
    "title": "Threshold Review: What 8.4% NZF Means Now",
@@ -1021,7 +1102,7 @@ function drawFiscalTable(container, wp7) {
 }
 
 /* house-style party trend chart for a single party (colour + band + TODAY) */
-function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
+function drawPartyTrend(container, partyKey, partyLabel, latestVal, h, opts) {
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
     .attr('preserveAspectRatio', 'none');
@@ -1042,11 +1123,13 @@ function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
     .attr('y1', 6).attr('y2', h - 16).attr('stroke', 'rgba(255,255,255,0.5)');
   svg.append('text').attr('x', x(hist.length - 1)).attr('y', 4).attr('text-anchor', 'middle')
     .attr('font-size', 8).attr('letter-spacing', '0.1em').attr('fill', '#9aa7b4').text('TODAY');
-  svg.append('path').datum(hist)
-    .attr('d', d3.area().x(function (d, i) { return x(i); })
-      .y0(function (d) { return y(d - 1.3); }).y1(function (d) { return y(d + 1.3); })
-      .curve(d3.curveMonotoneX))
-    .attr('fill', color).attr('opacity', 0.16);
+  if (opts && typeof opts.moemargin === 'number' && isFinite(opts.moemargin) && opts.moemargin > 0) {
+    svg.append('path').datum(hist)
+      .attr('d', d3.area().x(function (d, i) { return x(i); })
+        .y0(function (d) { return y(d - opts.moemargin); }).y1(function (d) { return y(d + opts.moemargin); })
+        .curve(d3.curveMonotoneX))
+      .attr('fill', color).attr('opacity', 0.16);
+  }
   svg.selectAll(null).data(hist).enter().append('circle')
     .attr('cx', function (d, i) { return x(i); }).attr('cy', function (d) { return y(d); })
     .attr('r', 2.2).attr('fill', color).attr('opacity', 0.45);
@@ -1288,6 +1371,58 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
+    // Render inline charts if any
+    if (art && art.charts) {
+      const seenIds = new Set();
+      art.charts.forEach(chart => {
+        if (!chart || typeof chart !== 'object') { console.warn('Invalid chart entry', chart); return; }
+        const { id, type, after_section, side, title, caption, as_of, alt } = chart;
+        if (seenIds.has(id)) { console.warn('Duplicate chart id:', id); return; }
+        seenIds.add(id);
+        if (after_section < 0 || after_section >= art.sections.length) {
+          console.warn('Chart after_section out of range:', id, after_section);
+          return;
+        }
+        if (!['poll_table','fiscal_table','poll_trend'].includes(type)) {
+          console.warn('Unknown chart type:', id, type);
+          return;
+        }
+        // Insert placeholder after the p element at index after_section
+        const pEls = bodyEl.querySelectorAll('p');
+        const p = pEls[after_section];
+        if (!p) { console.warn('Could not find p element for after_section:', id, after_section); return; }
+        const span = document.createElement('span');
+        span.dataset.chartId = id;
+        p.parentNode.insertBefore(span, p.nextSibling);
+      });
+      // Now render each chart
+      const spans = bodyEl.querySelectorAll('span[data-chart-id]');
+      spans.forEach(span => {
+        const id = span.dataset.chartId;
+        const chartDef = art.charts.find(c => c.id === id);
+        if (!chartDef) { span.remove(); return; }
+        const figure = document.createElement('figure');
+        figure.className = 'a-inline-chart';
+        const chartDiv = document.createElement('div');
+        figure.appendChild(chartDiv);
+        const figcap = document.createElement('figcaption');
+        figcap.textContent = chartDef.caption;
+        figure.appendChild(figcap);
+        span.parentNode.insertBefore(figure, span.nextSibling);
+        span.remove();
+        // Draw based on type
+        if (chartDef.type === 'poll_table') {
+          drawPollTable(chartDiv);
+        } else if (chartDef.type === 'fiscal_table') {
+          // For wp6 articles, we don't have a wp7/pg parameter; use default (else branch) of drawFiscalTable
+          drawFiscalTable(chartDiv, '');
+        } else if (chartDef.type === 'poll_trend') {
+          // Use national party trend
+          const latest = POLL_HISTORY.national[POLL_HISTORY.national.length - 1];
+          drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
+        }
+      });
+    }
     var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
     captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
@@ -1316,6 +1451,58 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
+    // Render inline charts if any
+    if (art && art.charts) {
+      const seenIds = new Set();
+      art.charts.forEach(chart => {
+        if (!chart || typeof chart !== 'object') { console.warn('Invalid chart entry', chart); return; }
+        const { id, type, after_section, side, title, caption, as_of, alt } = chart;
+        if (seenIds.has(id)) { console.warn('Duplicate chart id:', id); return; }
+        seenIds.add(id);
+        if (after_section < 0 || after_section >= art.sections.length) {
+          console.warn('Chart after_section out of range:', id, after_section);
+          return;
+        }
+        if (!['poll_table','fiscal_table','poll_trend'].includes(type)) {
+          console.warn('Unknown chart type:', id, type);
+          return;
+        }
+        // Insert placeholder after the p element at index after_section
+        const pEls = bodyEl.querySelectorAll('p');
+        const p = pEls[after_section];
+        if (!p) { console.warn('Could not find p element for after_section:', id, after_section); return; }
+        const span = document.createElement('span');
+        span.dataset.chartId = id;
+        p.parentNode.insertBefore(span, p.nextSibling);
+      });
+      // Now render each chart
+      const spans = bodyEl.querySelectorAll('span[data-chart-id]');
+      spans.forEach(span => {
+        const id = span.dataset.chartId;
+        const chartDef = art.charts.find(c => c.id === id);
+        if (!chartDef) { span.remove(); return; }
+        const figure = document.createElement('figure');
+        figure.className = 'a-inline-chart';
+        const chartDiv = document.createElement('div');
+        figure.appendChild(chartDiv);
+        const figcap = document.createElement('figcaption');
+        figcap.textContent = chartDef.caption;
+        figure.appendChild(figcap);
+        span.parentNode.insertBefore(figure, span.nextSibling);
+        span.remove();
+        // Draw based on type
+        if (chartDef.type === 'poll_table') {
+          drawPollTable(chartDiv);
+        } else if (chartDef.type === 'fiscal_table') {
+          // For wp7 articles, use the wp7 parameter
+          drawFiscalTable(chartDiv, c.wp7);
+        } else if (chartDef.type === 'poll_trend') {
+          // Use national party trend
+          const latest = POLL_HISTORY.national[POLL_HISTORY.national.length - 1];
+          drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
+        }
+      });
+    }
     var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
     captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
@@ -1338,6 +1525,58 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
+    // Render inline charts if any
+    if (art && art.charts) {
+      const seenIds = new Set();
+      art.charts.forEach(chart => {
+        if (!chart || typeof chart !== 'object') { console.warn('Invalid chart entry', chart); return; }
+        const { id, type, after_section, side, title, caption, as_of, alt } = chart;
+        if (seenIds.has(id)) { console.warn('Duplicate chart id:', id); return; }
+        seenIds.add(id);
+        if (after_section < 0 || after_section >= art.sections.length) {
+          console.warn('Chart after_section out of range:', id, after_section);
+          return;
+        }
+        if (!['poll_table','fiscal_table','poll_trend'].includes(type)) {
+          console.warn('Unknown chart type:', id, type);
+          return;
+        }
+        // Insert placeholder after the p element at index after_section
+        const pEls = bodyEl.querySelectorAll('p');
+        const p = pEls[after_section];
+        if (!p) { console.warn('Could not find p element for after_section:', id, after_section); return; }
+        const span = document.createElement('span');
+        span.dataset.chartId = id;
+        p.parentNode.insertBefore(span, p.nextSibling);
+      });
+      // Now render each chart
+      const spans = bodyEl.querySelectorAll('span[data-chart-id]');
+      spans.forEach(span => {
+        const id = span.dataset.chartId;
+        const chartDef = art.charts.find(c => c.id === id);
+        if (!chartDef) { span.remove(); return; }
+        const figure = document.createElement('figure');
+        figure.className = 'a-inline-chart';
+        const chartDiv = document.createElement('div');
+        figure.appendChild(chartDiv);
+        const figcap = document.createElement('figcaption');
+        figcap.textContent = chartDef.caption;
+        figure.appendChild(figcap);
+        span.parentNode.insertBefore(figure, span.nextSibling);
+        span.remove();
+        // Draw based on type
+        if (chartDef.type === 'poll_table') {
+          drawPollTable(chartDiv);
+        } else if (chartDef.type === 'fiscal_table') {
+          // For wp8 articles, use the suffix
+          drawFiscalTable(chartDiv, 'wp8-' + c.wp8.slice(-1));
+        } else if (chartDef.type === 'poll_trend') {
+          // Use national party trend
+          const latest = POLL_HISTORY.national[POLL_HISTORY.national.length - 1];
+          drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
+        }
+      });
+    }
     var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
     captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
@@ -1360,14 +1599,82 @@ function openArticle(c) {
     if (sArt) {
       document.getElementById('a-date').textContent = (c.date || '') + ' · Beehive Political Intelligence' + srcEl;
       var sHtml = '';
-      sArt.sections.forEach(function (s) {
+      /* chart_refs is the section-level reading-guide contract: the guide text
+         lives in the anchored section declaration, not in the paragraph body,
+         and is rendered exactly once by this loop at the end of that section. */
+      sArt.sections.forEach(function (s, i) {
         if (s.as_of) {
           sHtml += '<p style="margin-top:14px;padding-top:10px;border-top:1px solid #2b3542;color:#8b98a8;font-size:12px;">' + s.p + '</p>';
         } else {
           sHtml += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
         }
+        if (s.chart_refs && s.chart_refs.length) {
+          var lastRef = s.chart_refs[s.chart_refs.length - 1];
+          if (lastRef && lastRef.text) {
+            sHtml += '<p class="a-chart-ref" data-section-idx="' + i + '">' + lastRef.text + '</p>';
+          }
+        }
       });
       bodyEl.innerHTML = sHtml;
+      /* Inline charts: the figure is anchored to the rendered reading-guide
+         paragraph of its section, so the DOM order is always
+         section paragraph -> reading guide -> figure -> next section. */
+      if (sArt.charts) {
+        var seenIds = new Set();
+        var byIdx = {};
+        // guide paragraphs only exist once innerHTML above is committed
+        bodyEl.querySelectorAll('p.a-chart-ref').forEach(function (el) {
+          byIdx[el.getAttribute('data-section-idx')] = el;
+        });
+        sArt.charts.forEach(function (chart) {
+          if (!chart || typeof chart !== 'object') { console.warn('Invalid chart entry', chart); return; }
+          if (seenIds.has(chart.id)) { console.warn('Duplicate chart id:', chart.id); return; }
+          seenIds.add(chart.id);
+          if (chart.after_section < 0 || chart.after_section >= sArt.sections.length) {
+            console.warn('Chart after_section out of range:', chart.id, chart.after_section);
+            return;
+          }
+          if (!['poll_table','fiscal_table','poll_trend'].includes(chart.type)) {
+            console.warn('Unknown chart type:', chart.id, chart.type);
+            return;
+          }
+          var guide = byIdx[String(chart.after_section)];
+          if (!guide) {
+            console.warn('Anchored section has no chart_refs guide to anchor:', chart.id, chart.after_section);
+            return;
+          }
+          var span = document.createElement('span');
+          span.dataset.chartId = chart.id;
+          guide.parentNode.insertBefore(span, guide.nextSibling);
+        });
+      // Now render each chart
+      const spans = bodyEl.querySelectorAll('span[data-chart-id]');
+      spans.forEach(span => {
+        const id = span.dataset.chartId;
+        const chartDef = sArt.charts.find(c => c.id === id);
+        if (!chartDef) { span.remove(); return; }
+        const figure = document.createElement('figure');
+        figure.className = 'a-inline-chart';
+        const chartDiv = document.createElement('div');
+        figure.appendChild(chartDiv);
+        const figcap = document.createElement('figcaption');
+        figcap.textContent = chartDef.caption;
+        figure.appendChild(figcap);
+        span.parentNode.insertBefore(figure, span.nextSibling);
+        span.remove();
+        // Draw based on type
+        if (chartDef.type === 'poll_table') {
+          drawPollTable(chartDiv);
+        } else if (chartDef.type === 'fiscal_table') {
+          // For s articles, use default (else branch) of drawFiscalTable
+          drawFiscalTable(chartDiv, '');
+        } else if (chartDef.type === 'poll_trend') {
+          // Use national party trend
+          const latest = POLL_HISTORY.national[POLL_HISTORY.national.length - 1];
+          drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
+        }
+      });
+    }
     } else {
       document.getElementById('a-date').textContent = (c.date || '') + ' · Beehive Political Intelligence';
       bodyEl.innerHTML = '<p>No full article has been produced for this story.</p>' +
