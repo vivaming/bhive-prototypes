@@ -1809,6 +1809,17 @@ document.getElementById('grid').addEventListener('click', function(e){
   if (!e.target.closest('.cell')) clearMq(document.querySelector('.cell.armed'));
 });
 renderGrid();
+/* bfcache restore: re-render grid when page is restored from back/forward cache */
+window.addEventListener('pageshow', function(e){
+  if (e.persisted) {
+    if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
+  }
+});
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'visible' && !document.getElementById('grid').children.length) {
+    if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
+  }
+});
 var rs;
 window.addEventListener('resize', function(){
   clearTimeout(rs);
