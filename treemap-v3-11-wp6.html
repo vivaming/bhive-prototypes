@@ -1438,24 +1438,6 @@ function drawInzBars(container, h) {
 }
 
 /* ── Article view ──────────────────────────────────────────── */
-/* `articleCaption(c)` — the caption shown under the article chart. Real
-   news articles (wp6/7/8 and s-cards) show their chart provenance; the
-   election hero shows the poll aggregate + threshold note. Empty string
-   hides the caption row entirely. */
-function articleCaption(c) {
-  if (c.id === 'election' || c.full) {
-    return 'Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b> · Curia Research';
-  }
-  var key = c.wp6 || c.wp7 || c.wp8 || c.id;
-  var art = ARTICLE_DATA['art-' + key];
-  if (!art || !art.charts || !art.charts.length) return '';
-  var chart = art.charts[0];
-  var nm = SOURCE_NAMES[SOURCE_BY_KEY[key]] || 'Beehive';
-  var dateLabel = chart.as_of
-    ? '<b>' + new Date(chart.as_of + 'T12:00:00').toLocaleDateString('en-NZ', { day:'numeric', month:'short', year:'numeric', timeZone:'Pacific/Auckland' }) + '</b>'
-    : '<b>—</b>';
-  return chart.caption + ' · Source: ' + nm + ' · Beehive chart · as of ' + dateLabel;
-}
 
 function openArticle(c) {
   clearTimeout(armTimer); clearMq(document.querySelector('.cell.armed')); armedId = null;
@@ -1474,9 +1456,7 @@ function openArticle(c) {
     sp.textContent = ' · ' + sourceName(c);
     aDateEl.appendChild(sp);
   }
-  /* Clear the caption on entry; each branch that has real chart
-     provenance re-populates it via articleCaption(). No branch ever
-     leaves stale "Sample data" text in the caption row. */
+  /* Clear the caption on entry; each branch re-populates via setCaption(). */
   var captionEl = document.querySelector('.a-caption');
   captionEl.innerHTML = '';
   captionEl.style.display = 'none';
@@ -1553,8 +1533,7 @@ function openArticle(c) {
         }
       });
     }
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
-    captionEl.style.display = '';
+    setCaption('Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ');
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1633,8 +1612,7 @@ function openArticle(c) {
         }
       });
     }
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
-    captionEl.style.display = '';
+    setCaption('Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ');
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1707,8 +1685,7 @@ function openArticle(c) {
         }
       });
     }
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
-    captionEl.style.display = '';
+    setCaption('Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ');
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1720,7 +1697,7 @@ function openArticle(c) {
     av.scrollTop = 0;
     return;
   }
-  if (/^s\d+$/.test(c.id)) {
+  if (!c.full && /^s\d+$/.test(c.id)) {
     var sArt = ARTICLE_DATA['art-' + c.id];
     document.getElementById('a-badge').textContent = c.priority || 'STORY';
     renderPeople('');
@@ -1818,6 +1795,7 @@ function openArticle(c) {
     bodyEl.innerHTML = '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
+    setCaption('Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b> · Curia Research');
     requestAnimationFrame(function(){ drawPollChart(ch, 260); });
   } else {
     bodyEl.innerHTML =
