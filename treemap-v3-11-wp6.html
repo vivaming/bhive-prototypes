@@ -108,34 +108,47 @@
   .logo { font-weight:700; letter-spacing:.14em; font-size:11px; color:#f2f4f7; }
   .logo b { color:#e5484d; }
   .logo-sub { font-size:8px; color:#77828f; letter-spacing:.18em; margin-top:2px; }
-  /* brand mark — source art is 720x1280 with the glyph centred mid-frame (rows 607-721).
-     box 44px tall x 125px wide, background-size:cover -> scale 1.736, visible source window
-     y 360-608; the glyph centre (y 664) must land at box centre (y 22), so offset = 304px
-     = 304/600.3 of the 600px vertical overflow = 50.68% */
+  /* brand mark — <img> crop of the 720x1280 source art. The glyph is a horizontal
+     wordmark spanning x 90-622, y 591-698 (centre 356,645), measured by luminance.
+     box 125x44 + object-fit:cover => scale 125/720 = 0.17361, rendered 125x222.2, so
+     the visible source window is 44/0.17361 = 253.5px tall and spans the full image
+     width. To centre the glyph band its centre (y 645) must land at box centre (y 22):
+     window top = 645 - 126.7 = 518.3 -> object-position Y = 518.3/(1280 - 253.5)
+     = 50.46%. The 108px glyph renders at 18.8px in the 44px box - small by design of
+     the source art, not a crop error. box-sizing:content-box keeps width/height as
+     content dims so border-radius crops the raster without shrinking it.
+     <=480px the header is 40px tall, so the box drops to 30px tall and shows the full
+     125px-wide wordmark at natural scale (object-fit:contain, no crop at all). */
   .brand-mark {
     display: block;
-    width: auto;
+    width: 125px;
     height: 44px;
+    box-sizing: content-box;
+    object-fit: cover;
+    object-position: 50% 50.46%;
     border-radius: 4px;
-    background-color: #0a0d11;
-    background-image: url("logo-new.jpg");
-    background-repeat: no-repeat;
-    background-position: 50% 50.68%;
-    background-size: cover;
     flex-shrink: 0;
-    margin-bottom: 6px;
   }
   .header-logo {
-    height: 48px;
+    height: 50px;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 9px;
     margin-bottom: 0;
   }
+  .header-logo .logo-sub { margin-top: 0; }
   @media (max-width: 480px) {
     .header-logo {
       height: 40px;
+      gap: 7px;
+    }
+    /* Full wordmark, uncropped, fits the 40px header: 30px tall at natural scale.
+       object-fit:contain never overflows, so no object-position is needed here. */
+    .header-logo .brand-mark {
+      height: 30px;
+      object-fit: contain;
     }
   }
   /* category pills — float above the treemap */
@@ -232,7 +245,7 @@
 <body>
 
 <!-- ================= TREEMAP VIEW ================= -->
-<div class="view active" id="treemap-view"><div class="header-logo"><div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
+<div class="view active" id="treemap-view"><div class="header-logo"><img class="brand-mark" src="logo-new.jpg" alt="Beehive NZ Political Intelligence"><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
 <div class="pager" id="pager"><button type="button" class="pg-btn" id="pg-prev">‹</button><span class="pg-num" id="pg-num">1 / 2</span><button type="button" class="pg-btn" id="pg-next">›</button></div></div>
 
 <!-- ================= ARTICLE VIEW ================= -->
@@ -295,10 +308,94 @@
     ov.appendChild(tr);
     ti.appendChild(ov);
     tr.style.setProperty('--mq-dur', (P / 28) + 's');
-
   }
-  /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
-  function wireCard(el, story) {
+
+/* ---- Calendar-day comparison for NZ-issued articles ----
+   Every article carries a full ISO-8601 date (YYYY-MM-DD). The 7-day
+   "old" cutoff compares *calendar days*, so an article published just
+   after midnight NZST is not flagged old merely because of the UTC
+   offset of Date.parse(). Calendar days are indexed in the Pacific /
+   Auckland zone, the zone that decides the NZ electoral/news calendar.
+
+   Both endpoints are shifted by 12h before truncating, which is safe
+   across DST transitions: NZ moves by whole hours, so adding 12h to
+   *both* the article instant and the `asOf` instant shifts both
+   midnight boundaries by the same amount and cannot move one into a
+   different calendar day while the other stays put.
+   The cutoff is expressed relative to an injectable `asOf` instant so
+   the rule is testable without a wall clock. */
+var NZ_STALE_DAYS = 7;
+var DAY_MS = 86400000;
+/* The zone that decides NZ election/news calendar days. */
+var NZ_ZONE = 'Pacific/Auckland';
+function nzDayIndex(iso, zone) {
+  var t = Date.parse(iso);
+  if (isNaN(t)) return NaN;
+  var parts = new Intl.DateTimeFormat('en-NZ', {
+    timeZone: zone || NZ_ZONE, year: 'numeric', month: '2-digit', day: '2-digit'
+  }).formatToParts(new Date(t + DAY_MS / 2));
+  var y, m, d;
+  for (var i = 0; i < parts.length; i++) {
+    if (parts[i].type === 'year') y = +parts[i].value;
+    else if (parts[i].type === 'month') m = +parts[i].value;
+    else if (parts[i].type === 'day') d = +parts[i].value;
+  }
+  return Date.UTC(y, m - 1, d);
+}
+
+/* `isOldDate(iso, asOf)`: true when `iso` is more than NZ_STALE_DAYS
+   calendar days before `asOf` (default = now). Strictly greater, so an
+   article exactly NZ_STALE_DAYS days old is still current. Both
+   arguments are ISO-8601 date strings. */
+function isOldDate(iso, asOf) {
+  var d = nzDayIndex(iso, NZ_ZONE);
+  var a = nzDayIndex(asOf || new Date().toISOString(), NZ_ZONE);
+  if (isNaN(d) || isNaN(a)) return false;
+  return (a - d) / DAY_MS > NZ_STALE_DAYS;
+}
+/* ---- Source identity --------------------------------------------------------------------------------------------
+   Each article owns a canonical `source_id` (its provenance), and the
+   display name is resolved through this single map. Charts and article
+   bodies must not re-spell a source name by hand — that is how Curia
+   ended up written four different ways ("Curia", "Curia Research",
+   "Taxpayers' Union / Curia Research"). Adding a source means adding
+   one row here; renaming one means changing one row. */
+var SOURCE_NAMES = {
+  rnz:            'RNZ',
+  nz_herald:      'NZ Herald',
+  'stats_nz':     'Stats NZ',
+  'rein_stats_nz':'REINZ / Stats NZ',
+  fma_fsc:        'FMA / FSC',
+  'curia_research':'Curia Research',
+  fma:            'FMA'
+};
+
+/* Articles carry either a string `source` (older entries), a full
+   `{ id, name, url }` object, or a legacy `source_id` field. `sourceId`
+   returns the canonical id, in that precedence order. */
+function sourceId(c) {
+  if (!c) return null;
+  if (c.source && typeof c.source === 'object') return c.source.id || null;
+  return c.source || c.source_id || null;
+}
+
+/* Display name for an article's source, resolved from SOURCE_NAMES.
+   The map is the single source of truth for spelling; the inlined name
+   covers entries that predate it, and the id itself is the last resort. */
+function sourceName(c) {
+  var id = sourceId(c);
+  if (id && SOURCE_NAMES[id]) return SOURCE_NAMES[id];
+  if (c && c.source && typeof c.source === 'object' && c.source.name) return c.source.name;
+  return id || 'Beehive';
+}
+
+/* `sourceRow(c)` — the provenance line shown under an article title. */
+function sourceRow(c) {
+  var nm = sourceName(c);
+  return nm ? 'Source: ' + nm + ' · Beehive chart' : '';
+}
+
+function wireCard(el, story) {
     el.setAttribute('tabindex', '0'); /* Enter walks the same state machine */
     var activate = function () {
       if (el.classList.contains('armed')) {
@@ -314,53 +411,41 @@
   }
   /* single date emission point — every visible date goes through this helper */
   function dateHtml(c, cls) { return '<span class="'+cls+'">'+(c.date||'')+'</span>'; }
-function isOldDate(dateStr) {
-  if (!dateStr) return false;
-  var parts = dateStr.split(' ');
-  if (parts.length !== 2) return false;
-  var day = parseInt(parts[0], 10);
-  var monthStr = parts[1].toUpperCase();
-  var monthMap = {
-    'JAN':0, 'FEB':1, 'MAR':2, 'APR':3, 'MAY':4, 'JUN':5,
-    'JUL':6, 'AUG':7, 'SEP':8, 'OCT':9, 'NOV':10, 'DEC':11
-  };
-  var month = monthMap[monthStr];
-  if (isNaN(day) || month === undefined) return false;
-  var date = new Date(2026, month, day);
-  var ref = new Date(2026, 8, 16); // September is 8 (0-indexed), 16th
-  var diffTime = ref - date;
-  var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays > 7;
+/* Story → canonical source_id map. Every article resolves to exactly one
+   row; adding a story means adding one entry here, renaming a source
+   means editing one row in SOURCE_NAMES. Stories with no authoritative
+   source of record (s10, s11, s15, s19..s30, election hero) are omitted
+   from the map so their provenance line is empty. */
+var SOURCE_BY_KEY = {
+  'wp6-1': 'rnz', 'wp6-2': 'rnz', 'wp6-3': 'nz_herald',
+  'wp7-1': 'rnz', 'wp7-2': 'nz_herald', 'wp7-3': 'rnz',
+  'wp8-1': 'nz_herald', 'wp8-2': 'curia_research',
+  'wp8-3': 'nz_herald', 'wp8-4': 'nz_herald',
+  s05: 'stats_nz', s06: 'stats_nz', s07: 'curia_research', s08: 'rnz',
+  s09: 'rein_stats_nz', s12: 'rnz',
+  s13: 'curia_research', s14: 'curia_research',
+  s16: 'rnz', s17: 'rnz', s18: 'nz_herald'
+};
+
+/* `articleKey(c)` — the canonical key that indexes ARTICLE_DATA and
+   SOURCE_BY_KEY for any story: wpN wins over s-card id; election hero
+   falls through to null (no article body, no source of record). */
+function articleKey(c) {
+  if (c.wp6) return c.wp6;
+  if (c.wp7) return c.wp7;
+  if (c.wp8) return c.wp8;
+  if (c.id && /^s\d+$/.test(c.id)) return c.id;
+  return null;
 }
+
 function getSourceHtml(c) {
-  // wp6-1/wp6-2/wp7-1/wp7-3 → via RNZ
-  // wp6-3/wp7-2/wp8-1/wp8-3/wp8-4 → via NZ Herald
-  // wp8-2 → via Curia
-  // s-cards (WP9 real news): mapped to the data source behind each story
-  if (c.wp6 === 'wp6-1' || c.wp6 === 'wp6-2' || c.wp7 === 'wp7-1' || c.wp7 === 'wp7-3') {
-    return '<span class="source">via RNZ</span>';
-  } else if (c.wp7 === 'wp7-2' || c.wp8 === 'wp8-1' || c.wp8 === 'wp8-3' || c.wp8 === 'wp8-4' || c.wp6 === 'wp6-3') {
-    return '<span class="source">via NZ Herald</span>';
-  } else if (c.wp8 === 'wp8-2') {
-    return '<span class="source">via Curia</span>';
-  } else if (c.id === 's05' || c.id === 's06') {
-    return '<span class="source">via Stats NZ</span>';
-  } else if (c.id === 's07') {
-    return '<span class="source">via Curia</span>'; 
-  } else if (c.id === 's09') {
-    return '<span class="source">via REINZ</span>';
-  } else if (c.id === 's10' || c.id === 's11') {
-    return '<span class="source">via RNZ</span>';
-  } else if (c.id === 's10' || c.id === 's11' || c.id === 's15') {
-  } else if (c.id === 's12') {
-    return '<span class="source">via RNZ</span>';
-  } else if (c.id === 's13' || c.id === 's14') {
-    return '<span class="source">via Curia Research</span>';
-  } else if (c.id === 's16' || c.id === 's17') {
-    return '<span class="source">via RNZ</span>';
-  } else if (c.id === 's18') {
-    return '<span class="source">via NZ Herald</span>';  }
-  return ''
+  var key = articleKey(c);
+  if (!key) return '';
+  var id = SOURCE_BY_KEY[key];
+  if (!id) return '';
+  var nm = SOURCE_NAMES[id];
+  if (!nm) return '';
+  return '<span class="source">via ' + nm + '</span>';
 }
 /* demote overflowing ids to the head of the next page (new page if the last overflows) */
   function demote(ids) {
@@ -400,7 +485,7 @@ function getSourceHtml(c) {
     if (bad.length) demote(bad);
   }
 
-  /* ── V44 §2: desktop-only title autofit — mobile keeps tier sizes ── */
+  /* ---- V44 §2: desktop-only title autofit — mobile keeps tier sizes ---- */
   function contentH(ti) { var rg = document.createRange(); rg.selectNodeContents(ti); return rg.getBoundingClientRect().height; }
   function fitTitleAll(grid) {
     grid.querySelectorAll('.cell-title').forEach(function(ti){
@@ -423,7 +508,7 @@ function getSourceHtml(c) {
       if (cell.classList.contains('p0')) ti.style.flex = '0 0 auto'; /* V44 §3: hero title hugs its content; chart (flex:1) absorbs the slack */
     });
   }
-/* ── Party colors (data-encoding only) ─────────────────────── */
+/* ---- Party colors (data-encoding only) ---------------------------------------------- */
 var PARTY = {
   national:{ name:'National', color:'#5a94d4', poll:29.0, reached:true },
   labour:  { name:'Labour',   color:'#D82A20', poll:25.9, reached:true },
@@ -439,18 +524,18 @@ var POLL_HISTORY = {
   nzfirst:[11.9,10.5,9.7,13.6,11.7,11.4,10.8,9.1,8.4],
 };
 
-/* ── Treemap data: black gradient by priority ──────────────── */
+/* ---- Treemap data: black gradient by priority -------------------------------- */
 var CELLS = [
-  { id:'wp6-1', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#KiwiSaver','#Labour'], title:'Labour: Employer KiwiSaver Contributions to Become Compulsory', wp6:'wp6-1' },
-  { id:'wp6-2', tier:1, priority:'HIGH', date:'14 SEP', cat:'politics', tags:['#Immigration','#Accountability'], title:"Immigration NZ: $134m of Forecast Benefits Ruled Flawed", wp6:'wp6-2' },
-  { id:'wp6-3', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#ACT','#PartyList'], title:'Act List: Paul Henry at Fourth, Sitting MPs at Risk', wp6:'wp6-3' },
-  { id:'wp7-1', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Fiscal'], title:'Government Scraps 2027 Fuel Tax Hike, Tops Up Transport Fund', wp7:'wp7-1' },
-  { id:'wp7-2', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Unveils Sweeping Immigration Overhaul', wp7:'wp7-2' },
-  { id:'wp7-3', tier:1, priority:'HIGH', date:'01 SEP', cat:'health', tags:['#Health','#Jobs'], title:'Labour Guarantees Jobs for NZ-Trained Graduate Nurses', wp7:'wp7-3' },
-  { id:'wp8-1', tier:1, priority:'HIGH', date:'10 AUG', cat:'finance', tags:['#ACT','#Fiscal'], title:'ACT Pledges Faster Path to Surplus, No New Taxes', wp8:'wp8-1' },
-  { id:'wp8-2', tier:1, priority:'HIGH', date:'03 SEP', cat:'politics', tags:['#Polls','#Coalition'], title:'Coalition Returned in Curia Poll; Opportunity Loses Kingmaker Bid', wp8:'wp8-2' },
-  { id:'wp8-3', tier:2, date:'14 SEP', cat:'economy', tags:['#Housing','#Election'], title:'Housing Election Forum: Parties to Face Direct Questions', wp8:'wp8-3' },
-  { id:'wp8-4', tier:2, date:'08 SEP', cat:'politics', tags:['#Election','#Reform'], title:'Government Accepts 65 Election-Process Changes', wp8:'wp8-4' },
+  { id:'wp6-1', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#KiwiSaver','#Labour'], title:'Labour: Employer KiwiSaver Contributions to Become Compulsory', wp6:'wp6-1', isSample:true },
+  { id:'wp6-2', tier:1, priority:'HIGH', date:'14 SEP', cat:'politics', tags:['#Immigration','#Accountability'], title:"Immigration NZ: $134m of Forecast Benefits Ruled Flawed", wp6:'wp6-2', isSample:true },
+  { id:'wp6-3', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#ACT','#PartyList'], title:'Act List: Paul Henry at Fourth, Sitting MPs at Risk', wp6:'wp6-3', isSample:true },
+  { id:'wp7-1', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Fiscal'], title:'Government Scraps 2027 Fuel Tax Hike, Tops Up Transport Fund', wp7:'wp7-1', isSample:true },
+  { id:'wp7-2', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Unveils Sweeping Immigration Overhaul', wp7:'wp7-2', isSample:true },
+  { id:'wp7-3', tier:1, priority:'HIGH', date:'01 SEP', cat:'health', tags:['#Health','#Jobs'], title:'Labour Guarantees Jobs for NZ-Trained Graduate Nurses', wp7:'wp7-3', isSample:true },
+  { id:'wp8-1', tier:1, priority:'HIGH', date:'10 AUG', cat:'finance', tags:['#ACT','#Fiscal'], title:'ACT Pledges Faster Path to Surplus, No New Taxes', wp8:'wp8-1', isSample:true },
+  { id:'wp8-2', tier:1, priority:'HIGH', date:'03 SEP', cat:'politics', tags:['#Polls','#Coalition'], title:'Coalition Returned in Curia Poll; Opportunity Loses Kingmaker Bid', wp8:'wp8-2', isSample:true },
+  { id:'wp8-3', tier:2, date:'14 SEP', cat:'economy', tags:['#Housing','#Election'], title:'Housing Election Forum: Parties to Face Direct Questions', wp8:'wp8-3', isSample:true },
+  { id:'wp8-4', tier:2, date:'08 SEP', cat:'politics', tags:['#Election','#Reform'], title:'Government Accepts 65 Election-Process Changes', wp8:'wp8-4', isSample:true },
   { id:'election', tier:0, priority:'HIGH', date:'12 SEP 2026',
     cat:'politics', tags:['#Polls','#MMP'], title:'ELECTION 2026 — Polls & the 5% Threshold', full:true },
   { id:'s02', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Coalition'], title:'Fuel Tax Retreat: The $1.4B Land Transport Fund Hole' },
@@ -495,7 +580,7 @@ var CELLS = [
   { id:'logo', tier:3, logo:true }
 ];
 
-/* ── Charts ────────────────────────────────────────────────── */
+/* ---- Charts ---------------------------------------------------------------------------------------------------- */
 function drawPollChart(container, h, opts) {
   /* Cover card: brief-page main chart DNA — TWO MAJOR PARTIES ONLY (National vs Labour),
      model lines + confidence bands + poll dots + right-edge name/value labels,
@@ -600,7 +685,7 @@ function legendRow() {
   return html;
 }
 
-/* ── Treemap layout ────────────────────────────────────────── */
+/* ---- Treemap layout ------------------------------------------------------------------------------------ */
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 var activeCat = 'all';
@@ -717,7 +802,7 @@ function renderGrid(cat) {
         return;
       }
       el.classList.add('logo-cell');
-      el.innerHTML = '<div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
+      el.innerHTML = '<img class="brand-mark" src="logo-new.jpg" alt="Beehive NZ Political Intelligence"><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
       grid.appendChild(el);
       return;
     }
@@ -755,7 +840,7 @@ var sparkParty = { s05:'act' }[c.id];
   requestAnimationFrame(function(){ if (!narrow) fitTitleAll(grid); fitAudit(grid); });
 }
 
-/* ── WP6 sample articles (2026-09-13/14 news) ──────────────── */
+/* ---- WP6 sample articles (2026-09-13/14 news) -------------------------------- */
 /* Related people — copyright-free portraits (CC0 / CC BY-SA, Wikimedia Commons) */
 var PEOPLE = {
   'wp6-1': [{
@@ -1353,6 +1438,25 @@ function drawInzBars(container, h) {
 }
 
 /* ── Article view ──────────────────────────────────────────── */
+/* `articleCaption(c)` — the caption shown under the article chart. Real
+   news articles (wp6/7/8 and s-cards) show their chart provenance; the
+   election hero shows the poll aggregate + threshold note. Empty string
+   hides the caption row entirely. */
+function articleCaption(c) {
+  if (c.id === 'election' || c.full) {
+    return 'Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b> · Curia Research';
+  }
+  var key = c.wp6 || c.wp7 || c.wp8 || c.id;
+  var art = ARTICLE_DATA['art-' + key];
+  if (!art || !art.charts || !art.charts.length) return '';
+  var chart = art.charts[0];
+  var nm = SOURCE_NAMES[SOURCE_BY_KEY[key]] || 'Beehive';
+  var dateLabel = chart.as_of
+    ? '<b>' + new Date(chart.as_of + 'T12:00:00').toLocaleDateString('en-NZ', { day:'numeric', month:'short', year:'numeric', timeZone:'Pacific/Auckland' }) + '</b>'
+    : '<b>—</b>';
+  return chart.caption + ' · Source: ' + nm + ' · Beehive chart · as of ' + dateLabel;
+}
+
 function openArticle(c) {
   clearTimeout(armTimer); clearMq(document.querySelector('.cell.armed')); armedId = null;
   document.getElementById('treemap-view').classList.remove('active');
@@ -1360,11 +1464,37 @@ function openArticle(c) {
   av.classList.add('active');
   av.querySelector('.a-badge').textContent = c.tier===0 ? 'ELECTION 2026' : (c.priority || 'STORY');
   document.getElementById('a-title').textContent = c.title;
-  document.getElementById('a-date').textContent = (c.date||'') + ' · Beehive Political Intelligence · Sample article';
+  /* Provenance line is built as nodes: date text + `.source` element.
+     No HTML string is stuffed into textContent anywhere in this file. */
+  var aDateEl = document.getElementById('a-date');
+  aDateEl.textContent = (c.date||'') + ' · Beehive Political Intelligence';
+  if (getSourceHtml(c)) {
+    var sp = document.createElement('span');
+    sp.className = 'source';
+    sp.textContent = ' · ' + sourceName(c);
+    aDateEl.appendChild(sp);
+  }
+  /* Clear the caption on entry; each branch that has real chart
+     provenance re-populates it via articleCaption(). No branch ever
+     leaves stale "Sample data" text in the caption row. */
+  var captionEl = document.querySelector('.a-caption');
+  captionEl.innerHTML = '';
+  captionEl.style.display = 'none';
+  /* `setCaption(html)` — the only place caption text is emitted. Every
+     branch calls this once with its real chart provenance; branches
+     without a chart call `setCaption('')` to hide the row. */
+  function setCaption(html) {
+    captionEl.innerHTML = html || '';
+    captionEl.style.display = html ? '' : 'none';
+  }
   var bodyEl = document.getElementById('a-body');
   if (c.wp6) {
     var art = ARTICLE_DATA['art-' + c.wp6];
-    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp6 === 'wp6-2' ? 'ACCOUNTABILITY' : (c.wp6 === 'wp6-3' ? 'ELECTION WATCH' : 'POLICY'));
+    /* Badge: the SAMPLE label is only shown on articles whose chart data
+       is a demo fixture. wp6/7/8 articles are demo fixtures, s-cards
+       carry real source-of-record, and the election hero is the poll
+       aggregate. */
+    document.getElementById('a-badge').textContent = (c.isSample ? 'SAMPLE · ' : '') + (c.wp6 === 'wp6-2' ? 'ACCOUNTABILITY' : (c.wp6 === 'wp6-3' ? 'ELECTION WATCH' : 'POLICY'));
     renderPeople(c.wp6);
     var html = '';
     art.sections.forEach(function (s) {
@@ -1423,8 +1553,8 @@ function openArticle(c) {
         }
       });
     }
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    captionEl.style.display = '';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1443,8 +1573,8 @@ function openArticle(c) {
     return;
   }
   if (c.wp7) {
+    document.getElementById('a-badge').textContent = (c.isSample ? 'SAMPLE · ' : '') + (c.wp7 === 'wp7-2' ? 'ELECTION WATCH' : 'POLICY');
     var art = ARTICLE_DATA['art-' + c.wp7];
-    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp7 === 'wp7-2' ? 'ELECTION WATCH' : 'POLICY');
     renderPeople(c.wp7 || '');
     var html = '';
     art.sections.forEach(function (s) {
@@ -1503,8 +1633,8 @@ function openArticle(c) {
         }
       });
     }
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    captionEl.style.display = '';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1517,8 +1647,8 @@ function openArticle(c) {
     return;
   }
   if (c.wp8) {
+    document.getElementById('a-badge').textContent = (c.isSample ? 'SAMPLE · ' : '') + (c.wp8 === 'wp8-2' ? 'ELECTION WATCH' : 'POLICY');
     var art = ARTICLE_DATA['art-' + c.wp8];
-    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp8 === 'wp8-2' ? 'ELECTION WATCH' : 'POLICY');
     renderPeople('');
     var html = '';
     art.sections.forEach(function (s) {
@@ -1577,8 +1707,8 @@ function openArticle(c) {
         }
       });
     }
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    captionEl.style.display = '';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1597,7 +1727,9 @@ function openArticle(c) {
     document.getElementById('a-chart').style.display = 'none';
     var srcEl = getSourceHtml(c);
     if (sArt) {
-      document.getElementById('a-date').textContent = (c.date || '') + ' · Beehive Political Intelligence' + srcEl;
+      var dateEl = document.getElementById('a-date');
+      dateEl.textContent = (c.date || '') + ' · Beehive Political Intelligence';
+      if (srcEl) { dateEl.insertAdjacentHTML('beforeend', srcEl); }
       var sHtml = '';
       /* chart_refs is the section-level reading-guide contract: the guide text
          lives in the anchored section declaration, not in the paragraph body,
@@ -1674,7 +1806,6 @@ function openArticle(c) {
           drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
         }
       });
-    }
     } else {
       document.getElementById('a-date').textContent = (c.date || '') + ' · Beehive Political Intelligence';
       bodyEl.innerHTML = '<p>No full article has been produced for this story.</p>' +
@@ -1684,7 +1815,7 @@ function openArticle(c) {
     return;
   }
   if (c.full) {
-      '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
+    bodyEl.innerHTML = '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     requestAnimationFrame(function(){ drawPollChart(ch, 260); });
@@ -1695,6 +1826,7 @@ function openArticle(c) {
     document.getElementById('a-chart').style.display = 'none';
   }
   av.scrollTop = 0;
+}
 }
 function showTreemap() {
   document.getElementById('article-view').classList.remove('active');
