@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BEEHIVE ADMIN — 文章评审与下线 (X-Pi IMP-2)</title>
+<!--
+  ─────────────────────────────────────────────────────────────────────
+  安全注意 / SECURITY
+  ─────────────────────────────────────────────────────────────────────
+  本页口令 `bhive-admin-2026` 目前是**硬编码在前端**的，仅为原型阶段的
+  前端级门禁：它能挡住误入，**挡不住任何人读源码**。
+  上线前必须：
+    1. 改用服务端鉴权（会话 cookie：HttpOnly / Secure / SameSite=Lax，
+       服务端只存口令哈希，带失败限速与锁定）。
+    2. 口令移出 git 与 HTML，改从部署密钥管理读取。
+    3. 把 ARCHIVE_STATE_KEY 指向受保护的写接口 + 审计留档，
+       本页的 localStorage 逻辑整体退役。
+  本文件为 ASTRA-ADMIN-AND-AUTHORS.md §一 的 v0 本地版；
+  主站 treemap-v3-11-wp6.html 一行未动。
+  ─────────────────────────────────────────────────────────────────────
+-->
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --bg:#05070a; --panel:#0a0d11; --panel2:#10151c; --panel3:#171f29;
+    --line:#2b3542; --line2:#232e3d;
+    --t1:#f2f4f7; --t2:#9aa7b4; --t3:#6b7684;
+    --red:#e5484d; --red-dim:#7a2a22;
+    --amber:#d9a13b; --orange:#c96f2f;
+    --green:#3d9e5c; --blue:#5a94d4;
+  }
+  html, body { width:100%; min-height:100%; background:var(--bg);
+    color:var(--t1); font-family:'Chakra Petch','Segoe UI',Consolas,sans-serif; }
+  body { font-size:13px; line-height:1.5; padding:0 0 60px; }
+  a { color:var(--blue); text-decoration:none; }
+  a:hover { color:#8fb8e8; text-decoration:underline; }
+
+  /* ── Gate ─────────────────────────────────────────────────── */
+  #gate { position:fixed; inset:0; z-index:100; display:flex;
+    align-items:center; justify-content:center; background:var(--bg);
+    background-image:radial-gradient(ellipse at 50% 20%, #0d141d 0%, #05070a 65%); }
+  .gate-card { width:min(400px, 92vw); background:var(--panel);
+    border:1px solid var(--line2); border-top:3px solid var(--red);
+    padding:26px 24px; box-shadow:0 18px 60px rgba(0,0,0,.7); }
+  .gate-mark { font-size:10px; font-weight:700; letter-spacing:.34em;
+    color:var(--red); text-transform:uppercase; margin-bottom:10px; }
+  .gate-card h1 { font-size:19px; letter-spacing:.04em; margin-bottom:6px; }
+  .gate-card p.hint { font-size:11px; color:var(--t3); margin-bottom:18px; line-height:1.6; }
+  .gate-card input[type=password] { width:100%; background:#05080c; color:var(--t1);
+    border:1px solid var(--line); padding:10px 12px; font-size:14px;
+    font-family:inherit; letter-spacing:.18em; }
+  .gate-card input[type=password]:focus { outline:none; border-color:var(--red); }
+  .gate-card input[type=password].bad { border-color:var(--red); animation:shake .3s; }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-5px)}
+    75%{transform:translateX(5px)} }
+  .gate-err { color:var(--red); font-size:11px; min-height:15px; margin-top:8px; }
+  .btn { display:inline-block; border:1px solid var(--line); background:var(--panel3);
+    color:var(--t1); font-family:inherit; font-size:12px; padding:8px 14px;
+    cursor:pointer; letter-spacing:.04em; transition:background .12s,border-color .12s; }
+  .btn:hover { background:#232e3d; border-color:#3a4757; }
+  .btn.primary { background:var(--red); border-color:var(--red); color:#fff; font-weight:700; }
+  .btn.primary:hover { background:#c93a40; border-color:#c93a40; }
+  .btn.ghost { background:transparent; }
+  .btn:disabled { opacity:.4; cursor:not-allowed; }
+  .gate-foot { margin-top:16px; font-size:10px; color:var(--t3); line-height:1.7; }
+
+  /* ── Topbar ───────────────────────────────────────────────── */
+  #app { display:none; }
+  .topbar { display:flex; align-items:center; gap:14px; padding:14px 22px;
+    border-bottom:1px solid var(--line2); background:var(--panel); }
+  .topbar .mark { font-size:11px; font-weight:700; letter-spacing:.3em; color:var(--red); }
+  .topbar h2 { font-size:15px; letter-spacing:.03em; }
+  .topbar .spacer { flex:1; }
+  .stat { font-size:10px; color:var(--t3); letter-spacing:.1em;
+    font-variant-numeric:tabular-nums; }
+  .stat b { color:var(--t1); font-size:13px; margin-right:2px; }
+
+  .notice { background:#1a1408; border-bottom:1px solid #4a3812; color:#d9a13b;
+    font-size:11px; padding:8px 22px; letter-spacing:.02em; }
+  .notice code { background:#2a2008; padding:1px 5px; color:#f0c674; font-size:10px; }
+
+  /* ── Toolbar ──────────────────────────────────────────────── */
+  .toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+    padding:12px 22px; border-bottom:1px solid var(--line2); }
+  .chip { border:1px solid var(--line); background:var(--panel2); color:var(--t2);
+    font-family:inherit; font-size:11px; padding:6px 11px; cursor:pointer;
+    letter-spacing:.05em; }
+  .chip:hover { border-color:#3a4757; color:var(--t1); }
+  .chip.on { border-color:var(--red); color:var(--t1); background:#2a1518; }
+  .chip .n { color:var(--t3); margin-left:6px; font-variant-numeric:tabular-nums; }
+  .chip.on .n { color:var(--red); }
+  .toolbar .search { margin-left:auto; display:flex; align-items:center; gap:0; }
+  .toolbar .search input { width:220px; background:#05080c; border:1px solid var(--line);
+    border-left:none; color:var(--t1); font-family:inherit; font-size:12px; padding:7px 10px; }
+  .toolbar .search input:focus { outline:none; border-color:var(--blue); border-left-color:var(--blue); }
+  .toolbar .search .lbl { background:var(--panel2); border:1px solid var(--line);
+    color:var(--t3); padding:7px 9px; font-size:11px; }
+  .toolbar .meta { width:100%; font-size:10px; color:var(--t3); letter-spacing:.06em; }
+
+  /* ── Table ────────────────────────────────────────────────── */
+  .wrap { padding:0 22px; overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; min-width:1180px; }
+  thead th { text-align:left; font-size:9.5px; font-weight:600; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--t3); padding:11px 10px;
+    border-bottom:1px solid var(--line); white-space:nowrap; }
+  tbody tr { border-bottom:1px solid #141b24; transition:background .12s; }
+  tbody tr:hover { background:#121a25; box-shadow:inset 2px 0 0 0 rgba(229,72,77,.85); }
+  tbody td { padding:11px 10px; vertical-align:middle; }
+  tbody tr.row-off { background:#080a0d; }
+  tbody tr.row-off:hover { background:#0b0e13; box-shadow:inset 2px 0 0 0 rgba(122,135,148,.55); }
+  tbody tr.row-off .t-title { color:var(--t3); }
+
+  .aid { font-size:10px; color:var(--t3); letter-spacing:.08em;
+    font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .card-tag { margin-left:5px; padding:1px 5px; border:1px solid var(--line);
+    border-radius:2px; font-size:9px; color:var(--t3); letter-spacing:.1em; }
+  .t-title { display:block; font-size:12.5px; color:var(--t1); line-height:1.35;
+    max-width:360px; }
+  .t-title:hover { color:#fff; }
+  .t-cat { display:block; font-size:9.5px; color:var(--t3); letter-spacing:.12em;
+    text-transform:uppercase; margin-top:3px; }
+  .td-date { font-size:11px; color:var(--t2); letter-spacing:.1em;
+    font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* 规则分（reports/rule_backfill/ 实跑，满分 65） */
+  .rule-cell { display:flex; flex-direction:column; gap:3px; align-items:flex-start;
+    min-width:112px; }
+  .rule-pill { display:inline-flex; align-items:baseline; gap:3px; padding:3px 9px 4px;
+    border:1px solid; border-radius:3px; background:transparent; }
+  .rp-ok   { color:var(--green);  border-color:#1f5134; background:#0d1f16; }
+  .rp-warn { color:var(--amber);  border-color:#5a4415; background:#1c1608; }
+  .rp-bad  { color:var(--red);    border-color:#6e2327; background:#221012; }
+  .rule-num { font-size:18px; font-weight:700; font-variant-numeric:tabular-nums;
+    line-height:1; }
+  .rule-max { font-size:10px; opacity:.65; }
+  .rule-none { font-size:18px; color:var(--t3); line-height:1; opacity:.6; }
+  .rule-note { font-size:9px; color:var(--t3); letter-spacing:.06em; max-width:150px;
+    line-height:1.4; }
+  .rule-note.block { color:var(--red); font-weight:600; letter-spacing:.08em; }
+
+  .badge { display:inline-flex; align-items:center; gap:5px; font-size:10.5px;
+    font-weight:600; letter-spacing:.06em; padding:4px 9px; white-space:nowrap;
+    border:1px solid transparent; }
+  .b-ok { color:var(--green); border-color:#1f5134; background:#0d1f16; }
+  .b-rev { color:var(--amber); border-color:#5a4415; background:#1c1608; }
+  .b-blok { color:var(--red); border-color:#6e2327; background:#221012; }
+  .b-none { color:var(--t3); border-color:var(--line); background:var(--panel2); }
+  .b-off { color:#7d8794; border-color:#2c333c; background:#11141a;
+    text-decoration:line-through; }
+
+  /* risks */
+  .risk-cell { position:relative; min-width:150px; }
+  .risk-chip { cursor:pointer; font-size:10px; color:var(--t2); letter-spacing:.04em;
+    border:1px dashed var(--line); padding:3px 7px; background:transparent;
+    font-family:inherit; display:inline-flex; align-items:center; gap:5px; }
+  .risk-chip:hover { border-color:var(--red); color:var(--t1); }
+  .risk-chip .car { color:var(--t3); transition:transform .15s; }
+  .risk-chip.pinned .car, .risk-chip:hover .car { transform:rotate(90deg); }
+  .risk-none { font-size:10px; color:#3d4754; letter-spacing:.08em; }
+  .risk-pop { display:none; position:absolute; left:0; top:calc(100% + 6px); z-index:30;
+    width:330px; background:#0c1117; border:1px solid var(--red-dim);
+    box-shadow:0 12px 34px rgba(0,0,0,.75); padding:10px 12px;
+    font-size:11px; line-height:1.6; color:var(--t2); }
+  .risk-cell:hover .risk-pop, .risk-chip.pinned + .risk-pop { display:block; }
+  .risk-pop .rp-h { font-size:9px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--red); margin-bottom:6px; }
+  .risk-pop ul { list-style:none; }
+  .risk-pop li { padding:3px 0 3px 12px; position:relative; border-top:1px solid #161d26; }
+  .risk-pop li:first-child { border-top:none; }
+  .risk-pop li::before { content:'▸'; position:absolute; left:0; top:3px; color:var(--red); }
+
+  .act-cell { white-space:nowrap; }
+  .act-cell .btn { padding:6px 12px; font-size:11px; letter-spacing:.08em;
+    border-radius:3px; min-width:64px; text-align:center; transition:background .12s,border-color .12s,color .12s; }
+  .act-off { border-color:#5a2328; color:var(--red); background:transparent; }
+  .act-off:hover { background:var(--red); border-color:var(--red); color:#fff; }
+  .act-restore { border-color:#1f5134; color:var(--green); background:transparent; }
+  .act-restore:hover { background:var(--green); border-color:var(--green); color:#04120a; }
+
+  .reason-tag { display:block; font-size:10px; color:var(--amber); margin-top:4px;
+    max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    font-style:italic; }
+  .when-tag { display:block; font-size:9px; color:var(--t3); margin-top:2px;
+    font-variant-numeric:tabular-nums; }
+
+  .empty { padding:44px 22px; text-align:center; color:var(--t3); font-size:12px;
+    letter-spacing:.08em; }
+
+  .footer { padding:18px 22px 0; font-size:10px; color:var(--t3);
+    letter-spacing:.04em; line-height:1.8; }
+  .footer .hr { border-top:1px solid var(--line2); margin-bottom:14px; }
+
+  /* ── Modal ────────────────────────────────────────────────── */
+  #modal-bg { position:fixed; inset:0; z-index:200; background:rgba(3,5,8,.82);
+    display:none; align-items:center; justify-content:center; }
+  #modal-bg.show { display:flex; }
+  .modal { width:min(460px,92vw); background:var(--panel); border:1px solid var(--line);
+    border-top:3px solid var(--amber); padding:22px; box-shadow:0 20px 60px rgba(0,0,0,.8); }
+  .modal h3 { font-size:14px; letter-spacing:.04em; margin-bottom:4px; }
+  .modal .sub { font-size:11.5px; color:var(--t2); margin-bottom:16px; line-height:1.5;
+    word-break:break-word; }
+  .modal label { display:block; font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--t3); margin-bottom:6px; }
+  .modal textarea { width:100%; height:74px; background:#05080c; border:1px solid var(--line);
+    color:var(--t1); font-family:inherit; font-size:12px; padding:9px 11px; resize:vertical; }
+  .modal textarea:focus { outline:none; border-color:var(--amber); }
+  .modal .warn { font-size:10.5px; color:var(--t3); margin-top:9px; line-height:1.6; }
+  .modal .warn b { color:var(--amber); }
+  .modal-err { color:var(--red); font-size:11px; min-height:15px; margin-top:6px; }
+  .modal-btns { display:flex; gap:8px; justify-content:flex-end; margin-top:18px; }
+</style>
+</head>
+<body>
+
+<!-- ══ 1. 门禁 ═══════════════════════════════════════════════════ -->
+<div id="gate">
+  <div class="gate-card">
+    <div class="gate-mark">▓ BEEHIVE / ADMIN</div>
+    <h1>文章评审与下线</h1>
+    <p class="hint">输入管理员口令以进入评审队列。<br>本页为私有运维页，不进公共导航。</p>
+    <input type="password" id="pw" placeholder="admin passcode" autocomplete="off"
+           aria-label="管理员口令">
+    <div class="gate-err" id="gate-err"></div>
+    <div class="modal-btns">
+      <span class="stat" style="margin-right:auto">v0 · 本地版</span>
+      <button class="btn primary" id="gate-go">解 锁</button>
+    </div>
+    <div class="gate-foot">
+      前端级门禁，仅原型用途；口令存于本浏览器 sessionStorage，
+      刷新免重输。上线改为服务端会话（详见页首注释）。
+    </div>
+  </div>
+</div>
+
+<!-- ══ 2/3. 应用 ══════════════════════════════════════════════════ -->
+<div id="app">
+  <div class="topbar">
+    <span class="mark">▓ ADMIN</span>
+    <h2>文章评审队列</h2>
+    <span class="stat">共 <b id="st-total">0</b> 篇</span>
+    <span class="stat">可发 <b id="st-ok">0</b></span>
+    <span class="stat">待审 <b id="st-rev">0</b></span>
+    <span class="stat">拦截 <b id="st-blok">0</b></span>
+    <span class="stat">已下线 <b id="st-off">0</b></span>
+    <span class="spacer"></span>
+    <button class="btn ghost" id="btn-logout">退出</button>
+  </div>
+
+  <div class="notice">
+    ⚠ 当前为<b>本地版</b>：下线状态仅存本浏览器
+    （<code>localStorage["bhive_admin_state_v1"]</code>）。
+    服务端同步为二期 —— 二期前主页不读取本状态，因此「下线」在这里只影响本表的显示，
+    不改变线上读者看到的内容。
+  </div>
+
+  <div class="toolbar">
+    <button class="chip on" data-f="ALL">全部 <span class="n" id="c-all">0</span></button>
+    <button class="chip" data-f="APPROVED">✅ 可发 <span class="n" id="c-ok">0</span></button>
+    <button class="chip" data-f="REVISE">⚠️ 待审 <span class="n" id="c-rev">0</span></button>
+    <button class="chip" data-f="BLOCK">⛔ 拦截 <span class="n" id="c-blok">0</span></button>
+    <div class="search">
+      <span class="lbl">搜索</span>
+      <input type="text" id="q" placeholder="标题 / ID / 风险原因…" autocomplete="off">
+    </div>
+    <div class="meta">
+      评分来源：<code>reports/rule_backfill/quality_report_art-sNN.json</code>（Astra 规则评分器实跑，满分 65）。
+      规则分色阶：≥55 达标 · 40–54 待修 · &lt;40 或命中硬门 拦截。
+      LLM 评委分（35 分）本轮未跑，下表只呈现规则分，不再显示旧版合成总分。
+    </div>
+  </div>
+
+  <div class="wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>标题 / 主站卡片</th>
+          <th>日期</th>
+          <th>规则分</th>
+          <th>状态</th>
+          <th>风险原因</th>
+          <th>下线 / 恢复</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+    <div class="empty" id="empty" style="display:none">没有匹配的文章。</div>
+  </div>
+  <div class="footer">
+    <div class="hr"></div>
+    篇目对齐自 <code style="color:#8b98a8">treemap-v3-11-wp6.html</code> 的
+    <code style="color:#8b98a8">CELLS</code>：14 篇有正文的 s 卡（art-s05 ~ art-s18）+ election hero。
+    规则分取自 <code style="color:#8b98a8">reports/rule_backfill/</code> 实跑报告，静态内联、无网络请求。
+    本表不改动主站；主站后续接入 <code style="color:#8b98a8">window.getBhiveAdminState()</code>
+    后按 archived 跳过卡片（二期）。<br>
+    状态变更只写本浏览器，键：<code style="color:#8b98a8">bhive_admin_state_v1</code>。
+    <button class="btn ghost" id="btn-reset" style="margin-left:6px">重置本地状态</button>
+  </div>
+</div>
+
+<!-- ══ 确认框 ═════════════════════════════════════════════════════ -->
+<div id="modal-bg">
+  <div class="modal" id="modal">
+    <h3 id="m-title">确认下线</h3>
+    <div class="sub" id="m-sub"></div>
+    <label for="m-reason">原因（必填）</label>
+    <textarea id="m-reason" placeholder="例：数据期标注错误，需与 Stats NZ 原始表核对后重发"></textarea>
+    <div class="modal-err" id="m-err"></div>
+    <div class="warn" id="m-warn"></div>
+    <div class="modal-btns">
+      <button class="btn ghost" id="m-cancel">取消</button>
+      <button class="btn primary" id="m-ok">确认下线</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   X-Pi (IMP-2) — Admin review page v0, local-state edition
+   红线：本文件不修改 treemap-v3-11-wp6.html；无外部依赖；纯原生。
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── 门禁 ───────────────────────────────────────────────────────── */
+var ADMIN_PASS = 'bhive-admin-2026';           // 上线前改 + 移出 git（见页首注释）
+var AUTH_KEY = 'bhive_admin_authed_v1';
+var ARCHIVE_STATE_KEY = 'bhive_admin_state_v1';
+
+/* ── 文章 + 规则分（reports/rule_backfill/ 实跑）────────────────── */
+/*
+  规则分满分 65 = A30 + B15 + C8 + E12（D 维度离线不评，不进分母）。
+  数值与状态直接内联自 reports/rule_backfill/quality_report_art-sNN.json，
+  字段 rule_points_earned / status / hard_gates；14 篇 s 卡报告齐全，
+  election hero 无正文故无规则分（显示「—」）。
+  旧版总分 100 = 规则 65 + LLM 35 的合成值已删除：LLM 评委分本轮未跑，
+  旧表里的 llm/total/A–E 明细是按“21 分基准线 + 篇内差异”补录的演示数，
+  不是实测，故一并撤下。
+  状态映射：hard_gates 命中 → BLOCK · 否则 REVISE · 无报告 → UNSCORED。
+  色阶（rulePillClass）：≥55 达标 · 40–54 待修 · <40 或硬门 拦截。
+*/
+var MAIN_PAGE = 'treemap-v3-11-wp6.html';   // 主站卡片（treemap 页，按标题定位）
+var RULE_MAX = 65;                          // 规则分满分（D 维度不评）
+
+var ARTICLE_DATA_ADMIN = [
+  { id:'election', card:'election', title:'ELECTION 2026 — Polls & the 5% Threshold', date:'12 SEP 2026',
+    cat:'政治 / POLITICS', rule:null, status:'UNSCORED', archived:false,
+    note:'主站 hero 卡（全宽头条），无正文，不进规则评分器。',
+    risks:[] },
+  { id:'art-s05', card:'s05', title:'CPI Hits 4.1% as Petrol Adds 27.5%', date:'15 SEP',
+    cat:'经济 / ECONOMY', rule:48, status:'REVISE', archived:false,
+    risks:[
+      'A1 evidence_id：14/14 claims 无 evidence_id，需回补 Stats NZ 原始表链接与采集日。',
+      'A4 来源缺失：21 个数值声明无来源 URL（含 4.1%、27.5%、47.7%）。',
+      'E1 引用：正文无任何具名来源。'
+    ] },
+  { id:'art-s06', card:'s06', title:'Migration Rebound of 20,300 Reshapes Coalition Arithmetic', date:'14 SEP',
+    cat:'政治 / POLITICS', rule:48, status:'REVISE', archived:false,
+    risks:[
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 20,300 / 9,600 等关键人口数字。',
+      'E1 引用：正文无任何具名来源。'
+    ] },
+  { id:'art-s07', card:'s07', title:'Threshold Review: What 8.4% NZF Means Now', date:'01 SEP',
+    cat:'政治 / POLITICS', rule:46, status:'BLOCK', archived:false,
+    note:'硬门 H1：3.4points 在正文出现但无来源、无台账、无真值表匹配。',
+    risks:[
+      'H1 硬门：fabricated numeric claim「3.4points」无来源可核，命中即拦截。',
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 8.4%、13.9%、10.5% 等全部投票数字。'
+    ] },
+  { id:'art-s08', card:'s08', title:'Green Surplus Roadmap Meets Weak Growth', date:'08 SEP',
+    cat:'国际 / INTERNATIONAL', rule:45.5, status:'REVISE', archived:false,
+    risks:[
+      'B2/B3 时效：B 维度 12.5/15，事件期与 as_of 间隔扣分。',
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含平台条款与财政缺口数字。'
+    ] },
+  { id:'art-s09', card:'s09', title:'Housing Prices Steady as Inventory Hits Records', date:'15 SEP',
+    cat:'经济 / ECONOMY', rule:48, status:'REVISE', archived:false,
+    risks:[
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 $750,000、3,543、32,908 等 REINZ 数字。',
+      'E1 引用：正文无任何具名来源。'
+    ] },
+  { id:'art-s10', card:'s10', title:'ED Wait Targets Slip as Nurse Hiring Stalls', date:'16 SEP',
+    cat:'医疗 / HEALTH', rule:43.5, status:'BLOCK', archived:false,
+    note:'硬门 H1：200percent 无来源、无台账、无真值表匹配。',
+    risks:[
+      'H1 硬门：fabricated numeric claim「200percent」无来源可核。',
+      'B2/B3 时效：B 维度 12.5/15（68% 为 2023 年末读数）。',
+      'A1 evidence_id：14/14 claims 无 evidence_id。'
+    ] },
+  { id:'art-s11', card:'s11', title:'Reshuffle Rumours Meet a Thin Ministerial Bench', date:'16 SEP',
+    cat:'政治 / POLITICS', rule:48, status:'REVISE', archived:false,
+    risks:[
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 2026-04-02 reshuffle 相关日期与人事数字。',
+      'E1 引用：核心素材为 rumours，正文无任何具名来源。'
+    ] },
+  { id:'art-s12', card:'s12', title:'Foodstuffs Split: National Bets on Competition', date:'17 SEP',
+    cat:'政治 / POLITICS', rule:48, status:'REVISE', archived:false,
+    risks:[
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 48 小时报道数与分拆条款数字。',
+      'E1 引用：正文无任何具名来源。'
+    ] },
+  { id:'art-s13', card:'s13', title:'Māori Electorate Two-Track: TPM 29% vs 3%', date:'17 SEP',
+    cat:'政治 / POLITICS', rule:38.5, status:'BLOCK', archived:false,
+    note:'硬门 H1（18points/21points 无来源）+ H3（poll_table 与文章主题实体不符）。',
+    risks:[
+      'H1 硬门：fabricated numeric claim「18points」「21points」无来源可核。',
+      'H3 硬门：poll_table 与 maori-electorate/party-vote 主题实体不匹配。',
+      'C 相关性：5/8（29% vs 3% 与 2023 席位口径混用）。'
+    ] },
+  { id:'art-s14', card:'s14', title:'Cost of Living Tops Māori Voter Concerns at 42%', date:'17 SEP',
+    cat:'政治 / POLITICS', rule:45.5, status:'REVISE', archived:false,
+    risks:[
+      'B2/B3 时效：B 维度 12.5/15。',
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 42%、15%、±3.1% 等全部调查数字。'
+    ] },
+  { id:'art-s15', card:'s15', title:'Dairy Payout Trimmed as Global Demand Softens', date:'16 SEP',
+    cat:'经济 / ECONOMY', rule:48, status:'REVISE', archived:false,
+    risks:[
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 US$3,868、-5.7%、+16.5% 等拍卖数字。',
+      'E1 引用：正文无任何具名来源。'
+    ] },
+  { id:'art-s16', card:'s16', title:'Overhang Scenario: What 123 Seats Taught Us in 2023', date:'16 SEP',
+    cat:'政治 / POLITICS', rule:45.5, status:'REVISE', archived:false,
+    risks:[
+      'B2/B3 时效：B 维度 12.5/15（对比 2023 年席位）。',
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 123 席与 3 席 overhang 数字。'
+    ] },
+  { id:'art-s17', card:'s17', title:'TPM Energy Fund: The $1 Billion Question', date:'15 SEP',
+    cat:'政治 / POLITICS', rule:48, status:'REVISE', archived:false,
+    risks:[
+      'A1 evidence_id：14/14 claims 无 evidence_id。',
+      'A4 来源缺失：含 $1bn 与 $32.5m 年化利息推算。',
+      'E1 引用：正文无任何具名来源。'
+    ] },
+  { id:'art-s18', card:'s18', title:'Herald Poll of Polls: Coalition at 47.8%', date:'16 SEP',
+    cat:'政治 / POLITICS', rule:38.5, status:'BLOCK', archived:false,
+    note:'硬门 H1（3.1points 无来源）+ H3（poll_trend 与 poll-of-polls 主题实体不符）。',
+    risks:[
+      'H1 硬门：fabricated numeric claim「3.1points」无来源可核。',
+      'H3 硬门：poll_trend 与 poll-of-polls 主题实体不匹配。',
+      'C 相关性：3/8，模型方法学未核（数字取自 meta description）。'
+    ] }
+];
+
+/* ═══ 状态存储 ═══ */
+function loadArchiveState() {
+  try {
+    var raw = localStorage.getItem(ARCHIVE_STATE_KEY);
+    var obj = raw ? JSON.parse(raw) : {};
+    return (obj && typeof obj === 'object') ? obj : {};
+  } catch (e) {
+    console.warn('[bhive-admin] 本地状态解析失败，已忽略：', e.message);
+    return {};
+  }
+}
+function saveArchiveState(state) {
+  try { localStorage.setItem(ARCHIVE_STATE_KEY, JSON.stringify(state)); }
+  catch (e) { console.warn('[bhive-admin] 写入 localStorage 失败：', e.message); }
+}
+
+/** 二期接入点：主站读此函数拿到 archived 状态后跳过卡片。 */
+window.getBhiveAdminState = function () {
+  return JSON.parse(JSON.stringify(loadArchiveState()));
+};
+
+function applyState(state) {
+  var byId = {};
+  ARTICLE_DATA_ADMIN.forEach(function (a) { byId[a.id] = a; });
+  Object.keys(state || {}).forEach(function (id) {
+    var rec = byId[id];
+    if (!rec) return;                                  // 未知 id 忽略，不写进内存
+    rec.archived = !!state[id].archived;
+    rec.archiveReason = state[id].reason || '';
+    rec.changedAt = state[id].changed_at || '';
+  });
+  return ARTICLE_DATA_ADMIN;
+}
+
+/* ═══ 展示辅助 ═══ */
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+  });
+}
+function rulePillClass(a) {
+  var r = a.rule;
+  if (r == null) return 'rp-none';         // 无报告 / 无正文
+  if (a.status === 'BLOCK') return 'rp-bad'; // 硬门命中，无论分值
+  if (r >= 55) return 'rp-ok';              // ≥55 达标
+  if (r >= 40) return 'rp-warn';            // 40-54 待修
+  return 'rp-bad';                          // <40 拦截
+}
+function ruleFmt(v) {
+  // 报告用整数写 46，实际是 45.5 —— 只在非整数时显示一位小数
+  return (v % 1 === 0) ? String(v) : v.toFixed(1);
+}
+function ruleCellHtml(a) {
+  var r = a.rule;
+  if (r == null) {
+    return '<span class="rule-none">—</span>' +
+           '<span class="rule-note">' + esc(a.note || '未评分') + '</span>';
+  }
+  var blocked = a.status === 'BLOCK';
+  var label = blocked ? '硬门拦截' : (r >= 55 ? '达标' : (r >= 40 ? '待修' : '偏低'));
+  return '<span class="rule-pill ' + rulePillClass(a) + '">' +
+           '<span class="rule-num">' + ruleFmt(r) + '</span>' +
+           '<span class="rule-max">/' + RULE_MAX + '</span></span>' +
+         '<span class="rule-note' + (blocked ? ' block' : '') + '">' + label + '</span>';
+}
+
+function badgeFor(a) {
+  if (a.archived) return '<span class="badge b-off">— 已下线</span>';
+  switch (a.status) {
+    case 'APPROVED': return '<span class="badge b-ok">✅ 可发</span>';
+    case 'BLOCK':    return '<span class="badge b-blok">⛔ 拦截</span>';
+    case 'UNSCORED': return '<span class="badge b-none">· 未评分</span>';
+    case 'REVISE':
+    default:         return '<span class="badge b-rev">⚠️ 待审</span>';
+  }
+}
+function filterKey(a) {
+  return a.archived ? 'ARCHIVED' : a.status;           // 过滤按评审状态，下线行跟原状态走
+}
+
+
+function riskHtml(a) {
+  var risks = a.risks || [];
+  if (!risks.length) return '<span class="risk-none">无' +
+    (a.note ? ' · ' + esc(a.note) : '') + '</span>';
+  var head = esc(a.id) + ' · 风险原因' +
+             (a.note ? ' · 硬门：' + esc(a.note) : '');
+  var items = risks.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('');
+  return '<button class="risk-chip" type="button" data-pin="1">' +
+         '<span class="car">▸</span>' + risks.length + ' 条风险</button>' +
+         '<div class="risk-pop"><div class="rp-h">' + head + '</div>' +
+         '<ul>' + items + '</ul></div>';
+}
+
+function actionHtml(a) {
+  if (a.archived) {
+    return '<button class="btn act-restore" type="button" data-act="restore" data-id="' +
+           esc(a.id) + '">恢复</button>' +
+           (a.archiveReason ? '<span class="reason-tag" title="' + esc(a.archiveReason) + '">“' +
+             esc(a.archiveReason) + '”</span>' : '') +
+           (a.changedAt ? '<span class="when-tag">' + esc(a.changedAt) + '</span>' : '');
+  }
+  return '<button class="btn act-off" type="button" data-act="archive" data-id="' +
+         esc(a.id) + '">下线</button>';
+}
+
+/* ═══ 渲染 ═══ */
+var FILTER = 'ALL';
+var QUERY = '';
+
+function renderStats() {
+  var n = { ALL:0, APPROVED:0, REVISE:0, BLOCK:0, UNSCORED:0, off:0 };
+  ARTICLE_DATA_ADMIN.forEach(function (a) {
+    n.ALL++;
+    n[filterKey(a)] = (n[filterKey(a)] || 0) + 1;
+    if (a.archived) n.off++;
+  });
+  var set = function (id, v) { document.getElementById(id).textContent = v; };
+  set('st-total', n.ALL); set('st-ok', n.APPROVED || 0); set('st-rev', n.REVISE || 0);
+  set('st-blok', n.BLOCK || 0); set('st-off', n.off);
+  set('c-all', n.ALL); set('c-ok', n.APPROVED || 0); set('c-rev', n.REVISE || 0);
+  set('c-blok', n.BLOCK || 0);
+}
+
+function visible(a) {
+  if (FILTER !== 'ALL' && filterKey(a) !== FILTER) return false;
+  if (!QUERY) return true;
+  var hay = [a.id, a.card, a.title, a.cat, a.note || '',
+            (a.risks || []).join(' '), a.archiveReason || ''].join(' ').toLowerCase();
+  return hay.indexOf(QUERY) >= 0;
+}
+
+function renderRows() {
+  var tb = document.getElementById('tbody');
+  var rows = ARTICLE_DATA_ADMIN.filter(visible);
+  tb.innerHTML = rows.map(function (a) {
+    return '<tr class="' + (a.archived ? 'row-off' : '') + '">' +
+      '<td><span class="aid">' + esc(a.id) + '</span>' +
+          '<span class="card-tag">cell ' + esc(a.card) + '</span></td>' +
+      '<td><a class="t-title" href="' + esc(MAIN_PAGE) + '" title="打开主站 treemap 页定位此卡片（主站暂不支持锚点跳转）">' +
+          esc(a.title) + '</a>' +
+          '<span class="t-cat">' + esc(a.cat) + '</span></td>' +
+      '<td class="td-date">' + esc(a.date) + '</td>' +
+      '<td class="rule-cell">' + ruleCellHtml(a) + '</td>' +
+      '<td>' + badgeFor(a) + '</td>' +
+      '<td class="risk-cell">' + riskHtml(a) + '</td>' +
+      '<td class="act-cell">' + actionHtml(a) + '</td>' +
+    '</tr>';
+  }).join('');
+  document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
+}
+function renderAll() { renderStats(); renderRows(); }
+
+/* ═══ 确认框 ═══ */
+var PENDING = null;
+
+function openModal(articleId) {
+  var a = ARTICLE_DATA_ADMIN.filter(function (x) { return x.id === articleId; })[0];
+  if (!a) return;
+  PENDING = { id: articleId, act: a.archived ? 'restore' : 'archive' };
+  var isOff = PENDING.act === 'archive';
+  document.getElementById('m-title').textContent = isOff ? '确认下线：移出首页' : '确认恢复上线';
+  document.getElementById('m-sub').textContent = a.id + ' — ' + a.title;
+  document.getElementById('m-reason').value = '';
+  document.getElementById('m-err').textContent = '';
+  document.getElementById('m-ok').textContent = isOff ? '确认下线' : '确认恢复';
+  document.getElementById('m-warn').innerHTML = isOff
+    ? '仅在本浏览器标记 <b>archived=true</b>，二期前线上读者仍能看到该卡片；' +
+      '正文与 CELL 数据保留（可恢复），不是撤稿。侵权/禁令/严重错误须另走紧急撤稿。'
+    : '恢复只把 <b>archived</b> 翻回 false。<b>不重置评审状态</b>：' +
+      'BLOCK/HOLD 仍需重新核对证据与评分，不能把恢复当成绕过拦截的后门。';
+  document.getElementById('modal-bg').classList.add('show');
+  setTimeout(function () { document.getElementById('m-reason').focus(); }, 30);
+}
+function closeModal() {
+  PENDING = null;
+  document.getElementById('modal-bg').classList.remove('show');
+}
+
+function commitPending() {
+  if (!PENDING) return;
+  var reason = document.getElementById('m-reason').value.trim();
+  if (!reason) {
+    document.getElementById('m-err').textContent = '请填写原因（审计留档用）。';
+    document.getElementById('m-reason').focus();
+    return;
+  }
+  var now = new Date();
+  var stamp = now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getDate()).padStart(2, '0') + ' ' +
+    String(now.getHours()).padStart(2, '0') + ':' +
+    String(now.getMinutes()).padStart(2, '0');
+  var state = loadArchiveState();
+  state[PENDING.id] = {
+    archived: PENDING.act === 'archive',
+    reason: reason,
+    changed_at: stamp
+  };
+  saveArchiveState(state);
+  closeModal();
+  applyState(state);
+  renderAll();
+}
+
+/* ═══ 事件 ═══ */
+function unlock() {
+  var input = document.getElementById('pw');
+  if (input.value === ADMIN_PASS) {
+    try { sessionStorage.setItem(AUTH_KEY, '1'); } catch (e) { /* 私密模式下忽略 */ }
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    input.value = '';
+    applyState(loadArchiveState());
+    renderAll();
+  } else {
+    var err = document.getElementById('gate-err');
+    err.textContent = '口令错误。已记录，未展示任何文章数据。';
+    input.classList.remove('bad'); void input.offsetWidth; input.classList.add('bad');
+    input.value = ''; input.focus();
+  }
+}
+function logout() {
+  try { sessionStorage.removeItem(AUTH_KEY); } catch (e) { /* ignore */ }
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('gate').style.display = 'flex';
+  document.getElementById('gate-err').textContent = '';
+  document.getElementById('pw').focus();
+}
+
+document.addEventListener('click', function (ev) {
+  var t = ev.target;
+  if (t.nodeType !== 1) return;
+  var act = t.closest('[data-act]');
+  if (act) { openModal(act.getAttribute('data-id')); return; }
+  var pin = t.closest('[data-pin]');
+  if (pin) { pin.classList.toggle('pinned'); return; }
+  var chip = t.closest('.chip[data-f]');
+  if (chip) {
+    FILTER = chip.getAttribute('data-f');
+    document.querySelectorAll('.chip[data-f]').forEach(function (c) {
+      c.classList.toggle('on', c === chip);
+    });
+    renderRows();
+    return;
+  }
+  if (t.id === 'gate-go') { unlock(); return; }
+  if (t.id === 'btn-logout') { logout(); return; }
+  if (t.id === 'm-cancel' || t.id === 'modal-bg') { closeModal(); return; }
+  if (t.id === 'm-ok') { commitPending(); return; }
+  if (t.id === 'btn-reset') {
+    if (window.confirm('清空本浏览器的 bhive_admin_state_v1（所有下线/恢复记录）？')) {
+      try { localStorage.removeItem(ARCHIVE_STATE_KEY); } catch (e) { /* ignore */ }
+      applyState({});
+      renderAll();
+    }
+    return;
+  }
+  /* 点击表格外区域收起已 pin 的风险列表 */
+  if (!t.closest('.risk-cell')) {
+    document.querySelectorAll('.risk-chip.pinned').forEach(function (c) {
+      c.classList.remove('pinned');
+    });
+  }
+});
+document.addEventListener('keydown', function (ev) {
+  if (ev.key === 'Escape') closeModal();
+  if (ev.key === 'Enter' && document.activeElement &&
+      document.activeElement.id === 'pw') { ev.preventDefault(); unlock(); }
+  if (ev.key === 'Enter' && ev.ctrlKey && document.activeElement &&
+      document.activeElement.id === 'm-reason') { ev.preventDefault(); commitPending(); }
+});
+document.getElementById('q').addEventListener('input', function (e) {
+  QUERY = e.target.value.trim().toLowerCase();
+  renderRows();
+});
+
+/* 免重输：sessionStorage 命中则直接进表 */
+(function boot() {
+  var ok = false;
+  try { ok = sessionStorage.getItem(AUTH_KEY) === '1'; } catch (e) { ok = false; }
+  if (ok) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    applyState(loadArchiveState());
+    renderAll();
+  } else {
+    document.getElementById('pw').focus();
+  }
+})();
+</script>
+</body>
+</html>
