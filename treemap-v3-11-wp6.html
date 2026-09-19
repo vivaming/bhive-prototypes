@@ -87,6 +87,10 @@
   .cell-title::after { content:''; position:absolute; left:0; right:0; bottom:-2px; height:2px;
     background:#f2f4f7; transform:scaleX(0); transform-origin:left; transition:transform .28s cubic-bezier(.22,.61,.36,1); }
   .cell.armed .cell-title::after { transform:scaleX(1); }
+  /* B3-4: inert placeholder cells (narrow logo / narrow-strip logo) have no
+     wireCard arm→open handler, so :active scale is the only tap feedback. */
+  .cell.press { transition: background-color .12s ease-out, box-shadow .12s ease-out, transform .08s ease-out; }
+  .cell.press:active { transform: scale(0.96); }
   /* election chart area */
   .election-chart { flex:1; min-height:0; margin:8px 0 4px 0; }
   .election-chart svg { width:100%; height:100%; display:block; }
@@ -213,6 +217,13 @@
   .a-body p { font-size:16px; line-height:1.7; color:#c7cfd8; margin-bottom:22px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; animation:none !important; } }
 /* Inline charts */
+/* B3-2: below 300px container width, let the SVG keep its min-width and let
+   the figure scroll horizontally. Above 300px, `overflow-x:auto` never fires
+   and the layout is byte-identical to before — desktop is untouched. */
+@media (max-width: 375px) {
+  .a-inline-chart { overflow-x: auto; }
+  .a-inline-chart svg { min-width: 300px; }
+}
 .a-inline-chart {
   position: relative;
   margin: 12px 0;
@@ -802,6 +813,10 @@ function renderGrid(cat) {
     }
     if (c.logo) {
       if (narrow || (n.x1-n.x0) < 96) {
+        /* B3-4: these cells skip wireCard (no arm→open), so `.press` gives
+           :active scale feedback on tap — same feel as the arm animation on
+           real cards, without introducing a click target that could 404. */
+        el.classList.add('press');
         el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;">BEEHIVE</div>';
         grid.appendChild(el);
         return;
@@ -831,18 +846,41 @@ var sparkParty = { s05:'act' }[c.id];
     el.innerHTML = html;
     wireCard(el, c);
     grid.appendChild(el);
-    if (big) {
-      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55));
-      thresholdBars(el.querySelector('.thresholds'));
-    } else if (sparkParty && el.querySelector('.spark-mini')) {
-      var sparkH = narrow ? 48 : Math.max(48, Math.min(96, Math.round(h*0.30))); /* V44 §4: 160→48 · 240→72 · 265→80 · ≥320→96 cap */
-      if (!narrow) el.querySelector('.spark-mini').style.height = sparkH + 'px';
-      try { drawMiniSpark(el.querySelector('.spark-mini'), sparkParty, sparkH); }
-      catch(e) { document.title = 'SPARKERR ' + c.id + ': ' + e.message; }
+    /* B3-1: set the spark height on the DOM node now so redrawChartCells can
+       read it back at draw time. Desktop: V44 §4 ladder. Narrow: fixed 48px
+       via .spark-mini CSS. */
+    var mini = el.querySelector('.spark-mini');
+    if (mini && !narrow) {
+      mini.style.height = Math.max(48, Math.min(96, Math.round(h * 0.30))) + 'px';
     }
   });
   updatePager();
-  requestAnimationFrame(function(){ if (!narrow) fitTitleAll(grid); fitAudit(grid); });
+  /* B3-1: defer chart draws to rAF so d3 sees the container's real
+     clientWidth. At render time the .election-chart flex box is still 0×0
+     (its flex slack isn't resolved until paint), so `container.clientWidth
+     || 400` silently falls back to 400 and the SVG is drawn wider than the
+     cell — overflow on narrow screens. `redrawChartCells` measures per-call,
+     so every render pass and every resize pass share the same code path. */
+  requestAnimationFrame(function(){ redrawChartCells(); if (!narrow) fitTitleAll(grid); fitAudit(grid); });
+}
+function redrawChartCells() {
+  var grid = document.getElementById('grid');
+  grid.querySelectorAll('.cell').forEach(function(el){
+    if (el.querySelector('.election-chart')) {
+      drawPollChart(el.querySelector('.election-chart'), Math.max(150, (parseFloat(el.style.height)||150)*0.55));
+      thresholdBars(el.querySelector('.thresholds'));
+    }
+    var mini = el.querySelector('.spark-mini');
+    if (mini) {
+      var story = CELLS.filter(function(x){ return x.id === el.dataset.id; })[0];
+      if (!story) return;
+      var sparkParty = { s05:'act' }[story.id];
+      if (!sparkParty) return;
+      var sparkH = parseInt(mini.style.height, 10) || 48;
+      try { drawMiniSpark(mini, sparkParty, sparkH); }
+      catch(e) { document.title = 'SPARKERR ' + story.id + ': ' + e.message; }
+    }
+  });
 }
 
 /* ---- WP6 sample articles (2026-09-13/14 news) -------------------------------- */
@@ -1796,6 +1834,9 @@ function openArticle(c) {
     av.scrollTop = 0;
     return;
   }
+
+  av.scrollTop = 0;
+}
   if (c.full) {
     bodyEl.innerHTML = '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
     var ch = document.getElementById('a-chart');
@@ -1808,8 +1849,6 @@ function openArticle(c) {
       '<p>This story is tracked by the Beehive discovery pipeline and will receive a full evidence-led briefing when the news cycle warrants it.</p>';
     document.getElementById('a-chart').style.display = 'none';
   }
-  av.scrollTop = 0;
-}
 }
 function showTreemap() {
   document.getElementById('article-view').classList.remove('active');
@@ -1828,9 +1867,16 @@ var CATS = [
 var catTimer = null;
 function setCat(cat) {
   pageNum = 1;
+  activeCat = cat; /* B3-3 fix: sync before updatePager so pager reads the NEW category */
   document.querySelectorAll('.cat-pill').forEach(function(p){
     p.classList.toggle('active', p.dataset.cat === cat);
   });
+  /* B3-3: flush the pager immediately after pageNum resets. Without this,
+     the visible page counter stays on the pre-switch value until
+     setTimeout(…,160) fires renderGrid→updatePager — user sees "3 / 4" for
+     up to 160ms after clicking a filter, then jumps to "1 / 1". updatePager
+     is idempotent; renderGrid calls it again at the end. */
+  updatePager();
   var fading = 0;
   if (cat !== 'all' && !reduced) {
     document.querySelectorAll('#grid .cell').forEach(function(el){
@@ -1938,6 +1984,14 @@ document.addEventListener('visibilitychange', function(){
 var rs;
 window.addEventListener('resize', function(){
   clearTimeout(rs);
+  /* B3-5: clear the armed selection synchronously on every resize — not
+     after the 200ms debounce. The armed ring and marquee were already
+     positioned by pixel offsets that just changed; leaving them until
+     renderGrid would show a stale inset shadow and a marquee tracking the
+     old title rect during the debounce window. clearMq runs even when
+     article-view is open, but `document.querySelector('.cell.armed')`
+     safely returns null then. */
+  clearTimeout(armTimer); clearMq(document.querySelector('.cell.armed')); armedId = null;
   rs = setTimeout(function(){
     if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
   }, 200);
