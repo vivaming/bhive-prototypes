@@ -191,6 +191,112 @@
     letter-spacing:.04em; line-height:1.8; }
   .footer .hr { border-top:1px solid var(--line2); margin-bottom:14px; }
 
+  /* ── 审查行按钮 / 审查视图 / 去风险弹窗 ───────────────────── */
+  .act-rev { border-color:#2b4a7a; color:#8fb8e8; background:transparent; margin-right:6px; }
+  .act-rev:hover { background:var(--blue); border-color:var(--blue); color:#03101e; }
+  .act-rev:disabled { opacity:.35; cursor:not-allowed; color:var(--t3); border-color:var(--line); background:transparent; }
+
+  #review-bg { position:fixed; inset:0; z-index:180; background:rgba(3,5,8,.9);
+    display:none; flex-direction:column; }
+  #review-bg.show { display:flex; }
+  .rv-head { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap;
+    padding:13px 22px; border-bottom:1px solid var(--line2); background:var(--panel); }
+  .rv-head .mark { font-size:10px; font-weight:700; letter-spacing:.28em; color:var(--red); }
+  .rv-head h3 { font-size:14px; letter-spacing:.03em; }
+  .rv-head .aid { color:var(--t3); font-size:10px; }
+  .rv-head .rv-spacer { flex:1; }
+  .rv-head .btn { padding:6px 12px; font-size:11px; border-radius:3px; letter-spacing:.06em; }
+  .rv-close { font-size:16px; padding:4px 10px; line-height:1; color:var(--t3); }
+  .rv-close:hover { color:var(--red); border-color:var(--red-dim); }
+  .rv-body { display:flex; flex:1; min-height:0; overflow:hidden; }
+
+  /* 风险清单 */
+  .rv-risks { width:min(410px,38%); flex:0 0 auto; border-right:1px solid var(--line2);
+    background:var(--panel2); overflow-y:auto; padding:12px 12px 26px; }
+  .rv-sec-h { font-size:9px; letter-spacing:.18em; text-transform:uppercase;
+    color:var(--t3); margin:0 0 8px; padding-bottom:5px; border-bottom:1px solid #1c2431; }
+  .rv-sec-h.cnt { color:var(--amber); border-color:#3a2f14; }
+  .rv-sec + .rv-sec { margin-top:14px; }
+  .rv-item { display:block; width:100%; text-align:left; margin-bottom:6px; padding:7px 9px;
+    background:transparent; border:1px solid var(--line); border-left:3px solid var(--line);
+    color:var(--t2); font-family:inherit; font-size:11px; line-height:1.5; cursor:pointer; }
+  .rv-item:hover { background:#131a24; color:var(--t1); }
+  .rv-item.b { border-left-color:var(--red); }
+  .rv-item.b:hover { border-color:var(--red); }
+  .rv-item.h { border-left-color:var(--orange); }
+  .rv-item.h:hover { border-color:var(--orange); }
+  .rv-item.dim { opacity:.45; }
+  .rv-item.active { background:#131a24; color:var(--t1); border-color:var(--blue); }
+  .rv-lvl { display:inline-block; margin-right:6px; padding:1px 5px; font-size:8.5px;
+    font-weight:700; letter-spacing:.12em; border:1px solid; vertical-align:1px; }
+  .lvl-b { color:var(--red); border-color:var(--red-dim); background:#221012; }
+  .lvl-h { color:var(--orange); border-color:#5a3319; background:#20140a; }
+  .rv-why { display:block; margin-top:3px; font-size:10px; color:var(--t3); }
+  .rv-item.active .rv-why { color:var(--t2); }
+
+  /* 正文 */
+  .rv-body-col { flex:1; min-width:0; overflow-y:auto; padding:14px 30px 46px; }
+  .rv-doc { max-width:720px; margin:0 auto; font-size:12.5px; line-height:1.72; color:var(--t2); }
+  .rv-doc .art-h { font-size:17px; font-weight:700; color:var(--t1); letter-spacing:.02em;
+    line-height:1.35; margin:0 0 3px; }
+  .rv-doc .art-meta { font-size:10px; color:var(--t3); letter-spacing:.14em;
+    text-transform:uppercase; margin-bottom:15px; }
+  .rv-doc .art-meta .src-ok { color:var(--green); }
+  .rv-doc .sec-h { font-size:11px; font-weight:700; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--t1); margin:17px 0 6px; }
+  .rv-doc .sec-p { margin-bottom:10px; }
+  .rv-doc .asof { margin-top:16px; padding:8px 11px; border:1px solid #1f5134;
+    background:#0d1f16; color:#8fc9a3; font-size:11px; line-height:1.6; }
+  .rv-doc .asof.weak { border-color:#5a4415; background:#1c1608; color:#d9b06a; }
+  mark.rv-b { background:#5e1e22; color:#ffd7d9; padding:1px 3px; border-radius:2px;
+    box-shadow:0 0 0 1px var(--red); cursor:pointer; }
+  mark.rv-h { background:#6a4517; color:#ffe0b8; padding:1px 3px; border-radius:2px;
+    box-shadow:0 0 0 1px var(--orange); cursor:pointer; }
+  mark.rv-b.on, mark.rv-h.on { box-shadow:0 0 0 1px var(--blue), 0 0 10px rgba(90,148,212,.6); }
+  .rv-doc .miss { display:block; margin-top:9px; padding:7px 10px; border:1px dashed var(--red-dim);
+    background:#1c0d10; color:#e8a7aa; font-size:11px; }
+  .rv-doc .miss.h { border-color:#5a3319; background:#1b1208; color:#e0c19a; }
+  .rv-hint { font-size:10px; color:var(--t3); padding:9px 22px; border-top:1px solid var(--line2);
+    background:var(--panel2); letter-spacing:.04em; }
+  .rv-hint.locked { color:var(--red); }
+  .rv-head .btn.af-locked { border-color:var(--red-dim); color:var(--red);
+    background:rgba(122,42,34,.28); cursor:not-allowed; opacity:1; }
+
+  /* 去风险 / 自动修正 弹窗 */
+  #prompt-bg { position:fixed; inset:0; z-index:220; background:rgba(3,5,8,.86);
+    display:none; align-items:center; justify-content:center; }
+  #prompt-bg.show { display:flex; }
+  .pm { width:min(760px,94vw); max-height:90vh; display:flex; flex-direction:column;
+    background:var(--panel); border:1px solid var(--line); border-top:3px solid var(--blue);
+    box-shadow:0 20px 60px rgba(0,0,0,.85); }
+  .pm-head { display:flex; align-items:flex-start; gap:12px; padding:15px 18px;
+    border-bottom:1px solid var(--line2); }
+  .pm-head .pm-title-wrap { flex:1; min-width:0; }
+  .pm-head h3 { font-size:13.5px; letter-spacing:.04em; margin-bottom:3px; }
+  .pm-head .sub { font-size:10.5px; color:var(--t3); line-height:1.5; }
+  .pm-body { padding:12px 18px; overflow:auto; flex:1; }
+  .pm-note { font-size:10.5px; color:var(--amber); background:#1a1408;
+    border:1px solid #4a3812; padding:7px 10px; line-height:1.6; margin-bottom:9px; }
+  .pm-cnt { font-size:10.5px; color:var(--t2); margin-bottom:9px; letter-spacing:.05em; }
+  .pm-cnt b { font-size:15px; color:var(--red); font-variant-numeric:tabular-nums; margin:0 2px; }
+  .pm-cnt.empty b { color:var(--t3); }
+  .pm-cnt.empty { color:var(--red); }
+  .pm-disc { list-style:none; margin:0 0 10px; padding:0; }
+  .pm-disc li { font-size:10.5px; color:var(--t2); padding:2px 0 2px 14px; position:relative;
+    line-height:1.55; }
+  .pm-disc li::before { content:'▸'; position:absolute; left:0; color:var(--blue); }
+  .pm-lbl { display:block; font-size:9px; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--t3); margin:0 0 5px; }
+  .pm pre { margin:0; max-height:min(56vh,460px); overflow:auto; background:#05080c;
+    border:1px solid var(--line); color:#cfd8e3; font-family:'SFMono-Regular',Consolas,monospace;
+    font-size:10.5px; line-height:1.6; padding:11px 13px; white-space:pre-wrap;
+    word-break:break-word; }
+  .pm-foot { display:flex; align-items:center; gap:8px; padding:12px 18px;
+    border-top:1px solid var(--line2); }
+  .pm-foot .pm-spacer { flex:1; }
+  .pm-toast { font-size:10px; color:var(--green); letter-spacing:.1em; }
+  .pm-toast.fail { color:var(--red); }
+
   /* ── Modal ────────────────────────────────────────────────── */
   #modal-bg { position:fixed; inset:0; z-index:200; background:rgba(3,5,8,.82);
     display:none; align-items:center; justify-content:center; }
@@ -280,6 +386,7 @@
           <th>规则分</th>
           <th>状态</th>
           <th>风险原因</th>
+          <th>审查</th>
           <th>下线 / 恢复</th>
         </tr>
       </thead>
@@ -311,6 +418,56 @@
     <div class="modal-btns">
       <button class="btn ghost" id="m-cancel">取消</button>
       <button class="btn primary" id="m-ok">确认下线</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 审查视图（需求2）══════════════════════════════════════════
+     不用 iframe：同源 fetch 主站 HTML，正则截取该文 <pre> 正文，
+     解 HTML 实体后渲染成本地 DOM，再对风险片段包 <mark> 高亮。 -->
+<div id="review-bg">
+  <div class="rv-head">
+    <span class="mark">▓ 审查</span>
+    <h3 id="rv-title"></h3>
+    <span class="aid" id="rv-aid"></span>
+    <span class="rv-spacer"></span>
+    <button class="btn" id="rv-dederisk" type="button">生成去风险版</button>
+    <button class="btn" id="rv-autofix" type="button">自动修正 · 剩 <b id="af-left">3</b>/3</button>
+    <button class="btn ghost rv-close" id="rv-close" type="button" title="关闭（Esc）">✕</button>
+  </div>
+  <div class="rv-body">
+    <div class="rv-risks" id="rv-risks"></div>
+    <div class="rv-body-col"><div class="rv-doc" id="rv-doc"></div></div>
+  </div>
+  <div class="rv-hint" id="rv-hint"></div>
+</div>
+
+<!-- ══ 去风险 / 自动修正 prompt 弹窗（需求3 / 需求4）═══════════════
+     只生成 prompt + 复制入口；真调 X-Pi 属后续接管线。 -->
+<div id="prompt-bg">
+  <div class="pm">
+    <div class="pm-head">
+      <div class="pm-title-wrap">
+        <h3 id="pm-title"></h3>
+        <div class="sub" id="pm-sub"></div>
+      </div>
+      <button class="btn ghost rv-close" id="pm-close" type="button" title="关闭（Esc）">✕</button>
+    </div>
+    <div class="pm-body">
+      <div class="pm-note" id="pm-note"></div>
+      <div class="pm-cnt" id="pm-cnt"></div>
+      <div id="pm-disc-wrap">
+        <div class="pm-lbl">改写纪律（逐条写入 prompt）</div>
+        <ul class="pm-disc" id="pm-disc"></ul>
+      </div>
+      <div class="pm-lbl" id="pm-prompt-lbl">PROMPT</div>
+      <pre id="pm-prompt"></pre>
+    </div>
+    <div class="pm-foot">
+      <button class="btn ghost" id="pm-cancel">取消</button>
+      <span class="pm-spacer"></span>
+      <span class="pm-toast" id="pm-toast"></span>
+      <button class="btn primary" id="pm-copy" type="button">复制 prompt</button>
     </div>
   </div>
 </div>
@@ -450,6 +607,685 @@ var ARTICLE_DATA_ADMIN = [
     ] }
 ];
 
+/* ── 风险清单（需求2）───────────────────────────────────────────
+   lvl: 'B' = BLOCK 级（硬门命中）→ 红；'H' = HOLD 级（待修/时效/来源缺口）→ 橙。
+   src: 'report'  = reports/rule_backfill/quality_report_art-sNN.json 实跑项
+        'manual'  = 任务书作者通读 14 篇正文补充的疑似风险
+   text: 主站正文里要匹配的原文片段（必须逐字存在于渲染后的正文，否则清单项置灰）。
+   text 缺省且 doc:false → 无法高亮（该条是文档级问题），清单项置灰。
+   每篇 ≤5 条。 -->
+var RISK_REGISTRY = {
+  'art-s05': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'taking the 12-month increase to 4.1%',
+      why:'CPI 4.1%（及 1.5% 季增）是本篇头条数字，正文未挂 Stats NZ 原始表链接，14 个数值声明全部无来源 URL。' },
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'Petrol rose 27.5% in the year to June',
+      why:'27.5% 燃油涨幅为第二强支撑数字，无来源可核；同段 71.0%、12.0% 亦同。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'taking the 12-month increase to 4.1%',
+      why:'14/14 claims 无 evidence_id，无法回溯到台账，审计链断。' },
+    { lvl:'H', src:'report', tag:'E1 具名来源',
+      doc:false,
+      why:'正文段内零具名来源；唯一的「Source: Stats NZ」在文末 as_of 行，读者正文中读不到出处。' },
+    { lvl:'H', src:'manual', tag:'口径外渗',
+      text:'carrying 32,908 listings in inventory',
+      why:'REINZ 8 月库存 32,908 属另一篇（art-s09）的数据期；本篇引用未标交叉来源，易被读作 CPI 报告的读数。' }
+  ],
+  'art-s06': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:"New Zealand's population grew by 20,300 people",
+      why:'20,300 净移民为本篇头条数字，无 Stats NZ 原始表链接；9,600 / 134,400 / 114,100 同段同问题。' },
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'NZ First is polling at 8.4%',
+      why:'8.4% 为 NZF 席位论点的支点数字，正文未标出自哪一轮 Curia 读数。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:"New Zealand's population grew by 20,300 people",
+      why:'13/13 claims 无 evidence_id，人口读数与轮次读数都无法回溯。' },
+    { lvl:'H', src:'report', tag:'E1 具名来源',
+      doc:false,
+      why:'正文段内零具名来源，仅文末 as_of 行有「Stats NZ」。' },
+    { lvl:'H', src:'manual', tag:'未标 as_of 的轮次',
+      text:'down 1.9 points from the previous reading',
+      why:'「上一轮读数」未给轮次日期；与 s11 引用的 -5.5 points 是同一系列的不同口径，读者无法判断哪条是本轮值。' }
+  ],
+  'art-s07': [
+    { lvl:'B', src:'report', tag:'H1 硬门',
+      text:"NZ First's 8.4% sits 3.4 points above the 5% party-vote threshold",
+      why:'硬门：「3.4 points」在正文出现但无来源、无台账、无真值表匹配 → BLOCK，命中即拦截。' },
+    { lvl:'B', src:'report', tag:'A2 台账不符',
+      text:"NZ First's 8.4% sits 3.4 points above the 5% party-vote threshold",
+      why:'A2：body-only claim「3.4points」在台账中不存在，正文声明与证据台账脱钩。' },
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'The Green Party is on 13.9%',
+      why:'13.9% / 10.5% / 29.0% 等全部投票数字无来源 URL；as_of 只写「POLL_HISTORY series」，非具名调查方。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'The Green Party is on 13.9%',
+      why:'12/12 claims 无 evidence_id。' },
+    { lvl:'H', src:'manual', tag:'绝对化表述',
+      text:'a full point outside that band',
+      why:'（占位检查）本篇多处「the largest / the most consequential」类绝对化表述，通读未发现与 s05 同类的外渗错误，保留为低优先级核查项。' }
+  ],
+  'art-s08': [
+    { lvl:'H', src:'report', tag:'B1 时效',
+      text:"the Greens were on 13.9%, up 3.8 points",
+      why:'B 维度 12.5/15：事件期与 as_of 间隔扣分；13.9% 为 1–3 月 3 日 Curia 读数，正文未标轮次日期。' },
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'The promise is a path to surplus without new taxes',
+      why:'「无新税盈余」是核心平台主张，正文未引 Green Party 平台原文或官方声明。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'The promise is a path to surplus without new taxes',
+      why:'1/1 claims 无 evidence_id（本篇仅抽出 1 个可判 claim，其余为论断）。' },
+    { lvl:'H', src:'manual', tag:'无 as_of 行',
+      doc:false,
+      why:'本篇是唯一没有 as_of 结尾段的文章，全文数据期只能靠单条 Curia 引用倒推 —— 补 as_of 行即可关闭。' },
+    { lvl:'H', src:'manual', tag:'绝对化表述',
+      text:'the least glamorous and the most consequential',
+      why:'「最不炫目但最有后果」是不可核的论断式断言，建议改为可引用的平台/财政口径。' }
+  ],
+  'art-s09': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'The national median sale price was $750,000',
+      why:'REINZ 8 月快照全部数字（$750,000 / 3,543 / 5,430 / 32,908 等 16 项）无来源 URL。' },
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'Inventory rose 9.7% to 32,908',
+      why:'库存 32,908 是政策论点支点（与 s05 交叉引用），无来源可核。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'The national median sale price was $750,000',
+      why:'17/17 claims 无 evidence_id —— 14 篇中最高数量级。' },
+    { lvl:'H', src:'manual', tag:'绝对化表述',
+      text:'the sixth-lowest August in REINZ\'s 35 years of records',
+      why:'「35 年倒数第六低」需 REINZ 历史记录表支持；正文未给出可核链接。' },
+    { lvl:'H', src:'manual', tag:'口径外渗',
+      text:'Auckland and Wellington have each experienced 31 consecutive months',
+      why:'31 个月连续库存增长为分省口径，与全国 9.7% 混排，未标注这是分省序列。' }
+  ],
+  'art-s10': [
+    { lvl:'B', src:'report', tag:'H1 硬门',
+      text:'often running at 150 to 200 percent of capacity',
+      why:'硬门：「200percent」无来源、无台账、无真值表匹配 → BLOCK。该数字系 Tauranga 医院员工估计，非官方统计。' },
+    { lvl:'B', src:'report', tag:'A2 台账不符',
+      text:'often running at 150 to 200 percent of capacity',
+      why:'A2：body-only claim「200percent」在台账中不存在。' },
+    { lvl:'H', src:'report', tag:'B2/B3 时效',
+      text:'was 68% at the end of 2023',
+      why:'B 维度 12.5/15：68% 为 2023 年末读数，是两年前的数据却被当成本轮争议的核心数字。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'was 68% at the end of 2023',
+      why:'3/3 claims 无 evidence_id；Te Whatu Ora 停发说明仅靠 Herald 转述。' },
+    { lvl:'H', src:'manual', tag:'未标 as_of 的推算',
+      text:'put the shortfall at 13.66 posts for 2025/26 and 16.78 for 2026/27',
+      why:'13.66 / 16.78 缺口来自员工信函的建模，正文未标该建模的时点与作者。' }
+  ],
+  'art-s11': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'Labour is on 25.9%, down 5.5 points across the recorded series',
+      why:'25.9% / 29.0% / 31.0% / 5.5 points 无来源；与 s06 引用的同一 25.9% 口径不一致（-1.9 vs -5.5）。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'Labour is on 25.9%, down 5.5 points across the recorded series',
+      why:'3/3 claims 无 evidence_id。' },
+    { lvl:'H', src:'manual', tag:'未标 as_of 的事件',
+      text:'announced an election-year reshuffle on 2 April 2026',
+      why:'2026-04-02 改组为本篇唯一硬事实，正文未挂 RNZ 报道链接；as_of 行只写「RNZ, 2 April 2026」无 URL。' },
+    { lvl:'H', src:'manual', tag:'推测被写成事实',
+      text:'The cabinet that goes to the election is most likely the cabinet that already stands',
+      why:'「最可能的结果是现状延续」为预测性断言，未标注为推测；应加「我们的判断」类限定语。' },
+    { lvl:'H', src:'manual', tag:'口径矛盾',
+      text:'National is on 29.0% in the latest poll, down from 31.0%',
+      why:'29.0% 被标为「latest poll」，但 as_of 行写的轮次是 1–3 月 3 日；同一 29.0% 在 s16 又与 One NZ 8.4% 并列，轮次归属不清。' }
+  ],
+  'art-s12': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'drew more than ten reports across three newsrooms in 48 hours',
+      why:'「48 小时内 3 家新闻室 10+ 篇报道」为可核验主张，正文未挂任何一篇报道链接。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'On 16 September, National announced',
+      why:'1/1 claims 无 evidence_id；整篇唯一可判 claim 是宣布事件本身。' },
+    { lvl:'H', src:'manual', tag:'未标 as_of 的数据引用',
+      text:'a CPI release that put fuel at plus 27.5% year-on-year',
+      why:'27.5% 来自 s05 的 CPI 报告，本篇引用未标数据期与来源，属跨篇数据未标注。' },
+    { lvl:'H', src:'manual', tag:'转述未署名',
+      text:'Pak\'nSave\'s owner called the plan chilling',
+      why:'「Pak\'nSave 拥有者」指谁、在哪场发言，正文未具名也未给链接；「Winston Peters pushed back」同样未标注场合。' },
+    { lvl:'H', src:'manual', tag:'绝对化表述',
+      text:'the coalition\'s affordability answer',
+      why:'「联盟的负担能力答案」为编辑断言，未标注是本文观点还是党方口径。' }
+  ],
+  'art-s13': [
+    { lvl:'B', src:'report', tag:'H1 硬门',
+      text:'Te Pāti Māori\'s 29% is 21 points ahead of second place',
+      why:'硬门：「21points」与「18points」无来源、无台账、无真值表匹配 → BLOCK。' },
+    { lvl:'B', src:'report', tag:'H3 图表错配',
+      doc:false,
+      why:'硬门 H3：chart-s13-trend 为 poll_table（一般选区党派得票），与本篇 maori-electorate/tpm 主题实体不匹配；读者会误以为图表是本篇数据。' },
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'Te Pāti Māori would receive 29% of the party vote',
+      why:'29% / 3% / 8% / 23% 等核心数字无 Curia 原始表链接；MoE ±3.1% 亦未标计算基准。' },
+    { lvl:'H', src:'manual', tag:'口径混用',
+      text:'Labour is down from 44 to 28 in the comparison',
+      why:'2023 席位口径（44/28/17 席）与 2026 得票率口径（29% / 28）混排在同句对比，属口径混用。' },
+    { lvl:'H', src:'manual', tag:'无 as_of 行',
+      doc:false,
+      why:'本篇无 as_of 结尾段；调查为 9 月 17 日 1News 报道的 Curia 轮次，数据期只能靠正文推断。' }
+  ],
+  'art-s14': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'cost of living topped the list at 42%',
+      why:'42% / 15% / 3% 及全部分年龄段数字（49% / 38% / 72% / 79% 等）无来源 URL。' },
+    { lvl:'H', src:'report', tag:'B1 时效',
+      text:'Voters aged 18 to 30 named it at 49%',
+      why:'B 维度 12.5/15：事件期与 as_of 间隔扣分；分年龄读数的调查时点未标。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'cost of living topped the list at 42%',
+      why:'9/9 claims 无 evidence_id。' },
+    { lvl:'H', src:'manual', tag:'未标 as_of 的分组',
+      text:'Health, education, housing, immigration, welfare and the environment all sit at 3% or below',
+      why:'「3% 或以下」是分组聚合值，未标注是否来自同一波调查、以及是否含多选题的口径差异。' },
+    { lvl:'H', src:'manual', tag:'绝对化表述',
+      text:'it is the entire argument of the poll',
+      why:'「差距即整篇论点」为编辑论断；同一波调查的 ±3.1% 误差使 42% vs 15% 的差距虽显著，但不应写成唯一结论。' }
+  ],
+  'art-s15': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'took the average price down 1.1% to US$3,868',
+      why:'GDT 15 月 15 日拍卖全部数字（US$3,868 / -5.7% / +16.5% 等 14 项）无来源 URL。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'took the average price down 1.1% to US$3,868',
+      why:'14/14 claims 无 evidence_id。' },
+    { lvl:'H', src:'manual', tag:'未标 as_of 的买家结构',
+      text:'North Asian purchasing fell from 46% to 37% of the market',
+      why:'46%→37% 买家结构变化未标是否同一拍卖周期内可比、亦未标注该口径出自 GDT 官方还是转述。' },
+    { lvl:'H', src:'manual', tag:'跨篇数据未标注',
+      text:'the same property market that REINZ',
+      why:'（防漏项）本篇未外渗 REINZ 数据；此条留作交叉引用巡检占位，若正文新增跨篇数字须补标注。' },
+    { lvl:'H', src:'manual', tag:'未来时未加限定',
+      text:'have yet to show up in published production data',
+      why:'「尚未出现在公开生产数据」是对未来数据的判断，未标判断时点；读者可能读作已核实结论。' }
+  ],
+  'art-s16': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'at 123 seats',
+      why:'123 席 / 3 席 overhang 及全部轮次数字（29.0% / 25.9% 等 7 项）无来源 URL。' },
+    { lvl:'H', src:'report', tag:'B1 时效',
+      text:'In 2023 it produced the largest parliament in New Zealand\'s history',
+      why:'B 维度 12.5/15：2023 年席位对比与本轮 as_of 间隔扣分。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'at 123 seats',
+      why:'6/6 claims 无 evidence_id。' },
+    { lvl:'H', src:'manual', tag:'口径矛盾',
+      text:'One NZ at 8.4%',
+      why:'本篇称「One NZ 8.4%」，s07 称「NZ First 8.4%」—— 同一轮次同一数值给了两个不同党名，须以 POLL_HISTORY 台账核对后统一。' },
+    { lvl:'H', src:'manual', tag:'推算未标方法',
+      text:'which in a parliament of 123 is roughly four seats',
+      why:'「3.1 点 ≈ 4 席」为换算估算，未标注席位换算方法（是否按党派比例或直接除 123）。' }
+  ],
+  'art-s17': [
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'an energy sovereignty fund of approximately $1 billion',
+      why:'$1 billion 主张数字与 $32.5m 年化利息推算均无来源 URL。' },
+    { lvl:'H', src:'report', tag:'A1 证据 ID',
+      text:'an energy sovereignty fund of approximately $1 billion',
+      why:'1/1 claims 无 evidence_id。' },
+    { lvl:'H', src:'manual', tag:'推算未标基准',
+      text:'at the RBNZ cash rate of 3.25%',
+      why:'$32.5m = 3.25% × $1bn 为本文自算；3.25% 现金利率未标取值日期，属未标 as_of 的推算基准。' },
+    { lvl:'H', src:'manual', tag:'未标 as_of 的政策',
+      text:'The fund would operate through grants, concessional finance',
+      why:'基金运作方式（拨款/优惠融资/担保/股权投资）为提案描述，未标注出自哪份 TPM 文件、版本日期。' },
+    { lvl:'H', src:'manual', tag:'绝对化表述',
+      text:'a permanent share of energy assets',
+      why:'「永久性份额」是提案措辞还是本文转述未区分；若为党方原文须加引号与来源。' }
+  ],
+  'art-s18': [
+    { lvl:'B', src:'report', tag:'H1 硬门',
+      text:'National leads by 3.1 points on party vote',
+      why:'硬门：「3.1points」无来源、无台账、无真值表匹配 → BLOCK。' },
+    { lvl:'B', src:'report', tag:'H3 图表错配',
+      doc:false,
+      why:'硬门 H3：chart-s18-trend 为 poll_trend（国家党党派得票趋势），与 poll-of-polls 主题实体不匹配。' },
+    { lvl:'H', src:'report', tag:'A4 来源缺失',
+      text:'assigns a 47.8% probability to coalition government formation',
+      why:'47.8% 及全部轮次数字（29.0% / 25.9% / 13.9% 等 8 项）无来源 URL。' },
+    { lvl:'H', src:'report', tag:'C3 图表时效',
+      text:'assigns a 47.8% probability to coalition government formation',
+      why:'C3：chart-s18-trend 的 as_of 为 2026-09-03，早于本篇 2026-09-16 更新日，图表时效过期。' },
+    { lvl:'H', src:'manual', tag:'来源等级不足',
+      text:'The 47.8% number comes from the page\'s meta description rather than the article body',
+      why:'47.8% 取自页面 meta description，非文章正文，未与模型已发表方法学核对；正文已自陈但仍未降级为 secondary_signal。' }
+  ]
+};
+
+/* 每篇条数统计（供自检与回复用） */
+function riskCountOf(id) {
+  return (RISK_REGISTRY[id] || []).length;
+}
+
+/* ═══ 审查视图（需求2）══════════════════════════════════════════ */
+var REVIEW = { article:null, risks:[], active:null, docText:'', selIdx:-1 };
+
+/**
+ * 从主站 HTML 里取出一篇的正文。
+ * 主站是纯 JS 对象 `var ARTICLE_DATA = { "art-sNN": { "title":..., "sections":[...] } };`
+ * 没有 <pre> 包裹、没有实体转义，所以不能用 textarea 解转义那套。
+ * 用花括号配平扫描定位 `"art-sNN": { ... }` 块，再 JSON.parse。
+ */
+function extractStoryBlock(html, articleId) {
+  var key = '"' + articleId + '"';
+  var i = html.indexOf(key);
+  if (i < 0) return null;
+  var b = html.indexOf('{', i);
+  if (b < 0) return null;
+  var depth = 0, inStr = false, esc = false, k;
+  for (k = b; k < html.length; k++) {
+    var ch = html[k];
+    if (inStr) {
+      if (esc) esc = false;
+      else if (ch === '\\') esc = true;
+      else if (ch === '"') inStr = false;
+      continue;
+    }
+    if (ch === '"') inStr = true;
+    else if (ch === '{') depth++;
+    else if (ch === '}') { depth--; if (depth === 0) return html.slice(b, k + 1); }
+  }
+  return null;
+}
+
+function articleText(doc) {
+  return doc.sections.map(function (s) { return s.p || ''; }).join('\n');
+}
+
+function renderDoc(articleId, doc) {
+  var bodyEl = document.getElementById('rv-doc');
+  var secs = (doc.sections || []).slice();
+  /* 最后一段若是 as_of 行（{as_of:true}），单独渲成脚注样式 */
+  var asof = null;
+  if (secs.length && secs[secs.length - 1].as_of) asof = secs.pop();
+  var html = '<h1 class="art-h">' + esc(doc.title || articleId) + '</h1>' +
+    '<div class="art-meta">' + esc(articleId) + ' · ' +
+    (asof ? '<span class="src-ok">as_of 已标</span>' : '<span style="color:var(--amber)">无 as_of 行</span>') + '</div>';
+  secs.forEach(function (s) {
+    if (s.h) html += '<div class="sec-h">' + esc(s.h) + '</div>';
+    if (s.p) html += '<p class="sec-p">' + esc(s.p) + '</p>';
+  });
+  if (asof) html += '<div class="asof">' + esc(asof.p) + '</div>';
+  else html += '<div class="asof weak">⚠ 本篇缺少 as_of 结尾段：数据期与来源无法从正文尾部读取。</div>';
+  bodyEl.innerHTML = html;
+}
+
+/** 清单项 → 正文里包 &lt;mark&gt;。找不到原文片段则降级为「未定位」提示块。 */
+function wrapFirst(text, needle, lvl, rkey) {
+  var cls = lvl === 'B' ? 'rv-b' : 'rv-h';
+  var needleEsc = esc(needle);
+  var idx = text.indexOf(needleEsc);
+  if (idx < 0) return null;
+  var end = idx + needleEsc.length;
+  return text.slice(0, idx) + '<mark class="' + cls + '" data-r="' + rkey + '">' +
+    needleEsc + '</mark>' + text.slice(end);
+}
+
+function clearMarks(root) {
+  Array.prototype.slice.call(root.querySelectorAll('mark.rv-b, mark.rv-h')).forEach(function (m) {
+    var p = m.parentNode;
+    if (!p) return;
+    p.replaceChild(document.createTextNode(m.textContent), m);
+    p.normalize();
+  });
+}
+
+function paintMarks() {
+  var root = document.getElementById('rv-doc');
+  clearMarks(root);
+  REVIEW.active.forEach(function (r) {
+    var paras = root.querySelectorAll('.sec-p, .asof, .art-h');
+    var done = false;
+    for (var i = 0; i < paras.length && !done; i++) {
+      var el = paras[i];
+      if (el.classList.contains('miss')) continue;
+      var out = wrapFirst(el.innerHTML, r.text, r.lvl, String(REVIEW.active.indexOf(r)));
+      if (out != null) { el.innerHTML = out; done = true; }
+    }
+    if (!done) {
+      var note = document.createElement('p');
+      note.className = 'miss' + (r.lvl === 'B' ? '' : ' h');
+      note.textContent = '⚠ 「' + (r.tag || r.text) + '」在正文中未逐字匹配到，无法高亮；请按 why 说明人工定位。';
+      root.appendChild(note);
+    }
+  });
+  root.querySelectorAll('mark').forEach(function (m) {
+    var k = m.getAttribute('data-r');
+    if (k === String(REVIEW.selIdx)) m.classList.add('on');
+  });
+}
+
+function renderRiskList() {
+  var box = document.getElementById('rv-risks');
+  var rs = REVIEW.risks;
+  if (!rs.length) {
+    box.innerHTML = '<div class="rv-sec-h">风险清单</div>' +
+      '<p style="font-size:11px;color:var(--t3);line-height:1.7">本条没有已登记的风险项。<br>' +
+      'election hero 为全宽头条卡、无正文，不进规则评分器。</p>';
+    return;
+  }
+  var nB = rs.filter(function (r) { return r.lvl === 'B'; }).length;
+  var nH = rs.length - nB;
+  var html = '<div class="rv-sec-h cnt">风险清单 · ' + rs.length + ' 条（BLOCK ' + nB +
+    ' / HOLD ' + nH + '）<br>点击条目 → 右侧正文 <mark style="background:#5e1e22;color:#ffd7d9;padding:0 3px">' +
+    '高亮</mark></div><div class="rv-sec">';
+  rs.forEach(function (r, i) {
+    var hit = !!(r.text && REVIEW.docText && REVIEW.docText.indexOf(r.text) >= 0);
+    var lvlName = r.lvl === 'B' ? 'BLOCK' : 'HOLD';
+    html += '<button type="button" class="rv-item ' + (r.lvl === 'B' ? 'b' : 'h') +
+      (hit ? '' : ' dim') + (i === REVIEW.selIdx ? ' active' : '') +
+      '" data-ridx="' + i + '"' + (hit ? '' : ' disabled') + '>' +
+      '<span class="rv-lvl ' + (r.lvl === 'B' ? 'lvl-b' : 'lvl-h') + '">' + lvlName + '</span>' +
+      '<span>' + esc(r.tag || r.text) + '</span>' +
+      (hit ? '' : ' <span style="color:var(--t3)">（未定位）</span>') +
+      '<span class="rv-why">' + esc(r.why) + '</span>' +
+      '<span class="rv-why" style="color:var(--t3)">' + (r.src === 'report' ? '来源：rule_backfill 实跑' : '来源：通读补充') + '</span>' +
+      '</button>';
+  });
+  html += '</div>';
+  box.innerHTML = html;
+}
+
+function openReview(articleId) {
+  var a = ARTICLE_DATA_ADMIN.filter(function (x) { return x.id === articleId; })[0];
+  if (!a) return;
+  REVIEW.article = a;
+  REVIEW.risks = (RISK_REGISTRY[articleId] || []).map(function (r) {
+    return { lvl:r.lvl, tag:r.tag, text:r.text, why:r.why, src:r.src, doc:r.doc };
+  });
+  REVIEW.active = REVIEW.risks.filter(function (r) { return !r.doc && r.text; });
+  REVIEW.selIdx = REVIEW.active.length ? 0 : -1;
+  REVIEW.docText = '';
+  document.getElementById('rv-title').textContent = a.title;
+  document.getElementById('rv-aid').textContent = a.id + ' · cell ' + a.card + ' · ' + a.date;
+  var hint = document.getElementById('rv-hint');
+  if (hint) { hint.classList.remove('locked'); hint.textContent = ''; }
+  syncAutoFixBtn();
+  document.getElementById('rv-risks').innerHTML =
+    '<p style="font-size:11px;color:var(--t3);padding:6px 2px">加载正文中…</p>';
+  document.getElementById('rv-doc').innerHTML = '';
+  document.getElementById('review-bg').classList.add('show');
+  renderRiskList();
+  if (a.id === 'election') {
+    document.getElementById('rv-doc').innerHTML =
+      '<h1 class="art-h">' + esc(a.title) + '</h1>' +
+      '<div class="art-meta">' + esc(a.id) + ' · ' + esc(a.cat) + '</div>' +
+      '<p class="sec-p">' + esc(a.note) + '</p>';
+  } else {
+    loadArticleBody(a.id);
+  }
+}
+
+function selectRisk(i) {
+  var r = REVIEW.risks[i];
+  if (!r || !r.text || r.doc) return;
+  REVIEW.selIdx = REVIEW.active.indexOf(r);
+  document.querySelectorAll('.rv-item').forEach(function (el, k) {
+    el.classList.toggle('active', k === i);
+  });
+  paintMarks();
+}
+
+function closeReview() {
+  var hint = document.getElementById('rv-hint');
+  if (hint) { hint.classList.remove('locked'); hint.textContent = ''; }
+  document.getElementById('review-bg').classList.remove('show');
+  REVIEW.article = null; REVIEW.risks = []; REVIEW.active = [];
+  REVIEW.docText = ''; REVIEW.selIdx = -1;
+  closeModal();
+}
+
+/** 同源 fetch 主站 HTML，正则截取该文正文，渲染进弹层（不用 iframe）。 */
+function loadArticleBody(articleId) {
+  var bodyEl = document.getElementById('rv-doc');
+  function showErr(msg) { bodyEl.innerHTML = '<p class="miss">⚠ ' + esc(msg) + '</p>'; }
+  fetch(MAIN_PAGE)
+    .then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    })
+    .then(function (html) {
+      var block = extractStoryBlock(html, articleId);
+      if (!block) { showErr('主站未找到 ' + articleId + ' 的正文块，无法渲染。'); return; }
+      var doc;
+      try { doc = JSON.parse(block); }
+      catch (e) { showErr('正文块解析失败：' + e.message); return; }
+      REVIEW.docText = articleText(doc);
+      renderDoc(articleId, doc);
+      renderRiskList();          /* 正文到手后才能判定哪些条目可高亮 */
+      paintMarks();
+    })
+    .catch(function (e) {
+      showErr('抓取主站正文失败：' + e.message + '（需同源部署；file:// 下 fetch 会被浏览器拦）');
+    });
+}
+
+/* ═══ 需求3 / 需求4：去风险版 prompt 与「自动修正」计数器 ══════ */
+var AUTOFIX_KEY = 'bhive_admin_autofix_v1';   /* { "art-sNN": 已用次数 } */
+var AUTOFIX_MAX = 3;                            /* 每篇 3 次机会 */
+
+function loadAutoFixState() {
+  try {
+    var raw = localStorage.getItem(AUTOFIX_KEY);
+    var obj = raw ? JSON.parse(raw) : {};
+    return (obj && typeof obj === 'object') ? obj : {};
+  } catch (e) {
+    console.warn('[bhive-admin] 自动修正计数解析失败，已忽略：', e.message);
+    return {};
+  }
+}
+function autoFixUsed(id) {
+  var v = loadAutoFixState()[id] || 0;
+  return (typeof v === 'number' && v >= 0) ? Math.min(v, AUTOFIX_MAX) : 0;
+}
+function autoFixLeft(id) { return AUTOFIX_MAX - autoFixUsed(id); }
+var AUTOFIX_LOCKED = false;        /* 写入失败即锁定：宁可锁死不可放水 */
+
+/** 状态是否持久落盘成功；回读值 ≠ 预期值即视为假成功。 */
+function persistAutoFixState(st) {
+  var expected = JSON.stringify(st);
+  try {
+    localStorage.setItem(AUTOFIX_KEY, expected);
+  } catch (e) {
+    console.warn('[bhive-admin] 写入自动修正计数失败：', e.message);
+    AUTOFIX_LOCKED = true;
+    return false;
+  }
+  var got = null;
+  try { got = localStorage.getItem(AUTOFIX_KEY); }
+  catch (e) { console.warn('[bhive-admin] 回读自动修正计数失败：', e.message); }
+  if (got !== expected) {
+    console.warn('[bhive-admin] 自动修正计数回读不符，视为本次未消耗成功。');
+    AUTOFIX_LOCKED = true;
+  }
+  return !AUTOFIX_LOCKED;
+}
+
+/** 扣一次机会；剩 0 次或存储不可写时返回 false（机会不消耗）。 */
+function spendAutoFix(id) {
+  if (autoFixLeft(id) <= 0) return false;
+  var st = loadAutoFixState();
+  var want = autoFixUsed(id) + 1;
+  st[id] = want;
+  if (!persistAutoFixState(st)) return false;
+  return autoFixUsed(id) === want;
+}
+
+/** 标记存储不可用：锁定自动修正，并在审查视图底部提示。 */
+function setAutoFixLocked() {
+  AUTOFIX_LOCKED = true;
+  syncAutoFixBtn();
+  var hint = document.getElementById('rv-hint');
+  if (hint) { hint.classList.add('locked'); hint.textContent = '⛔ 存储不可用，自动修正已锁定。'; }
+}
+
+/** 改写纪律：去风险版与自动修正共用，逐条写进 prompt。 */
+var DERISK_DISCIPLINE = [
+  '事实与数字零改动：所有百分比、金额、人数、日期、席位、轮次读数必须与原文逐字一致；不新增、不取整、不换算。',
+  '逐条消除风险清单：每条风险给出具体修改动作（补来源 / 降级措辞 / 拆口径 / 标为推测），不得只改形容词了事。',
+  '补来源句：无来源的数字必须补「(来源：调查方，数据期，轮次/发布日期)」；查不到权威来源的，改写为「据 XX 报道」并标注为未经官方确认。',
+  '补 as_of：正文缺失 as_of 结尾段的文章，补一段「As of <日期>. Source: <具名来源 + 数据期 + 发布日期>」；已有 as_of 的保留原样。',
+  '硬门数字必须处理：H1 命中的数字（如 3.4points / 200percent / 18points / 21points / 3.1points）要么补上可核来源，要么整句改写并显式标注为「未核实」。',
+  '图表错配要说明：H3 命中的文章，正文中必须写清旁边图表的数据口径与本文章节的差异，或建议替换图表。',
+  '保留既有结构与风格：小节标题、as_of 行、图表引用位置不动；只改正文句子。',
+  '输出完整 HTML 片段：返回可直接替换的 <p> 段落序列（保留 .sec-h / .sec-p / .asof 结构），不要包在外层容器里。',
+  '不引入新断言：改写不得产生原文没有的事实声明。'
+];
+
+function buildPrompt(mode) {
+  var a = REVIEW.article;
+  if (!a) return '';
+  var rs = REVIEW.risks;
+  var L = [];
+  L.push(mode === 'fix' ? '# 任务：BEEHIVE 文章自动修正（去风险）' : '# 任务：BEEHIVE 文章去风险改写');
+  L.push('');
+  L.push('## 目标文章');
+  L.push('- id: ' + a.id + '  (cell ' + a.card + ')');
+  L.push('- 标题: ' + a.title);
+  L.push('- 日期: ' + a.date + ' · 分类: ' + a.cat);
+  L.push('- 规则分: ' + (a.rule == null ? '未评分' : ruleFmt(a.rule) + '/' + RULE_MAX) +
+    ' · 状态: ' + a.status + (a.note ? ' · 硬门/说明: ' + a.note : ''));
+  L.push('');
+  L.push('## 改写纪律（逐条遵守，全部写进你的修改理由）');
+  DERISK_DISCIPLINE.forEach(function (d, i) { L.push((i + 1) + '. ' + d); });
+  L.push('');
+  L.push('## 风险清单（' + rs.length + ' 条；BLOCK=红 必须消除，HOLD=橙 必须处理）');
+  if (!rs.length) {
+    L.push('（本条无已登记风险：仅做纪律性通读，不得改动任何事实与数字。）');
+  }
+  rs.forEach(function (r, i) {
+    L.push('');
+    L.push('### R' + (i + 1) + '  [' + (r.lvl === 'B' ? 'BLOCK' : 'HOLD') + '] ' +
+      (r.src === 'report' ? 'rule_backfill 实跑' : '通读补充') + ' · ' + (r.tag || '（文档级）'));
+    if (r.text) L.push('- 原文片段: 「' + r.text + '」');
+    else L.push('- 定位: 文档级（正文中无对应片段，需按 reason 处理）');
+    L.push('- reason: ' + r.why);
+    L.push('- 要求: 给出具体修改动作，并说明改后为何该风险已关闭。');
+  });
+  L.push('');
+  L.push('## 原文（全文，逐字；改写必须基于此）');
+  L.push('```');
+  L.push(REVIEW.docText || '（正文加载失败：请先在审查视图确认正文已渲染，再重试。）');
+  L.push('```');
+  L.push('');
+  L.push('## 输出格式');
+  L.push('1. 逐条风险回应表：R 编号 / 修改动作 / 改后为何已关闭。');
+  L.push('2. 改写后的完整 HTML 片段（.sec-h / .sec-p / .asof 结构不变）。');
+  L.push('3. 未关闭项清单：若某条风险无法在保持数字不变的前提下关闭，明确列出并说明需要的人工输入。');
+  L.push('');
+  L.push('禁止：改动任何数字与事实 · 新增原文没有的声明 · 省略 as_of · 输出非 HTML 片段。');
+  return L.join('\n');
+}
+function openPrompt(mode) {
+  var a = REVIEW.article;
+  if (!a) return;
+  var isFix = mode === 'fix';
+  if (isFix && (autoFixLeft(a.id) <= 0 || AUTOFIX_LOCKED)) return;   /* 防御：按钮已 disabled */
+
+  /* 计数器（需求4）：「每篇 3 次机会」—— 打开弹窗即计一次，localStorage 持久记 */
+  PROMPT.mode = mode; PROMPT.id = a.id;
+  if (isFix && !spendAutoFix(a.id)) {   /* 持久化失败：机会不消耗，直接锁定 */
+    setAutoFixLocked();
+    return;
+  }
+  var used = autoFixUsed(a.id);
+  var left = autoFixLeft(a.id);
+
+  var cnt = document.getElementById('pm-cnt');
+  if (isFix) {
+    var empty = left <= 0;
+    cnt.className = 'pm-cnt' + (empty ? ' empty' : '');
+    cnt.innerHTML = '每篇 <b>3</b> 次机会 · 已用 <b>' + used + '</b> · 剩余 <b>' + left +
+      '</b> 次' + (empty ? ' — 本条自动修正已关闭' :
+        '（本次是第 ' + used + ' 次）') +
+      ' — 计数存本浏览器 <code style="background:#05080c;padding:1px 5px">' +
+      AUTOFIX_KEY + '</code>';
+  } else {
+    cnt.className = 'pm-cnt';
+    cnt.innerHTML = '去风险版不限次。本条「自动修正」已用 <b>' + used + '</b>/3' +
+      (left <= 0 ? '（已用尽）' : '') + '。';
+  }
+
+  document.getElementById('pm-title').textContent =
+    (isFix ? '自动修正（第 ' + used + '/3 次） · ' : '生成去风险版 · ') + a.id;
+  document.getElementById('pm-sub').textContent = a.title + '  ·  规则分 ' +
+    (a.rule == null ? '—' : ruleFmt(a.rule) + '/' + RULE_MAX) + '  ·  ' +
+    REVIEW.risks.filter(function (r) { return r.lvl === 'B'; }).length + ' BLOCK / ' +
+    REVIEW.risks.filter(function (r) { return r.lvl === 'H'; }).length + ' HOLD';
+  document.getElementById('pm-note').innerHTML =
+    (isFix
+      ? '⚠ 本次打开已<b>占用 1 次机会</b>（剩 ' + left + ' 次），不扣线上额度。'
+      : '⚠ 去风险版不限次。') +
+    ' 仅生成 prompt 与复制入口，<b>不调用</b> X-Pi / 不联网；真实调用属后续接管线。' +
+    ' prompt 含原文全文 + 风险清单 + 改写纪律。';
+  document.getElementById('pm-disc').innerHTML =
+    DERISK_DISCIPLINE.map(function (d) { return '<li>' + esc(d) + '</li>'; }).join('');
+  document.getElementById('pm-prompt-lbl').textContent = 'PROMPT';
+  document.getElementById('pm-prompt').textContent = buildPrompt(mode);
+  document.getElementById('pm-toast').textContent = '';
+  document.getElementById('pm-copy').textContent = '复制 prompt';
+  document.getElementById('prompt-bg').classList.add('show');
+
+  if (isFix) syncAutoFixBtn();
+}
+var PROMPT = { mode:'derisk', id:null };
+
+/** 同步「自动修正 · 剩 N/3」按钮显示；剩 0 次或存储不可用时禁用。 */
+function syncAutoFixBtn() {
+  var a = REVIEW.article;
+  if (!a) return;
+  var btn = document.getElementById('rv-autofix');
+  var left = autoFixLeft(a.id);
+  btn.querySelector('#af-left').textContent = String(left);
+  btn.disabled = left <= 0 || AUTOFIX_LOCKED;
+  btn.classList.toggle('af-locked', AUTOFIX_LOCKED);
+  btn.title = AUTOFIX_LOCKED
+    ? '⛔ 存储不可用，自动修正已锁定'
+    : (left > 0 ? '每篇 3 次机会，剩余 ' + left + ' 次' : '本条已用完 3 次机会');
+}
+
+function closePrompt() {
+  PROMPT.mode = null; PROMPT.id = null;
+  document.getElementById('prompt-bg').classList.remove('show');
+}
+
+/** 复制 prompt：优先异步 clipboard API，非 HTTPS / file:// 走 execCommand 兼容模式。 */
+function copyPrompt() {
+  var pre = document.getElementById('pm-prompt');
+  var text = pre.textContent;
+  var toast = document.getElementById('pm-toast');
+  var btn = document.getElementById('pm-copy');
+  function ok(msg) {
+    toast.className = 'pm-toast'; toast.textContent = msg;
+    btn.textContent = '已复制';
+    setTimeout(function () { btn.textContent = '复制 prompt'; }, 1600);
+  }
+  function fail(err) {
+    toast.className = 'pm-toast fail';
+    toast.textContent = '✗ 复制失败，请手动全选 <pre> 复制（' +
+      (err && err.message ? err.message : err) + '）';
+  }
+  function execFallback() {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed'; ta.style.top = '-9999px';
+    ta.setAttribute('readonly', 'readonly');
+    document.body.appendChild(ta);
+    ta.select();
+    var done = false;
+    try { done = document.execCommand('copy'); } catch (e) { done = false; }
+    document.body.removeChild(ta);
+    if (done) { ok('✓ 已复制到剪贴板（兼容模式）'); } else { fail(new Error('execCommand 不可用')); }
+  }
+  if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+    navigator.clipboard.writeText(text).then(function () { ok('✓ 已复制到剪贴板'); }, execFallback);
+  } else {
+    execFallback();
+  }
+}
 /* ═══ 状态存储 ═══ */
 function loadArchiveState() {
   try {
@@ -544,6 +1380,15 @@ function riskHtml(a) {
          '<ul>' + items + '</ul></div>';
 }
 
+/** 审查列（需求2）：条数取 RISK_REGISTRY；election hero 无正文仍可进审查看说明。 */
+function reviewBtnHtml(a) {
+  var n = riskCountOf(a.id);
+  return '<button class="btn act-rev" type="button" data-act="review" data-id="' + esc(a.id) +
+    '" title="审查视图：风险清单 + 正文 <mark> 高亮">' +
+    '审查' + (n ? ' <span style="color:var(--t3);font-size:9.5px">' + n + '</span>' : '') + '</button>';
+}
+
+
 function actionHtml(a) {
   if (a.archived) {
     return '<button class="btn act-restore" type="button" data-act="restore" data-id="' +
@@ -589,13 +1434,15 @@ function renderRows() {
     return '<tr class="' + (a.archived ? 'row-off' : '') + '">' +
       '<td><span class="aid">' + esc(a.id) + '</span>' +
           '<span class="card-tag">cell ' + esc(a.card) + '</span></td>' +
-      '<td><a class="t-title" href="' + esc(MAIN_PAGE) + '" title="打开主站 treemap 页定位此卡片（主站暂不支持锚点跳转）">' +
+      '<td><a class="t-title" href="' + esc(MAIN_PAGE) + '#art-' + esc(a.card) + '" ' +
+          'title="新标签打开主站并定位此文章（#art- 深链）">' +
           esc(a.title) + '</a>' +
           '<span class="t-cat">' + esc(a.cat) + '</span></td>' +
       '<td class="td-date">' + esc(a.date) + '</td>' +
       '<td class="rule-cell">' + ruleCellHtml(a) + '</td>' +
       '<td>' + badgeFor(a) + '</td>' +
       '<td class="risk-cell">' + riskHtml(a) + '</td>' +
+      '<td>' + reviewBtnHtml(a) + '</td>' +
       '<td class="act-cell">' + actionHtml(a) + '</td>' +
     '</tr>';
   }).join('');
@@ -684,7 +1531,15 @@ document.addEventListener('click', function (ev) {
   var t = ev.target;
   if (t.nodeType !== 1) return;
   var act = t.closest('[data-act]');
-  if (act) { openModal(act.getAttribute('data-id')); return; }
+  if (act) {
+    var what = act.getAttribute('data-act');
+    var id = act.getAttribute('data-id');
+    if (what === 'review') { openReview(id); return; }   /* 需求2 */
+    openModal(id);
+    return;
+  }
+  var rid = t.closest('[data-ridx]');
+  if (rid) { selectRisk(parseInt(rid.getAttribute('data-ridx'), 10)); return; }
   var pin = t.closest('[data-pin]');
   if (pin) { pin.classList.toggle('pinned'); return; }
   var chip = t.closest('.chip[data-f]');
@@ -698,7 +1553,15 @@ document.addEventListener('click', function (ev) {
   }
   if (t.id === 'gate-go') { unlock(); return; }
   if (t.id === 'btn-logout') { logout(); return; }
-  if (t.id === 'm-cancel' || t.id === 'modal-bg') { closeModal(); return; }
+  if (t.id === 'rv-close') { closeReview(); return; }
+  if (t.id === 'rv-dederisk') { openPrompt('derisk'); return; }   /* 需求3 */
+  if (t.id === 'rv-autofix' && !t.disabled) { openPrompt('fix'); return; }  /* 需求4 */
+  if (t.id === 'pm-close' || t.id === 'pm-cancel') { closePrompt(); return; }
+  if (t.id === 'pm-copy') { copyPrompt(); return; }
+  if (t.id === 'modal-bg') { closeModal(); return; }
+  if (t.id === 'review-bg') { closeReview(); return; }
+  if (t.id === 'prompt-bg') { closePrompt(); return; }
+  if (t.id === 'm-cancel') { closeModal(); return; }
   if (t.id === 'm-ok') { commitPending(); return; }
   if (t.id === 'btn-reset') {
     if (window.confirm('清空本浏览器的 bhive_admin_state_v1（所有下线/恢复记录）？')) {
@@ -708,7 +1571,6 @@ document.addEventListener('click', function (ev) {
     }
     return;
   }
-  /* 点击表格外区域收起已 pin 的风险列表 */
   if (!t.closest('.risk-cell')) {
     document.querySelectorAll('.risk-chip.pinned').forEach(function (c) {
       c.classList.remove('pinned');
@@ -716,7 +1578,11 @@ document.addEventListener('click', function (ev) {
   }
 });
 document.addEventListener('keydown', function (ev) {
-  if (ev.key === 'Escape') closeModal();
+  if (ev.key === 'Escape') {
+    if (document.getElementById('prompt-bg').classList.contains('show')) { closePrompt(); return; }
+    if (document.getElementById('review-bg').classList.contains('show')) { closeReview(); return; }
+    closeModal();
+  }
   if (ev.key === 'Enter' && document.activeElement &&
       document.activeElement.id === 'pw') { ev.preventDefault(); unlock(); }
   if (ev.key === 'Enter' && ev.ctrlKey && document.activeElement &&

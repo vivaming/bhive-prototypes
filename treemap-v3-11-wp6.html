@@ -1942,6 +1942,12 @@ window.addEventListener('resize', function(){
     if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
   }, 200);
 });
+/* ADMIN-2: #art-sNN deep link (see reviews/TASK-XP-ADMIN2.md). ?v= is
+   carried by the admin deep link for provenance only; it is not consumed. */
+window.addEventListener('load', function(){
+  var m = /^#art-(s\d+)$/.exec(location.hash);
+  if (m) { var c = CELLS.filter(function(x){ return x.id === m[1]; })[0]; if (c) { pageNum = 1; renderGrid(); openArticle(c); } }
+});
 </script>
 </body>
 </html>
