@@ -365,6 +365,7 @@
     <button class="chip" data-f="APPROVED">✅ 可发 <span class="n" id="c-ok">0</span></button>
     <button class="chip" data-f="REVISE">⚠️ 待审 <span class="n" id="c-rev">0</span></button>
     <button class="chip" data-f="BLOCK">⛔ 拦截 <span class="n" id="c-blok">0</span></button>
+    <button class="chip" data-f="ARCHIVED">🗄️ 归档 <span class="n" id="c-off">0</span></button>
     <div class="search">
       <span class="lbl">搜索</span>
       <input type="text" id="q" placeholder="标题 / ID / 风险原因…" autocomplete="off">
@@ -497,7 +498,6 @@ var ARCHIVE_STATE_KEY = 'bhive_admin_state_v1';
 */
 var MAIN_PAGE = 'treemap-v3-11-wp6.html';   // 主站卡片（treemap 页，按标题定位）
 var RULE_MAX = 65;                          // 规则分满分（D 维度不评）
-
 var ARTICLE_DATA_ADMIN = [
   { id:'election', card:'election', title:'ELECTION 2026 — Polls & the 5% Threshold', date:'12 SEP 2026',
     cat:'政治 / POLITICS', rule:null, status:'UNSCORED', archived:false,
@@ -613,7 +613,6 @@ var ARTICLE_DATA_ADMIN = [
         'manual'  = 任务书作者通读 14 篇正文补充的疑似风险
    text: 主站正文里要匹配的原文片段（必须逐字存在于渲染后的正文，否则清单项置灰）。
    text 缺省且 doc:false → 无法高亮（该条是文档级问题），清单项置灰。
-   每篇 ≤5 条。 -->
 var RISK_REGISTRY = {
   'art-s05': [
     { lvl:'H', src:'report', tag:'A4 来源缺失',
@@ -1362,8 +1361,17 @@ function badgeFor(a) {
     default:         return '<span class="badge b-rev">⚠️ 待审</span>';
   }
 }
-function filterKey(a) {
-  return a.archived ? 'ARCHIVED' : a.status;           // 过滤按评审状态，下线行跟原状态走
+/* 状态归桶（四桶，无漏桶）：归档 > 拦截 > 可用 > 待审。
+   只认规则评分器实际产出的三个写法（APPROVED / BLOCK / REVISE），大小写不敏感；
+   任何不在四桶内的评审状态——UNSCORED、undefined、未知写法——一律落「待审」，
+   因此「每篇必归一桶」，四桶计数和恒等于总数（不会再出现 14≠15 的漏桶）。
+   下线行归「归档」，优先级高于评审状态（下线是运维动作，不重置评审）。 */
+function bucketOf(a) {
+  if (a.archived) return 'ARCHIVED';
+  var s = typeof a.status === 'string' ? a.status.toUpperCase().trim() : '';
+  if (s === 'APPROVED') return 'APPROVED';
+  if (s === 'BLOCK') return 'BLOCK';
+  return 'REVISE';
 }
 
 
@@ -1406,21 +1414,25 @@ var FILTER = 'ALL';
 var QUERY = '';
 
 function renderStats() {
-  var n = { ALL:0, APPROVED:0, REVISE:0, BLOCK:0, UNSCORED:0, off:0 };
+  var n = { ALL:0, APPROVED:0, REVISE:0, BLOCK:0, ARCHIVED:0 };
   ARTICLE_DATA_ADMIN.forEach(function (a) {
     n.ALL++;
-    n[filterKey(a)] = (n[filterKey(a)] || 0) + 1;
-    if (a.archived) n.off++;
+    n[bucketOf(a)]++;
   });
+  /* 四桶和必须等于总数；不成立就是分桶函数又漏了桶，直接报错而不是静默显示。 */
+  if (n.APPROVED + n.REVISE + n.BLOCK + n.ARCHIVED !== n.ALL) {
+    console.error('[bhive-admin] 分桶漏桶：' + (n.APPROVED + n.REVISE + n.BLOCK + n.ARCHIVED) +
+      ' ≠ ' + n.ALL);
+  }
   var set = function (id, v) { document.getElementById(id).textContent = v; };
-  set('st-total', n.ALL); set('st-ok', n.APPROVED || 0); set('st-rev', n.REVISE || 0);
-  set('st-blok', n.BLOCK || 0); set('st-off', n.off);
-  set('c-all', n.ALL); set('c-ok', n.APPROVED || 0); set('c-rev', n.REVISE || 0);
-  set('c-blok', n.BLOCK || 0);
+  set('st-total', n.ALL); set('st-ok', n.APPROVED); set('st-rev', n.REVISE);
+  set('st-blok', n.BLOCK); set('st-off', n.ARCHIVED);
+  set('c-all', n.ALL); set('c-ok', n.APPROVED); set('c-rev', n.REVISE);
+  set('c-blok', n.BLOCK); set('c-off', n.ARCHIVED);
 }
 
 function visible(a) {
-  if (FILTER !== 'ALL' && filterKey(a) !== FILTER) return false;
+  if (FILTER !== 'ALL' && bucketOf(a) !== FILTER) return false;
   if (!QUERY) return true;
   var hay = [a.id, a.card, a.title, a.cat, a.note || '',
             (a.risks || []).join(' '), a.archiveReason || ''].join(' ').toLowerCase();
