@@ -4,12 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BEEHIVE — NZ Political Intelligence</title>
-<meta name="description" content="Beehive NZ — real-time New Zealand political intelligence: polls, parliament, economy. Source-linked analysis, updated daily.">
-<meta property="og:title" content="Beehive NZ Political Intelligence">
-<meta property="og:description" content="Real-time New Zealand political intelligence: polls, parliament, economy. Source-linked analysis, updated daily.">
-<meta property="og:type" content="website">
-<link rel="canonical" href="https://vivaming.github.io/bhive-prototypes/treemap-v3-11-wp6.html">
-<link rel="icon" href="logo-new.jpg">
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
@@ -87,10 +81,6 @@
   .cell-title::after { content:''; position:absolute; left:0; right:0; bottom:-2px; height:2px;
     background:#f2f4f7; transform:scaleX(0); transform-origin:left; transition:transform .28s cubic-bezier(.22,.61,.36,1); }
   .cell.armed .cell-title::after { transform:scaleX(1); }
-  /* B3-4: inert placeholder cells (narrow logo / narrow-strip logo) have no
-     wireCard arm→open handler, so :active scale is the only tap feedback. */
-  .cell.press { transition: background-color .12s ease-out, box-shadow .12s ease-out, transform .08s ease-out; }
-  .cell.press:active { transform: scale(0.96); }
   /* election chart area */
   .election-chart { flex:1; min-height:0; margin:8px 0 4px 0; }
   .election-chart svg { width:100%; height:100%; display:block; }
@@ -117,47 +107,17 @@
   .logo { font-weight:700; letter-spacing:.14em; font-size:11px; color:#f2f4f7; }
   .logo b { color:#e5484d; }
   .logo-sub { font-size:8px; color:#77828f; letter-spacing:.18em; margin-top:2px; }
-  /* brand mark — <img> crop of the 720x1280 source art. The glyph is a horizontal
-     wordmark spanning x 90-622, y 591-698 (centre 356,645), measured by luminance.
-     box 125x44 + object-fit:cover => scale 125/720 = 0.17361, rendered 125x222.2, so
-     the visible source window is 44/0.17361 = 253.5px tall and spans the full image
-     width. To centre the glyph band its centre (y 645) must land at box centre (y 22):
-     window top = 645 - 126.7 = 518.3 -> object-position Y = 518.3/(1280 - 253.5)
-     = 50.46%. The 108px glyph renders at 18.8px in the 44px box - small by design of
-     the source art, not a crop error. box-sizing:content-box keeps width/height as
-     content dims so border-radius crops the raster without shrinking it.
-     <=480px the header is 40px tall, so the box drops to 30px tall and shows the full
-     125px-wide wordmark at natural scale (object-fit:contain, no crop at all). */
-  .brand-mark {
-    display: block;
-    width: 125px;
-    height: 44px;
-    box-sizing: content-box;
-    object-fit: cover;
-    object-position: 50% 50.46%;
-    border-radius: 4px;
-    flex-shrink: 0;
-  }
   .header-logo {
-    height: 50px;
+    height: 48px;
     display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 9px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
     margin-bottom: 0;
   }
-  .header-logo .logo-sub { margin-top: 0; }
   @media (max-width: 480px) {
     .header-logo {
       height: 40px;
-      gap: 7px;
-    }
-    /* Full wordmark, uncropped, fits the 40px header: 30px tall at natural scale.
-       object-fit:contain never overflows, so no object-position is needed here. */
-    .header-logo .brand-mark {
-      height: 30px;
-      object-fit: contain;
     }
   }
   /* category pills — float above the treemap */
@@ -216,52 +176,12 @@
   .a-caption { font-size:11px; color:#6b7684; margin-bottom:32px; }
   .a-body p { font-size:16px; line-height:1.7; color:#c7cfd8; margin-bottom:22px; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; animation:none !important; } }
-/* Inline charts */
-/* B3-2: below 300px container width, let the SVG keep its min-width and let
-   the figure scroll horizontally. Above 300px, `overflow-x:auto` never fires
-   and the layout is byte-identical to before — desktop is untouched. */
-@media (max-width: 375px) {
-  .a-inline-chart { overflow-x: auto; }
-  .a-inline-chart svg { min-width: 300px; }
-}
-.a-inline-chart {
-  position: relative;
-  margin: 12px 0;
-}
-.a-inline-chart figcaption {
-  font-size: 12px;
-  color: #9aa7b4;
-  text-align: center;
-  padding: 4px 0;
-  margin-top: 8px;
-}
-/* Reading guide: rendered once at the end of the anchored section by the renderer
-   from chart_refs[].text — never hardcoded in the section paragraph body. */
-.a-chart-ref {
-  font-size: 12.5px;
-  font-style: italic;
-  color: #98a6b5;
-  margin-top: 8px;
-}
-@media (max-width: 768px) {
-  .a-inline-chart {
-    width: 100%;
-    margin: 12px 0;
-  }
-}
-@media (min-width: 769px) {
-  .a-inline-chart {
-    float: right;
-    width: 360px;
-    margin-left: 12px;
-  }
-}
 </style>
 </head>
 <body>
 
 <!-- ================= TREEMAP VIEW ================= -->
-<div class="view active" id="treemap-view"><div class="header-logo"><img class="brand-mark" src="logo-new.jpg" alt="Beehive NZ Political Intelligence"><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
+<div class="view active" id="treemap-view"><div class="header-logo"><div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
 <div class="pager" id="pager"><button type="button" class="pg-btn" id="pg-prev">‹</button><span class="pg-num" id="pg-num">1 / 2</span><button type="button" class="pg-btn" id="pg-next">›</button></div></div>
 
 <!-- ================= ARTICLE VIEW ================= -->
@@ -324,94 +244,10 @@
     ov.appendChild(tr);
     ti.appendChild(ov);
     tr.style.setProperty('--mq-dur', (P / 28) + 's');
+
   }
-
-/* ---- Calendar-day comparison for NZ-issued articles ----
-   Every article carries a full ISO-8601 date (YYYY-MM-DD). The 7-day
-   "old" cutoff compares *calendar days*, so an article published just
-   after midnight NZST is not flagged old merely because of the UTC
-   offset of Date.parse(). Calendar days are indexed in the Pacific /
-   Auckland zone, the zone that decides the NZ electoral/news calendar.
-
-   Both endpoints are shifted by 12h before truncating, which is safe
-   across DST transitions: NZ moves by whole hours, so adding 12h to
-   *both* the article instant and the `asOf` instant shifts both
-   midnight boundaries by the same amount and cannot move one into a
-   different calendar day while the other stays put.
-   The cutoff is expressed relative to an injectable `asOf` instant so
-   the rule is testable without a wall clock. */
-var NZ_STALE_DAYS = 7;
-var DAY_MS = 86400000;
-/* The zone that decides NZ election/news calendar days. */
-var NZ_ZONE = 'Pacific/Auckland';
-function nzDayIndex(iso, zone) {
-  var t = Date.parse(iso);
-  if (isNaN(t)) return NaN;
-  var parts = new Intl.DateTimeFormat('en-NZ', {
-    timeZone: zone || NZ_ZONE, year: 'numeric', month: '2-digit', day: '2-digit'
-  }).formatToParts(new Date(t + DAY_MS / 2));
-  var y, m, d;
-  for (var i = 0; i < parts.length; i++) {
-    if (parts[i].type === 'year') y = +parts[i].value;
-    else if (parts[i].type === 'month') m = +parts[i].value;
-    else if (parts[i].type === 'day') d = +parts[i].value;
-  }
-  return Date.UTC(y, m - 1, d);
-}
-
-/* `isOldDate(iso, asOf)`: true when `iso` is more than NZ_STALE_DAYS
-   calendar days before `asOf` (default = now). Strictly greater, so an
-   article exactly NZ_STALE_DAYS days old is still current. Both
-   arguments are ISO-8601 date strings. */
-function isOldDate(iso, asOf) {
-  var d = nzDayIndex(iso, NZ_ZONE);
-  var a = nzDayIndex(asOf || new Date().toISOString(), NZ_ZONE);
-  if (isNaN(d) || isNaN(a)) return false;
-  return (a - d) / DAY_MS > NZ_STALE_DAYS;
-}
-/* ---- Source identity --------------------------------------------------------------------------------------------
-   Each article owns a canonical `source_id` (its provenance), and the
-   display name is resolved through this single map. Charts and article
-   bodies must not re-spell a source name by hand — that is how Curia
-   ended up written four different ways ("Curia", "Curia Research",
-   "Taxpayers' Union / Curia Research"). Adding a source means adding
-   one row here; renaming one means changing one row. */
-var SOURCE_NAMES = {
-  rnz:            'RNZ',
-  nz_herald:      'NZ Herald',
-  'stats_nz':     'Stats NZ',
-  'rein_stats_nz':'REINZ / Stats NZ',
-  fma_fsc:        'FMA / FSC',
-  'curia_research':'Curia Research',
-  fma:            'FMA'
-};
-
-/* Articles carry either a string `source` (older entries), a full
-   `{ id, name, url }` object, or a legacy `source_id` field. `sourceId`
-   returns the canonical id, in that precedence order. */
-function sourceId(c) {
-  if (!c) return null;
-  if (c.source && typeof c.source === 'object') return c.source.id || null;
-  return c.source || c.source_id || null;
-}
-
-/* Display name for an article's source, resolved from SOURCE_NAMES.
-   The map is the single source of truth for spelling; the inlined name
-   covers entries that predate it, and the id itself is the last resort. */
-function sourceName(c) {
-  var id = sourceId(c);
-  if (id && SOURCE_NAMES[id]) return SOURCE_NAMES[id];
-  if (c && c.source && typeof c.source === 'object' && c.source.name) return c.source.name;
-  return id || 'Beehive';
-}
-
-/* `sourceRow(c)` — the provenance line shown under an article title. */
-function sourceRow(c) {
-  var nm = sourceName(c);
-  return nm ? 'Source: ' + nm + ' · Beehive chart' : '';
-}
-
-function wireCard(el, story) {
+  /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
+  function wireCard(el, story) {
     el.setAttribute('tabindex', '0'); /* Enter walks the same state machine */
     var activate = function () {
       if (el.classList.contains('armed')) {
@@ -427,41 +263,53 @@ function wireCard(el, story) {
   }
   /* single date emission point — every visible date goes through this helper */
   function dateHtml(c, cls) { return '<span class="'+cls+'">'+(c.date||'')+'</span>'; }
-/* Story → canonical source_id map. Every article resolves to exactly one
-   row; adding a story means adding one entry here, renaming a source
-   means editing one row in SOURCE_NAMES. Stories with no authoritative
-   source of record (s10, s11, s15, s19..s30, election hero) are omitted
-   from the map so their provenance line is empty. */
-var SOURCE_BY_KEY = {
-  'wp6-1': 'rnz', 'wp6-2': 'rnz', 'wp6-3': 'nz_herald',
-  'wp7-1': 'rnz', 'wp7-2': 'nz_herald', 'wp7-3': 'rnz',
-  'wp8-1': 'nz_herald', 'wp8-2': 'curia_research',
-  'wp8-3': 'nz_herald', 'wp8-4': 'nz_herald',
-  s05: 'stats_nz', s06: 'stats_nz', s07: 'curia_research', s08: 'rnz',
-  s09: 'rein_stats_nz', s12: 'rnz',
-  s13: 'curia_research', s14: 'curia_research',
-  s16: 'rnz', s17: 'rnz', s18: 'nz_herald'
-};
-
-/* `articleKey(c)` — the canonical key that indexes ARTICLE_DATA and
-   SOURCE_BY_KEY for any story: wpN wins over s-card id; election hero
-   falls through to null (no article body, no source of record). */
-function articleKey(c) {
-  if (c.wp6) return c.wp6;
-  if (c.wp7) return c.wp7;
-  if (c.wp8) return c.wp8;
-  if (c.id && /^s\d+$/.test(c.id)) return c.id;
-  return null;
+function isOldDate(dateStr) {
+  if (!dateStr) return false;
+  var parts = dateStr.split(' ');
+  if (parts.length !== 2) return false;
+  var day = parseInt(parts[0], 10);
+  var monthStr = parts[1].toUpperCase();
+  var monthMap = {
+    'JAN':0, 'FEB':1, 'MAR':2, 'APR':3, 'MAY':4, 'JUN':5,
+    'JUL':6, 'AUG':7, 'SEP':8, 'OCT':9, 'NOV':10, 'DEC':11
+  };
+  var month = monthMap[monthStr];
+  if (isNaN(day) || month === undefined) return false;
+  var date = new Date(2026, month, day);
+  var ref = new Date(2026, 8, 16); // September is 8 (0-indexed), 16th
+  var diffTime = ref - date;
+  var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  return diffDays > 7;
 }
-
 function getSourceHtml(c) {
-  var key = articleKey(c);
-  if (!key) return '';
-  var id = SOURCE_BY_KEY[key];
-  if (!id) return '';
-  var nm = SOURCE_NAMES[id];
-  if (!nm) return '';
-  return '<span class="source">via ' + nm + '</span>';
+  // wp6-1/wp6-2/wp7-1/wp7-3 → via RNZ
+  // wp6-3/wp7-2/wp8-1/wp8-3/wp8-4 → via NZ Herald
+  // wp8-2 → via Curia
+  // s-cards (WP9 real news): mapped to the data source behind each story
+  if (c.wp6 === 'wp6-1' || c.wp6 === 'wp6-2' || c.wp7 === 'wp7-1' || c.wp7 === 'wp7-3') {
+    return '<span class="source">via RNZ</span>';
+  } else if (c.wp7 === 'wp7-2' || c.wp8 === 'wp8-1' || c.wp8 === 'wp8-3' || c.wp8 === 'wp8-4' || c.wp6 === 'wp6-3') {
+    return '<span class="source">via NZ Herald</span>';
+  } else if (c.wp8 === 'wp8-2') {
+    return '<span class="source">via Curia</span>';
+  } else if (c.id === 's05' || c.id === 's06') {
+    return '<span class="source">via Stats NZ</span>';
+  } else if (c.id === 's07') {
+    return '<span class="source">via Curia</span>'; 
+  } else if (c.id === 's09') {
+    return '<span class="source">via REINZ</span>';
+  } else if (c.id === 's10' || c.id === 's11') {
+    return '<span class="source">via RNZ</span>';
+  } else if (c.id === 's10' || c.id === 's11' || c.id === 's15') {
+  } else if (c.id === 's12') {
+    return '<span class="source">via RNZ</span>';
+  } else if (c.id === 's13' || c.id === 's14') {
+    return '<span class="source">via Curia Research</span>';
+  } else if (c.id === 's16' || c.id === 's17') {
+    return '<span class="source">via RNZ</span>';
+  } else if (c.id === 's18') {
+    return '<span class="source">via NZ Herald</span>';  }
+  return ''
 }
 /* demote overflowing ids to the head of the next page (new page if the last overflows) */
   function demote(ids) {
@@ -501,7 +349,7 @@ function getSourceHtml(c) {
     if (bad.length) demote(bad);
   }
 
-  /* ---- V44 §2: desktop-only title autofit — mobile keeps tier sizes ---- */
+  /* ── V44 §2: desktop-only title autofit — mobile keeps tier sizes ── */
   function contentH(ti) { var rg = document.createRange(); rg.selectNodeContents(ti); return rg.getBoundingClientRect().height; }
   function fitTitleAll(grid) {
     grid.querySelectorAll('.cell-title').forEach(function(ti){
@@ -524,7 +372,7 @@ function getSourceHtml(c) {
       if (cell.classList.contains('p0')) ti.style.flex = '0 0 auto'; /* V44 §3: hero title hugs its content; chart (flex:1) absorbs the slack */
     });
   }
-/* ---- Party colors (data-encoding only) ---------------------------------------------- */
+/* ── Party colors (data-encoding only) ─────────────────────── */
 var PARTY = {
   national:{ name:'National', color:'#5a94d4', poll:29.0, reached:true },
   labour:  { name:'Labour',   color:'#D82A20', poll:25.9, reached:true },
@@ -540,18 +388,18 @@ var POLL_HISTORY = {
   nzfirst:[11.9,10.5,9.7,13.6,11.7,11.4,10.8,9.1,8.4],
 };
 
-/* ---- Treemap data: black gradient by priority -------------------------------- */
+/* ── Treemap data: black gradient by priority ──────────────── */
 var CELLS = [
-  { id:'wp6-1', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#KiwiSaver','#Labour'], title:'Labour: Employer KiwiSaver Contributions to Become Compulsory', wp6:'wp6-1', isSample:true },
-  { id:'wp6-2', tier:1, priority:'HIGH', date:'14 SEP', cat:'politics', tags:['#Immigration','#Accountability'], title:"Immigration NZ: $134m of Forecast Benefits Ruled Flawed", wp6:'wp6-2', isSample:true },
-  { id:'wp6-3', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#ACT','#PartyList'], title:'Act List: Paul Henry at Fourth, Sitting MPs at Risk', wp6:'wp6-3', isSample:true },
-  { id:'wp7-1', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Fiscal'], title:'Government Scraps 2027 Fuel Tax Hike, Tops Up Transport Fund', wp7:'wp7-1', isSample:true },
-  { id:'wp7-2', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Unveils Sweeping Immigration Overhaul', wp7:'wp7-2', isSample:true },
-  { id:'wp7-3', tier:1, priority:'HIGH', date:'01 SEP', cat:'health', tags:['#Health','#Jobs'], title:'Labour Guarantees Jobs for NZ-Trained Graduate Nurses', wp7:'wp7-3', isSample:true },
-  { id:'wp8-1', tier:1, priority:'HIGH', date:'10 AUG', cat:'finance', tags:['#ACT','#Fiscal'], title:'ACT Pledges Faster Path to Surplus, No New Taxes', wp8:'wp8-1', isSample:true },
-  { id:'wp8-2', tier:1, priority:'HIGH', date:'03 SEP', cat:'politics', tags:['#Polls','#Coalition'], title:'Coalition Returned in Curia Poll; Opportunity Loses Kingmaker Bid', wp8:'wp8-2', isSample:true },
-  { id:'wp8-3', tier:2, date:'14 SEP', cat:'economy', tags:['#Housing','#Election'], title:'Housing Election Forum: Parties to Face Direct Questions', wp8:'wp8-3', isSample:true },
-  { id:'wp8-4', tier:2, date:'08 SEP', cat:'politics', tags:['#Election','#Reform'], title:'Government Accepts 65 Election-Process Changes', wp8:'wp8-4', isSample:true },
+  { id:'wp6-1', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#KiwiSaver','#Labour'], title:'Labour: Employer KiwiSaver Contributions to Become Compulsory', wp6:'wp6-1' },
+  { id:'wp6-2', tier:1, priority:'HIGH', date:'14 SEP', cat:'politics', tags:['#Immigration','#Accountability'], title:"Immigration NZ: $134m of Forecast Benefits Ruled Flawed", wp6:'wp6-2' },
+  { id:'wp6-3', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#ACT','#PartyList'], title:'Act List: Paul Henry at Fourth, Sitting MPs at Risk', wp6:'wp6-3' },
+  { id:'wp7-1', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Fiscal'], title:'Government Scraps 2027 Fuel Tax Hike, Tops Up Transport Fund', wp7:'wp7-1' },
+  { id:'wp7-2', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Unveils Sweeping Immigration Overhaul', wp7:'wp7-2' },
+  { id:'wp7-3', tier:1, priority:'HIGH', date:'01 SEP', cat:'health', tags:['#Health','#Jobs'], title:'Labour Guarantees Jobs for NZ-Trained Graduate Nurses', wp7:'wp7-3' },
+  { id:'wp8-1', tier:1, priority:'HIGH', date:'10 AUG', cat:'finance', tags:['#ACT','#Fiscal'], title:'ACT Pledges Faster Path to Surplus, No New Taxes', wp8:'wp8-1' },
+  { id:'wp8-2', tier:1, priority:'HIGH', date:'03 SEP', cat:'politics', tags:['#Polls','#Coalition'], title:'Coalition Returned in Curia Poll; Opportunity Loses Kingmaker Bid', wp8:'wp8-2' },
+  { id:'wp8-3', tier:2, date:'14 SEP', cat:'economy', tags:['#Housing','#Election'], title:'Housing Election Forum: Parties to Face Direct Questions', wp8:'wp8-3' },
+  { id:'wp8-4', tier:2, date:'08 SEP', cat:'politics', tags:['#Election','#Reform'], title:'Government Accepts 65 Election-Process Changes', wp8:'wp8-4' },
   { id:'election', tier:0, priority:'HIGH', date:'12 SEP 2026',
     cat:'politics', tags:['#Polls','#MMP'], title:'ELECTION 2026 — Polls & the 5% Threshold', full:true },
   { id:'s02', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Coalition'], title:'Fuel Tax Retreat: The $1.4B Land Transport Fund Hole' },
@@ -596,7 +444,7 @@ var CELLS = [
   { id:'logo', tier:3, logo:true }
 ];
 
-/* ---- Charts ---------------------------------------------------------------------------------------------------- */
+/* ── Charts ────────────────────────────────────────────────── */
 function drawPollChart(container, h, opts) {
   /* Cover card: brief-page main chart DNA — TWO MAJOR PARTIES ONLY (National vs Labour),
      model lines + confidence bands + poll dots + right-edge name/value labels,
@@ -701,7 +549,7 @@ function legendRow() {
   return html;
 }
 
-/* ---- Treemap layout ------------------------------------------------------------------------------------ */
+/* ── Treemap layout ────────────────────────────────────────── */
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 var activeCat = 'all';
@@ -813,16 +661,12 @@ function renderGrid(cat) {
     }
     if (c.logo) {
       if (narrow || (n.x1-n.x0) < 96) {
-        /* B3-4: these cells skip wireCard (no arm→open), so `.press` gives
-           :active scale feedback on tap — same feel as the arm animation on
-           real cards, without introducing a click target that could 404. */
-        el.classList.add('press');
         el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;">BEEHIVE</div>';
         grid.appendChild(el);
         return;
       }
       el.classList.add('logo-cell');
-      el.innerHTML = '<img class="brand-mark" src="logo-new.jpg" alt="Beehive NZ Political Intelligence"><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
+      el.innerHTML = '<div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div>';
       grid.appendChild(el);
       return;
     }
@@ -846,44 +690,21 @@ var sparkParty = { s05:'act' }[c.id];
     el.innerHTML = html;
     wireCard(el, c);
     grid.appendChild(el);
-    /* B3-1: set the spark height on the DOM node now so redrawChartCells can
-       read it back at draw time. Desktop: V44 §4 ladder. Narrow: fixed 48px
-       via .spark-mini CSS. */
-    var mini = el.querySelector('.spark-mini');
-    if (mini && !narrow) {
-      mini.style.height = Math.max(48, Math.min(96, Math.round(h * 0.30))) + 'px';
+    if (big) {
+      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55));
+      thresholdBars(el.querySelector('.thresholds'));
+    } else if (sparkParty && el.querySelector('.spark-mini')) {
+      var sparkH = narrow ? 48 : Math.max(48, Math.min(96, Math.round(h*0.30))); /* V44 §4: 160→48 · 240→72 · 265→80 · ≥320→96 cap */
+      if (!narrow) el.querySelector('.spark-mini').style.height = sparkH + 'px';
+      try { drawMiniSpark(el.querySelector('.spark-mini'), sparkParty, sparkH); }
+      catch(e) { document.title = 'SPARKERR ' + c.id + ': ' + e.message; }
     }
   });
   updatePager();
-  /* B3-1: defer chart draws to rAF so d3 sees the container's real
-     clientWidth. At render time the .election-chart flex box is still 0×0
-     (its flex slack isn't resolved until paint), so `container.clientWidth
-     || 400` silently falls back to 400 and the SVG is drawn wider than the
-     cell — overflow on narrow screens. `redrawChartCells` measures per-call,
-     so every render pass and every resize pass share the same code path. */
-  requestAnimationFrame(function(){ redrawChartCells(); if (!narrow) fitTitleAll(grid); fitAudit(grid); });
-}
-function redrawChartCells() {
-  var grid = document.getElementById('grid');
-  grid.querySelectorAll('.cell').forEach(function(el){
-    if (el.querySelector('.election-chart')) {
-      drawPollChart(el.querySelector('.election-chart'), Math.max(150, (parseFloat(el.style.height)||150)*0.55));
-      thresholdBars(el.querySelector('.thresholds'));
-    }
-    var mini = el.querySelector('.spark-mini');
-    if (mini) {
-      var story = CELLS.filter(function(x){ return x.id === el.dataset.id; })[0];
-      if (!story) return;
-      var sparkParty = { s05:'act' }[story.id];
-      if (!sparkParty) return;
-      var sparkH = parseInt(mini.style.height, 10) || 48;
-      try { drawMiniSpark(mini, sparkParty, sparkH); }
-      catch(e) { document.title = 'SPARKERR ' + story.id + ': ' + e.message; }
-    }
-  });
+  requestAnimationFrame(function(){ if (!narrow) fitTitleAll(grid); fitAudit(grid); });
 }
 
-/* ---- WP6 sample articles (2026-09-13/14 news) -------------------------------- */
+/* ── WP6 sample articles (2026-09-13/14 news) ──────────────── */
 /* Related people — copyright-free portraits (CC0 / CC BY-SA, Wikimedia Commons) */
 var PEOPLE = {
   'wp6-1': [{
@@ -930,23 +751,8 @@ var ARTICLE_DATA = {
   "sections": [
    { "h": "Two surveys, one electorate", "p": "A Curia Research poll commissioned by Whakaata Māori and reported by 1News on 17 September polled 1,000 Māori adults, split 500 by phone and 500 by online panel, with a margin of error of plus or minus 3.1%. The headline result is not party preference in the general electorate; it is a near-total divergence once the type of electorate enters the picture. Among Māori intending to vote in a Māori electorate, Te Pāti Māori would receive 29% of the party vote. Among Māori intending to vote in a general electorate, that figure falls to 3%." },
    { "h": "The gap is structural", "p": "Twenty-six percentage points separates two groups of voters who are demographically identical in ethnicity but differ only in which electoral roll they choose. The gap exists because Te Pāti Māori runs almost exclusively in Māori seats: its general-rollback electorate strategy is not a strategy, it is a non-event. For Te Pāti Māori the 29% figure is the relevant one. For every other party the 3% figure is the ceiling. The two percentages describe the same electorate split along an institutional line that most mainstream polling never surfaces." },
-{ "h": "The coalition numbers", "p": "The same poll gives the coalition parties a low mark in the Māori electorate: National, ACT and their partners combined take 8% of the Māori electorate party vote, rising to 23% among Māori voting in general electorates. The coalition's position is therefore not a vote share but a geography: it is a party that performs better in the general roll than in the Māori roll, and the two rolls are not interchangeable. Te Pāti Māori's 29% is 21 points ahead of second place in the Māori electorate, and 18 points ahead in the general electorate the other way around.",
-    "chart_refs": [
-     { "chart_id": "chart-s13-trend", "reference_id": "ref-s13-1", "text": "The poll table next to this section shows the party-vote split as it was read in the Curia fielding." }
-    ]
-},
+   { "h": "The coalition numbers", "p": "The same poll gives the coalition parties a low mark in the Māori electorate: National, ACT and their partners combined take 8% of the Māori electorate party vote, rising to 23% among Māori voting in general electorates. The coalition's position is therefore not a vote share but a geography: it is a party that performs better in the general roll than in the Māori roll, and the two rolls are not interchangeable. Te Pāti Māori's 29% is 21 points ahead of second place in the Māori electorate, and 18 points ahead in the general electorate the other way around." },
    { "h": "The 2023 comparison", "p": "Compared with the 2023 Māori electorate result, where Te Pāti Māori took 31 seats, Labour 28 and the Greens 17, the survey suggests Te Pāti Māori's share is holding at 29%, a two-point dip from the 31 seats it secured two years ago. Labour is down from 44 to 28 in the comparison, and the Greens are up from 9 to 17. Whether the dip is real or sampling noise cannot be resolved at plus or minus 3.1%: the margin of error is 10.7% of the measured value, which is too wide to call a trend. The direction is consistent with Te Pāti Māori's narrative that its base has consolidated since it formed its governing relationship with National. Note: the poll was conducted by Curia Research, which left the Research Association in 2024 (1News, 17 September 2026)." }
-  ],
-  "charts": [
-    {
-      "id": "chart-s13-trend",
-      "type": "poll_table",
-      "after_section": 2,
-      "side": "right",
-      "title": "Party vote poll",
-      "caption": "Latest party vote percentages from Curia Research.",
-      "alt": "Table showing party vote percentages."
-    }
   ]
 },
  "art-s14": {
@@ -980,25 +786,9 @@ var ARTICLE_DATA = {
   "title": "Herald Poll of Polls: Coalition at 47.8%",
   "sections": [
    { "h": "The model's headline", "p": "The NZ Herald's Poll of Polls, updated on 16 September, assigns a 47.8% probability to coalition government formation after the next election. The Poll of Polls is a model that aggregates multiple opinion polls into a single probability distribution, weighted by poll quality, fielding date and sample composition. A 47.8% figure is below the 50% threshold the model would need to call an outcome more likely than not, which is the most defensible reading of the number itself." },
-  { "h": "Why it is below 50%", "p": "The model is built on the underlying Curia Research poll, which gave National 29.0%, Labour 25.9%, the Greens 13.9%, ACT at 10.5%, NZ First 8.4%, One NZ 8.4% and the Opposition 4.5%. The probability reflects the gap between National's party vote and the 50% threshold required for a majority, the likelihood of overhang seats expanding or contracting the parliament, and the difficulty of assembling a coalition when no party is close to half the vote. The 47.8% is not a forecast; it is a Bayesian aggregation of the uncertainty in the polling data itself.",
-    "chart_refs": [
-     { "chart_id": "chart-s18-trend", "reference_id": "ref-s18-1", "text": "The trend chart next to this section traces the National party-vote series as it enters the model's underlying poll feed." }
-    ]
-  },
+   { "h": "Why it is below 50%", "p": "The model is built on the underlying Curia Research poll, which gave National 29.0%, Labour 25.9%, the Greens 13.9%, ACT at 10.5%, NZ First 8.4%, One NZ 8.4% and the Opposition 4.5%. The probability reflects the gap between National's party vote and the 50% threshold required for a majority, the likelihood of overhang seats expanding or contracting the parliament, and the difficulty of assembling a coalition when no party is close to half the vote. The 47.8% is not a forecast; it is a Bayesian aggregation of the uncertainty in the polling data itself." },
    { "h": "What the model does not say", "p": "The NZ Herald's full analysis is behind a Premium paywall, and the reasoning behind the 47.8% figure was not available in the open crawl of 16 September. The 47.8% number comes from the page's meta description rather than the article body, which means it has not been verified against the model's published methodology. The model does not publish its sensitivity analysis, the weight it assigns to individual polls, or the confidence interval around the 47.8% figure. These are the details that would distinguish a model-based probability from a rounding of intuition, and they are not accessible." },
    { "h": "What the polls say", "p": "The polling data that feeds the model is clear: National leads by 3.1 points on party vote, the coalition arithmetic requires at least two additional parties to reach a majority, and the overhang mechanism could add seats in a tightly contested result. The 47.8% figure is a summary of that arithmetic, a number that says the coalition outcome is plausible rather than probable, and that the model's confidence in that assessment is not high enough to cross the 50% line. As of 16 September 2026 the Poll of Polls says the outcome is still open (NZ Herald, 16 September 2026, meta description)." }
-  ],
-  "charts": [
-    {
-      "id": "chart-s18-trend",
-      "type": "poll_trend",
-      "after_section": 1,
-      "side": "right",
-      "title": "National party vote trend",
-      "caption": "National party vote percentage over recent months.",
-      "as_of": "2026-09-03",
-      "alt": "Line chart showing National party vote trend."
-    }
   ]
 },
  "art-wp6-1": {
@@ -1125,10 +915,11 @@ var ARTICLE_DATA = {
    "sections": [
     { "h": "The target band is no longer doing any work", "p": "Inflation rose 1.5% in the three months to June 2026, taking the 12-month increase to 4.1%. That is the highest annual reading since the December 2024 quarter, when CPI was 4.7%, and it is a full point above the March 2026 figure of 3.1%. The annual series has not printed below 2.2% since the September 2024 quarter, so even the recent low was at the top of the Reserve Bank's 1 to 3% target band. At 4.1% the economy is sitting a full point outside that band." },
     { "h": "One item explains most of the move", "p": "Petrol rose 27.5% in the year to June, contributing 23.5 percentage points of the 4.1-point rise across all groups. Other vehicle fuels and lubricants rose 71.0%, contributing 7.7 points. Household electricity rose 12.0%, contributing 8.4 points. The three together account for almost all of the annual increase and then some, because other items moved the other way. That concentration matters politically: a price print built almost entirely out of fuel and power is not a broad demand inflation, and it will not be turned around by the instrument that turns around broad demand inflation." },
-{ "h": "The quarterly picture is sharper still", "p": "In the quarter itself, petrol rose 20.1%, contributing 49.5 percentage points of the 1.5-point quarterly increase. Other vehicle fuels rose 47.7%, contributing 16.2 points. Household purchasing of housing rose 1.6%, contributing 10.2 points. The offsets were equally specific: fruit fell 8.5%, contributing minus 6.3 points, and domestic accommodation services fell 12.0%, contributing minus 5.6 points. The domestic accommodation fall is the number to note, because it is the opposite of what a demand-led inflation story would predict, and it points at the same property market that REINZ's August data shows carrying 32,908 listings in inventory." },
+    { "h": "The quarterly picture is sharper still", "p": "In the quarter itself, petrol rose 20.1%, contributing 49.5 percentage points of the 1.5-point quarterly increase. Other vehicle fuels rose 47.7%, contributing 16.2 points. Household purchasing of housing rose 1.6%, contributing 10.2 points. The offsets were equally specific: fruit fell 8.5%, contributing minus 6.3 points, and domestic accommodation services fell 12.0%, contributing minus 5.6 points. The domestic accommodation fall is the number to note, because it is the opposite of what a demand-led inflation story would predict, and it points at the same property market that REINZ's August data shows carrying 32,908 listings in inventory." },
+    { "h": "Core and tradables", "p": "The underlying measures tell a different story from the headline. CPI excluding food, household energy and vehicle fuels rose 2.5% over the year, which is inside the target band. Tradeables rose 4.9% and non-tradeables 3.4%, so the imported component of the rise remains the faster one. That is the pattern of a terms-of-trade or currency problem rather than a domestic wage spiral: strip out fuel and power and the annual reading stops being 4.1%." },
     { "h": "What the campaign gets from this quarter", "p": "The political use of 4.1% is a price list, and the price list is a fuel and power bill. The opposition can point at a print that is one third fuel and one third power and ask what a new budget does to it. Neither party gets to claim the print is being handled: the number is outside the target band, it moved up one full point in a single quarter, and its largest components are tax and wholesale energy rather than wages. That is the most uncomfortable shape a price release can take for a campaign running on affordability." },
     { "as_of": true, "p": "As of 15 September 2026. Source: Stats NZ, Consumer Prices Index: June 2026 quarter, published 15 September 2026." }
-   ],
+   ]
   },
   "art-s07": {
    "title": "Threshold Review: What 8.4% NZF Means Now",
@@ -1158,6 +949,72 @@ var ARTICLE_DATA = {
     { "h": "The more likely reading", "p": "Rumour is cheap and the cabinet is not. With the election-year reshuffle already spent in April, and with the polling showing a coalition still ahead, the option set is narrow: keep the same ministers and run on continuity, or move someone and pay for the move in the next poll. The April reshuffle was an election-year move, which argues that the leadership intended to settle the bench early rather than late. The cabinet that goes to the election is most likely the cabinet that already stands, and the reshuffle stories of the winter are the cheap part of the cycle doing the work the cabinet is not." },
     { "as_of": true, "p": "As of 2 April 2026 for the reshuffle event; poll readings from the 1 to 3 September 2026 poll series. Source: RNZ, 2 April 2026; poll data as recorded in the Beehive polling series." }
    ]
+  },
+ "art-s02": {
+  "title": "Fuel Tax Retreat: The $1.4B Land Transport Fund Hole",
+  "sections": [
+   { "h": "The reversal", "p": "The coalition government has cancelled the fuel tax increase that was scheduled for 1 January 2027. The original plan would have raised fuel taxes, including road user charges, by 12 cents per litre from that date. The replacement timetable starts later and rises in smaller steps: 5 cents per litre from 1 January 2028, then a further 5 cents every six months, so that the cumulative increase reaches 20 cents by the end of 2029. From 2030 the pace returns to 5 cents per year, road user charges included. Nothing in the reversal removes the tax; it reschedules it." },
+   { "h": "The fund hole", "p": "The revenue question is what the announcement was built around. The government intends to top up the National Land Transport Fund by $1.476 billion over the forecast period. Of that, $450 million comes from the fuel-response contingency set aside in Budget 2026, and the balance is to be found through the preliminary economic and fiscal update. Finance Minister Nicola Willis said the roughly $1 billion gap would be visible in that update by the end of September. Transport Minister Chris Bishop said that without the top-up, spending on road maintenance, public transport and infrastructure would face significant cuts. That is the shape of the decision: a tax deferred in exchange for a subsidy that must be found inside a forecast that is already closing." },
+   { "h": "The Labour comparison", "p": "Labour's position on the same question is a three-year freeze on fuel tax. Chris Hipkins argued that New Zealanders simply cannot afford an extra 22 cents a litre, and Nicola Willis responded that the Labour plan would leave a $4.6 billion hole in the fund. Those two figures, $1.476 billion and $4.6 billion, are the whole arithmetic of the campaign on this issue, and neither has been audited. The government's number is a funding action; Labour's is an estimate of the cost of a freeze. They measure different things, and they are being compared as if they measured the same one." },
+   { "h": "The price that drives the debate", "p": "The cost-of-living case for the reversal rests on petrol, and the petrol numbers are real. In the June 2026 quarter petrol was up 27.5% year-on-year and up 20.1% in the quarter alone, contributing roughly a quarter of the 4.1-point annual rise. Other vehicle fuel rose 71.0% and electricity 12.0%. Strip out food, household energy and vehicle fuel and the core measure is 2.5%. A tax that lands in 2028 is being argued about now because the price of the same product is already up a quarter, and because that quarter sits inside an inflation reading of 4.1%. Whether a 5 cent rise two years from now matters less than the 27.5% that has already happened is a case the government has not had to make, but it is the case being made." },
+   { "h": "The explanation offered", "p": "Prime Minister Christopher Luxon has said the change is not about the election, citing changing circumstances and changing geopolitics. In March he described the increase as possibly unlikely. Between a leader calling something possibly unlikely in March and a government cancelling it in September there is a gap the campaign will ask about, and the defensible answer is the fund arithmetic rather than the calendar. As of 1 September 2026 the reversal is public and the funding is still to be specified." },
+   { "as_of": true, "p": "As of 1 September 2026 for the policy reversal (RNZ, 1 September 2026, evidence state reported_unconfirmed). CPI figures for the June 2026 quarter, published 21 July 2026 by Stats NZ (officially_confirmed via official release mirror)." }
+  ]
+ },
+ "art-s03": {
+  "title": "NZ First Immigration Platform Lands",
+  "sections": [
+   { "h": "Thirteen proposals in a week", "p": "On 11 September NZ First released a suite of more than 13 immigration proposals. The centrepiece is legislation for a binding referendum that would set an annual ceiling of 20,000 resident visas, tied to a 30-year planning framework that coordinates immigration with housing and infrastructure. The rest of the package runs along the same line: children of citizens would acquire citizenship automatically, ending automatic citizenship for the children of residents; the residence period for permanent residence would rise from two years to five, and for citizenship from five to at least 10; non-citizens would be stood down from Jobseeker and Accommodation Supplement for 10 years; deportation would extend to any offence carrying a possible term of imprisonment, with automatic removal for specified violent, sexual, fraud, organised crime, money laundering and exploitation offences; protected-person status would become temporary and subject to ongoing assessment; overstayers would get a 24-month self-departure amnesty; student visa holders would have to leave the country to switch visas, with automatic work rights removed; social housing would be offered to citizens first; and fees would rise from $641 to $950 for citizenship and from $315 to $630 for permanent residence." },
+   { "h": "The cap against the current number", "p": "The policy with the clearest test is the cap, and the test is available. New Zealand's population grew by 20,300 people in the year to July 2026, plus or minus 1,800, against 9,600 plus or minus 200 in the same twelve months a year earlier. Arrivals rose 5% to 134,400 and departures fell 4% to 114,100. July on its own added 5,200. A ceiling of 20,000 therefore binds at roughly the current rate of net migration, not at the trough of a year ago that most of the recent reporting describes. That difference is the practical content of the policy: the cap is calibrated to the rebound, and it would remove the year-on-year doubling that just occurred rather than re-establishing the 2025 baseline." },
+   { "h": "Where it separates from the partner", "p": "The 10-year welfare stand-down is the item most likely to be priced by voters rather than by ministers, and it is the item that separates NZ First from National. It is a citizenship-first rule that needs a statutory change rather than a housing or infrastructure plan to take effect. Labour's counter-proposal runs the other direction: Phil Twyford's managed migration, with a GPS requirement on immigration and a residence period of four years plus a civics requirement, while National has moved to tighten management as well. All three major platforms agree that population growth has to match housing, health and infrastructure capacity. They disagree on whether the constraint sits on the number, on the status, or on the sequencing." },
+   { "h": "The polling position", "p": "In the Taxpayers' Union and Curia poll fielded from 1 to 3 September, NZ First was on 8.4%, down 0.7 points, with a margin of error of plus or minus 3.1%. That is a comfortable margin over the 5% threshold, and it is the figure that gives the party its position as a coalition partner rather than a negotiating target. Whether the 13 proposals add to or subtract from that position is not yet measurable: the release predates the closing of that fieldwork. What is measurable is that the proposals were framed as a platform for the November vote, and that they land in the same week as a migration release confirming the direction of travel they are arguing against." },
+   { "h": "What the coverage does not establish", "p": "No legislative text, ballot paper or departmental submission for the package was available at collection time, and the stand-down, citizenship and fee items come from party announcements reported by RNZ on 11 September rather than from a bill. The migration figures are the official ones. That distinction matters: the policy side of this story is reported_unconfirmed and the population side is officially confirmed, so any statement that combines the two should carry the split with it." },
+   { "as_of": true, "p": "As of 11 September 2026 for the NZ First package (RNZ, 11 September 2026, evidence state reported_unconfirmed). Migration figures for the year to July 2026, published 14 September 2026 by Stats NZ (officially_confirmed); the July monthly figure of 5,200 is reported_unconfirmed. Poll readings from the 1 to 3 September 2026 fieldwork, margin of error plus or minus 3.1%." }
+  ]
+ },
+ "art-s04": {
+  "title": "Labour Guarantees Graduate Nurse Jobs",
+  "sections": [
+   { "h": "The pledge", "p": "Labour has committed that, if it forms the next government, it will guarantee a public-sector position to every nursing graduate qualified from a New Zealand tertiary institution, delivered through the employment schemes already in use such as graduate entry programmes and cadetships. The party estimates roughly 2,400 nursing graduates a year, and would also double the primary care recruitment subsidy. Health spokesperson Ayesha Verrall framed it as giving graduates certainty, strengthening the workforce and improving care for patients." },
+   { "h": "The hiring rate it has to beat", "p": "The benchmark for any nurse hiring promise is the rate at which nurses have actually been added to the system. Te Whatu Ora data, as reported, show a net increase of 54 full-time equivalent nurses between March 2024 and March 2026, two years. Against an annual graduate intake the party estimates at 2,400, that is the difference between an offer and a hire. A job guarantee changes the offer: it makes the position certain at graduation rather than competitive after it. It does not change the number of positions that can exist, the pay that funds them, or the vacancy rate that sits between them." },
+   { "h": "The emergency department evidence", "p": "The measure the pledge is meant to move is hard to state with a current number. The proportion of people admitted, discharged or transferred from an emergency department within six hours was 68% at the end of 2023, was described in the latest public coverage as virtually unchanged from the year before, and was as low as 57% in some regions, against a government target of 95% nationwide by 2030. The 68% is an end-2023 figure and must not be presented as today's. Te Whatu Ora has paused publication of the waiting data after a review found poor planning and overwhelmed data teams, so the measure that would test the pledge is not currently being reported on an official quarterly basis." },
+   { "h": "The field report", "p": "On 15 September staff at Tauranga Hospital's emergency department declared a state of emergency, with more than 100 members of the nursing organisation involved, on the account that the department routinely runs at 150 to 200% of capacity short of people. A regional nurse staffing calculation put the need at 13.66 additional nurse or health assistant posts for 2025/26 and 16.78 for 2026/27 to reach a safe configuration, and a patient died in the waiting area on 25 August. The capacity figure is a staff estimate, not an official statistic, and it should be carried as one. The gap between an intake of 2,400 a year and a regional shortfall counted in single figures is the argument for a pipeline answer, and it is also the reason a hiring pledge cannot close it by itself." },
+   { "h": "What the numbers cannot show", "p": "The pledge is a recruitment policy aimed at retention failure, and the data available at collection time do not establish the party's annual cost figure or its graduate intake figure against an official source; both come from the party announcement. What is available is the staffing record, the department evidence and the paused data set. Those three point in the same direction, and none of them can be moved by a guarantee." },
+   { "as_of": true, "p": "As of 31 August to early September 2026 for the Labour pledge and its cost figures (NZ Herald, evidence state reported_unconfirmed; cost and intake figures not verified against an official source at collection time). Net FTE gain of 54 nurses for March 2024 to March 2026 and the Tauranga report are reported_unconfirmed via RNZ, 15 to 16 September 2026, drawing on Te Whatu Ora data. The 68% emergency figure is end-2023 vintage and must not be presented as current." }
+  ]
+ },
+ "art-s24": {
+  "title": "Building Consent Backlog Grows",
+  "sections": [
+   { "h": "The $11 billion claim", "p": "The case for rebuilding the development contribution system rests on a single figure: $11 billion of infrastructure cost from new development over 2021 to 2031, paid for by existing ratepayers. Infrastructure Minister Chris Bishop's proposal is to abolish the development contributions regime and replace it with a development levy, on the principle that growth should pay for growth, with core government departments and Crown entities required to pay as well. The same claim is used for a second purpose, that the current system creates an artificial scarcity of land, so that the reform would release supply rather than merely move the cost." },
+   { "h": "Who welcomed it", "p": "The reaction was unusual for a levy: councils and developers both welcomed the revamped instrument, according to the coverage of 17 September. The reason is in the design. Under the current regime the cost sits with the developer at consent stage, which is where a slow market lets the cost accumulate and where councils hold the leverage. Under a levy the obligation moves to ratepayers and to the government agencies that benefit, which is where the money is. The related revision to the local government legislation would let councils adjust contributions for out-of-sequence growth, and the coverage reports that in most cases that means developers paying more to councils." },
+   { "h": "The first test", "p": "The first observable move came from Auckland, which has appealed a fast-track approval for the Delmore housing project, reported by the NZ Herald on 15 September. The appeal is the first case in which a council has used the revised rule set against a consent it disagrees with, and it is a test of whether the reform gives councils discretion or removes it. A fast-track approval that can be appealed is not a fast track; it is a contested one, and the outcome will set the tone for how the new regime is read at local level." },
+   { "h": "The demand side", "p": "The reform is aimed at supply and has been announced into a market that has stopped clearing. In August 2026 the REINZ national median sale price was $750,000, down 1.3% year-on-year, and the house price index was 3,543, down 0.9%. Sales were 5,430, down 13.0%, the sixth-lowest August in 35 years. Listings were 32,908, up 9.7%, and the median time to sell was 51 days. Inventory in Auckland and Wellington has risen for 31 consecutive months on a year-on-year basis. The data do not show consents as the constraint; they show the absence of buyers, which is why a levy reform aimed at cost recovery would not be visible in August's sales numbers." },
+   { "h": "What the data pack does not cover", "p": "The building consent series itself was not collected for this briefing, so no statement is made here about consent volumes, backlogs or processing times. The figures used are the REINZ August 2026 release and the coverage of the levy proposal, and the $11 billion is a government claim rather than an audited figure. As of 17 September 2026 the levy is announced, councils and developers are on record as welcoming it, and the first appeal has been filed." },
+   { "as_of": true, "p": "As of 15 to 17 September 2026 for the levy proposal, the council response and the Delmore appeal (RNZ, 17 September 2026; NZ Herald, 15 September 2026, evidence state reported_unconfirmed). REINZ figures for August 2026, published 15 September 2026 (officially_confirmed). Building consent volumes were not collected for this briefing." }
+  ]
+ },
+ "art-s34": {
+  "title": "Minimum Wage Review Announced",
+  "sections": [
+   { "h": "Two numbers", "p": "ACT has proposed a training wage of $14.37 per hour for workers under 20, in place of the current $19.16 starting-out wage, which applies for the first 12 months with any employer. The party would also freeze the adult minimum wage at its current level of $23.95 for three years. The two figures have an arithmetic relation worth stating plainly: $14.37 is 60% of $23.95. That is the difference between two rates for the same work by two people who differ in age by a single year, and it is the number the union objected to." },
+   { "h": "The union reading", "p": "CTU president Sandra Grey called the plan unethical and nowhere near enough to live on, arguing that it pays two people doing the same work at different rates. The coverage dates the announcement to 16 September. The wage proposal sits alongside the party's fiscal position of a faster path to surplus without new taxes, which makes the wage floor part of a package rather than an isolated rate. That is the difference from every other platform in the campaign: no other party has proposed a lower floor for a defined group of workers, and the comparison is with a floor rather than with an increase." },
+   { "h": "The freeze in real terms", "p": "The three-year freeze on $23.95 has a measurable effect once the price data is applied. Inflation was 4.1% in the June 2026 quarter, and the core measure excluding food, household energy and vehicle fuel was 2.5%. A wage that does not move while prices rise loses ground every year it is held, and the loss compounds. Held for three years at the current annual rate, the real value of $23.95 falls by more than a tenth. The freeze is therefore not a pause in pay growth; it is a specified reduction in real pay, and its size is knowable before the vote." },
+   { "h": "The cost of the comparison", "p": "The wage proposal was announced in the same fortnight as the cost-of-living debate reached its peak, with petrol up 27.5% year-on-year and the annual reading at 4.1%. In that context a lower training rate is a claim about who bears the adjustment, and it converts a grievance that all parties share into a policy that only one can propose. In the 1 to 3 September poll ACT was on 10.5%, up 3.2 points, and NZ First on 8.4%, and the two platforms are built on the same cost crisis: one lowers a floor and the other caps migration. Which of the two a voter reads as relief is the question the wage announcement puts on the table." },
+   { "h": "What the coverage does not establish", "p": "No legislative text or instrument number for the training wage was available at collection time, and no effective date is stated. The figures are consistent with the party's announcement and with the CTU response, and both are reported_unconfirmed. The inflation figures are the official ones, for the June 2026 quarter published 21 July 2026. Any estimate of the real-pay effect of the freeze is a projection at the current annual rate rather than a forecast, and it should be labelled as such." },
+   { "as_of": true, "p": "As of 16 September 2026 for the ACT wage proposal and the CTU response (RNZ, 16 September 2026, evidence state reported_unconfirmed). Inflation figures for the June 2026 quarter, published 21 July 2026 by Stats NZ (officially_confirmed via official release mirror). Poll readings from the 1 to 3 September 2026 fieldwork." }
+  ]
+ },
+ "art-s39": {
+  "title": "Grocery Code Consultation Opens",
+  "sections": [
+   { "h": "Two remedies, one problem", "p": "On 16 September the two main opposition blocs each announced a remedy for the price of food. National said that if elected it would pursue a break-up of Foodstuffs, separating Pak'nSave from New World to increase competition. Labour said on the same day that it would ban large firms from charging excessive prices. The two remedies are structurally different and share a single precondition: neither can be implemented by the next government without an instrument that does not currently exist." },
+   { "h": "The regulatory precondition", "p": "A break-up requires a Commerce Commission review before it can proceed, which places a campaign announcement and a completed review years apart. The statutory route is the same in kind: an excessive-pricing ban needs legislation, a defined test and an enforcement body. Foodstuffs responded on 17 September with a list of questions covering the cost of separation, the disruption to supply chains and the length of the transition. Pak'nSave's owner called the plan chilling and said it would push prices up, and Winston Peters described National as a great pretender. Vegetable growers objected on cost. The coverage is unusually one-sided in the direction of opposition." },
+   { "h": "What the price data shows", "p": "The remedies are aimed at a category that is not driving the current reading. In the June 2026 quarter the annual inflation reading was 4.1%, and petrol contributed roughly a quarter of that rise at 27.5% year-on-year, against 71.0% for other vehicle fuel and 12.0% for electricity. Excluding food, household energy and vehicle fuel, the core measure is 2.5%. Food prices are not the reason the reading reached 4.1%, and a remedy that addresses food prices is a remedy for a grievance rather than for the headline. That distinction is the whole of the argument, and it is the reason the debate has moved to structure and process rather than to the index." },
+   { "h": "The trust question", "p": "Both remedies are commitments to future machinery. The government's own position is that a regulator must review the proposal before it can proceed, which is a fair process and a long one. As of 17 September 2026 neither a Commerce Commission consultation paper nor a bill for an excessive-pricing ban had been located at collection time, and neither party has stated a timetable. The coverage was unusually heavy for a policy with no instrument: more than ten reports across three newsrooms in 48 hours. A remedy that arrives with no timetable and no cost is cheap to announce and expensive to implement, and the difference between those two costs is what the campaign has not yet priced." },
+   { "h": "What the coverage does not establish", "p": "No statutory instrument, consultation paper or costed model for either remedy was available at collection time. The policy positions, the responses from Foodstuffs and Pak'nSave and the objection from NZ First are reported_unconfirmed. The inflation figures are officially confirmed for the June 2026 quarter. Whether either remedy would lower grocery prices is not something the coverage answers, and the question is the one a Commerce Commission review would have to answer before the policy could be implemented." },
+   { "as_of": true, "p": "As of 16 to 17 September 2026 for the policy announcements and stakeholder responses (RNZ, 1News and NZ Herald, 16 to 17 September 2026, evidence state reported_unconfirmed). Inflation figures for the June 2026 quarter, published 21 July 2026 by Stats NZ (officially_confirmed via official release mirror)." }
+  ]
   }
 };
 /* poll table: party vote bars from latest Curia poll (wp8-2) */
@@ -1230,7 +1087,7 @@ function drawFiscalTable(container, wp7) {
 }
 
 /* house-style party trend chart for a single party (colour + band + TODAY) */
-function drawPartyTrend(container, partyKey, partyLabel, latestVal, h, opts) {
+function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
     .attr('preserveAspectRatio', 'none');
@@ -1251,13 +1108,11 @@ function drawPartyTrend(container, partyKey, partyLabel, latestVal, h, opts) {
     .attr('y1', 6).attr('y2', h - 16).attr('stroke', 'rgba(255,255,255,0.5)');
   svg.append('text').attr('x', x(hist.length - 1)).attr('y', 4).attr('text-anchor', 'middle')
     .attr('font-size', 8).attr('letter-spacing', '0.1em').attr('fill', '#9aa7b4').text('TODAY');
-  if (opts && typeof opts.moemargin === 'number' && isFinite(opts.moemargin) && opts.moemargin > 0) {
-    svg.append('path').datum(hist)
-      .attr('d', d3.area().x(function (d, i) { return x(i); })
-        .y0(function (d) { return y(d - opts.moemargin); }).y1(function (d) { return y(d + opts.moemargin); })
-        .curve(d3.curveMonotoneX))
-      .attr('fill', color).attr('opacity', 0.16);
-  }
+  svg.append('path').datum(hist)
+    .attr('d', d3.area().x(function (d, i) { return x(i); })
+      .y0(function (d) { return y(d - 1.3); }).y1(function (d) { return y(d + 1.3); })
+      .curve(d3.curveMonotoneX))
+    .attr('fill', color).attr('opacity', 0.16);
   svg.selectAll(null).data(hist).enter().append('circle')
     .attr('cx', function (d, i) { return x(i); }).attr('cy', function (d) { return y(d); })
     .attr('r', 2.2).attr('fill', color).attr('opacity', 0.45);
@@ -1481,7 +1336,6 @@ function drawInzBars(container, h) {
 }
 
 /* ── Article view ──────────────────────────────────────────── */
-
 function openArticle(c) {
   clearTimeout(armTimer); clearMq(document.querySelector('.cell.armed')); armedId = null;
   document.getElementById('treemap-view').classList.remove('active');
@@ -1489,94 +1343,19 @@ function openArticle(c) {
   av.classList.add('active');
   av.querySelector('.a-badge').textContent = c.tier===0 ? 'ELECTION 2026' : (c.priority || 'STORY');
   document.getElementById('a-title').textContent = c.title;
-  /* Provenance line is built as nodes: date text + `.source` element.
-     No HTML string is stuffed into textContent anywhere in this file. */
-  var aDateEl = document.getElementById('a-date');
-  aDateEl.textContent = (c.date||'') + ' · Beehive Political Intelligence';
-  if (getSourceHtml(c)) {
-    var sp = document.createElement('span');
-    sp.className = 'source';
-    sp.textContent = ' · ' + sourceName(c);
-    aDateEl.appendChild(sp);
-  }
-  /* Clear the caption on entry; each branch re-populates via setCaption(). */
-  var captionEl = document.querySelector('.a-caption');
-  captionEl.innerHTML = '';
-  captionEl.style.display = 'none';
-  /* `setCaption(html)` — the only place caption text is emitted. Every
-     branch calls this once with its real chart provenance; branches
-     without a chart call `setCaption('')` to hide the row. */
-  function setCaption(html) {
-    captionEl.innerHTML = html || '';
-    captionEl.style.display = html ? '' : 'none';
-  }
+  document.getElementById('a-date').textContent = (c.date||'') + ' · Beehive Political Intelligence · Sample article';
   var bodyEl = document.getElementById('a-body');
   if (c.wp6) {
     var art = ARTICLE_DATA['art-' + c.wp6];
-    /* Badge: the SAMPLE label is only shown on articles whose chart data
-       is a demo fixture. wp6/7/8 articles are demo fixtures, s-cards
-       carry real source-of-record, and the election hero is the poll
-       aggregate. */
-    document.getElementById('a-badge').textContent = (c.isSample ? 'SAMPLE · ' : '') + (c.wp6 === 'wp6-2' ? 'ACCOUNTABILITY' : (c.wp6 === 'wp6-3' ? 'ELECTION WATCH' : 'POLICY'));
+    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp6 === 'wp6-2' ? 'ACCOUNTABILITY' : (c.wp6 === 'wp6-3' ? 'ELECTION WATCH' : 'POLICY'));
     renderPeople(c.wp6);
     var html = '';
     art.sections.forEach(function (s) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    // Render inline charts if any
-    if (art && art.charts) {
-      const seenIds = new Set();
-      art.charts.forEach(chart => {
-        if (!chart || typeof chart !== 'object') { console.warn('Invalid chart entry', chart); return; }
-        const { id, type, after_section, side, title, caption, as_of, alt } = chart;
-        if (seenIds.has(id)) { console.warn('Duplicate chart id:', id); return; }
-        seenIds.add(id);
-        if (after_section < 0 || after_section >= art.sections.length) {
-          console.warn('Chart after_section out of range:', id, after_section);
-          return;
-        }
-        if (!['poll_table','fiscal_table','poll_trend'].includes(type)) {
-          console.warn('Unknown chart type:', id, type);
-          return;
-        }
-        // Insert placeholder after the p element at index after_section
-        const pEls = bodyEl.querySelectorAll('p');
-        const p = pEls[after_section];
-        if (!p) { console.warn('Could not find p element for after_section:', id, after_section); return; }
-        const span = document.createElement('span');
-        span.dataset.chartId = id;
-        p.parentNode.insertBefore(span, p.nextSibling);
-      });
-      // Now render each chart
-      const spans = bodyEl.querySelectorAll('span[data-chart-id]');
-      spans.forEach(span => {
-        const id = span.dataset.chartId;
-        const chartDef = art.charts.find(c => c.id === id);
-        if (!chartDef) { span.remove(); return; }
-        const figure = document.createElement('figure');
-        figure.className = 'a-inline-chart';
-        const chartDiv = document.createElement('div');
-        figure.appendChild(chartDiv);
-        const figcap = document.createElement('figcaption');
-        figcap.textContent = chartDef.caption;
-        figure.appendChild(figcap);
-        span.parentNode.insertBefore(figure, span.nextSibling);
-        span.remove();
-        // Draw based on type
-        if (chartDef.type === 'poll_table') {
-          drawPollTable(chartDiv);
-        } else if (chartDef.type === 'fiscal_table') {
-          // For wp6 articles, we don't have a wp7/pg parameter; use default (else branch) of drawFiscalTable
-          drawFiscalTable(chartDiv, '');
-        } else if (chartDef.type === 'poll_trend') {
-          // Use national party trend
-          const latest = POLL_HISTORY.national[POLL_HISTORY.national.length - 1];
-          drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
-        }
-      });
-    }
-    setCaption('Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ');
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1595,67 +1374,16 @@ function openArticle(c) {
     return;
   }
   if (c.wp7) {
-    document.getElementById('a-badge').textContent = (c.isSample ? 'SAMPLE · ' : '') + (c.wp7 === 'wp7-2' ? 'ELECTION WATCH' : 'POLICY');
     var art = ARTICLE_DATA['art-' + c.wp7];
+    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp7 === 'wp7-2' ? 'ELECTION WATCH' : 'POLICY');
     renderPeople(c.wp7 || '');
     var html = '';
     art.sections.forEach(function (s) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    // Render inline charts if any
-    if (art && art.charts) {
-      const seenIds = new Set();
-      art.charts.forEach(chart => {
-        if (!chart || typeof chart !== 'object') { console.warn('Invalid chart entry', chart); return; }
-        const { id, type, after_section, side, title, caption, as_of, alt } = chart;
-        if (seenIds.has(id)) { console.warn('Duplicate chart id:', id); return; }
-        seenIds.add(id);
-        if (after_section < 0 || after_section >= art.sections.length) {
-          console.warn('Chart after_section out of range:', id, after_section);
-          return;
-        }
-        if (!['poll_table','fiscal_table','poll_trend'].includes(type)) {
-          console.warn('Unknown chart type:', id, type);
-          return;
-        }
-        // Insert placeholder after the p element at index after_section
-        const pEls = bodyEl.querySelectorAll('p');
-        const p = pEls[after_section];
-        if (!p) { console.warn('Could not find p element for after_section:', id, after_section); return; }
-        const span = document.createElement('span');
-        span.dataset.chartId = id;
-        p.parentNode.insertBefore(span, p.nextSibling);
-      });
-      // Now render each chart
-      const spans = bodyEl.querySelectorAll('span[data-chart-id]');
-      spans.forEach(span => {
-        const id = span.dataset.chartId;
-        const chartDef = art.charts.find(c => c.id === id);
-        if (!chartDef) { span.remove(); return; }
-        const figure = document.createElement('figure');
-        figure.className = 'a-inline-chart';
-        const chartDiv = document.createElement('div');
-        figure.appendChild(chartDiv);
-        const figcap = document.createElement('figcaption');
-        figcap.textContent = chartDef.caption;
-        figure.appendChild(figcap);
-        span.parentNode.insertBefore(figure, span.nextSibling);
-        span.remove();
-        // Draw based on type
-        if (chartDef.type === 'poll_table') {
-          drawPollTable(chartDiv);
-        } else if (chartDef.type === 'fiscal_table') {
-          // For wp7 articles, use the wp7 parameter
-          drawFiscalTable(chartDiv, c.wp7);
-        } else if (chartDef.type === 'poll_trend') {
-          // Use national party trend
-          const latest = POLL_HISTORY.national[POLL_HISTORY.national.length - 1];
-          drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
-        }
-      });
-    }
-    setCaption('Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ');
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1668,67 +1396,16 @@ function openArticle(c) {
     return;
   }
   if (c.wp8) {
-    document.getElementById('a-badge').textContent = (c.isSample ? 'SAMPLE · ' : '') + (c.wp8 === 'wp8-2' ? 'ELECTION WATCH' : 'POLICY');
     var art = ARTICLE_DATA['art-' + c.wp8];
+    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp8 === 'wp8-2' ? 'ELECTION WATCH' : 'POLICY');
     renderPeople('');
     var html = '';
     art.sections.forEach(function (s) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    // Render inline charts if any
-    if (art && art.charts) {
-      const seenIds = new Set();
-      art.charts.forEach(chart => {
-        if (!chart || typeof chart !== 'object') { console.warn('Invalid chart entry', chart); return; }
-        const { id, type, after_section, side, title, caption, as_of, alt } = chart;
-        if (seenIds.has(id)) { console.warn('Duplicate chart id:', id); return; }
-        seenIds.add(id);
-        if (after_section < 0 || after_section >= art.sections.length) {
-          console.warn('Chart after_section out of range:', id, after_section);
-          return;
-        }
-        if (!['poll_table','fiscal_table','poll_trend'].includes(type)) {
-          console.warn('Unknown chart type:', id, type);
-          return;
-        }
-        // Insert placeholder after the p element at index after_section
-        const pEls = bodyEl.querySelectorAll('p');
-        const p = pEls[after_section];
-        if (!p) { console.warn('Could not find p element for after_section:', id, after_section); return; }
-        const span = document.createElement('span');
-        span.dataset.chartId = id;
-        p.parentNode.insertBefore(span, p.nextSibling);
-      });
-      // Now render each chart
-      const spans = bodyEl.querySelectorAll('span[data-chart-id]');
-      spans.forEach(span => {
-        const id = span.dataset.chartId;
-        const chartDef = art.charts.find(c => c.id === id);
-        if (!chartDef) { span.remove(); return; }
-        const figure = document.createElement('figure');
-        figure.className = 'a-inline-chart';
-        const chartDiv = document.createElement('div');
-        figure.appendChild(chartDiv);
-        const figcap = document.createElement('figcaption');
-        figcap.textContent = chartDef.caption;
-        figure.appendChild(figcap);
-        span.parentNode.insertBefore(figure, span.nextSibling);
-        span.remove();
-        // Draw based on type
-        if (chartDef.type === 'poll_table') {
-          drawPollTable(chartDiv);
-        } else if (chartDef.type === 'fiscal_table') {
-          // For wp8 articles, use the suffix
-          drawFiscalTable(chartDiv, 'wp8-' + c.wp8.slice(-1));
-        } else if (chartDef.type === 'poll_trend') {
-          // Use national party trend
-          const latest = POLL_HISTORY.national[POLL_HISTORY.national.length - 1];
-          drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
-        }
-      });
-    }
-    setCaption('Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ');
+    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1740,92 +1417,23 @@ function openArticle(c) {
     av.scrollTop = 0;
     return;
   }
-  if (!c.full && /^s\d+$/.test(c.id)) {
+  if (/^s\d+$/.test(c.id)) {
     var sArt = ARTICLE_DATA['art-' + c.id];
     document.getElementById('a-badge').textContent = c.priority || 'STORY';
     renderPeople('');
     document.getElementById('a-chart').style.display = 'none';
     var srcEl = getSourceHtml(c);
     if (sArt) {
-      var dateEl = document.getElementById('a-date');
-      dateEl.textContent = (c.date || '') + ' · Beehive Political Intelligence';
-      if (srcEl) { dateEl.insertAdjacentHTML('beforeend', srcEl); }
+      document.getElementById('a-date').textContent = (c.date || '') + ' · Beehive Political Intelligence' + srcEl;
       var sHtml = '';
-      /* chart_refs is the section-level reading-guide contract: the guide text
-         lives in the anchored section declaration, not in the paragraph body,
-         and is rendered exactly once by this loop at the end of that section. */
-      sArt.sections.forEach(function (s, i) {
+      sArt.sections.forEach(function (s) {
         if (s.as_of) {
           sHtml += '<p style="margin-top:14px;padding-top:10px;border-top:1px solid #2b3542;color:#8b98a8;font-size:12px;">' + s.p + '</p>';
         } else {
           sHtml += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
         }
-        if (s.chart_refs && s.chart_refs.length) {
-          var lastRef = s.chart_refs[s.chart_refs.length - 1];
-          if (lastRef && lastRef.text) {
-            sHtml += '<p class="a-chart-ref" data-section-idx="' + i + '">' + lastRef.text + '</p>';
-          }
-        }
       });
       bodyEl.innerHTML = sHtml;
-      /* Inline charts: the figure is anchored to the rendered reading-guide
-         paragraph of its section, so the DOM order is always
-         section paragraph -> reading guide -> figure -> next section. */
-      if (sArt.charts) {
-        var seenIds = new Set();
-        var byIdx = {};
-        // guide paragraphs only exist once innerHTML above is committed
-        bodyEl.querySelectorAll('p.a-chart-ref').forEach(function (el) {
-          byIdx[el.getAttribute('data-section-idx')] = el;
-        });
-        sArt.charts.forEach(function (chart) {
-          if (!chart || typeof chart !== 'object') { console.warn('Invalid chart entry', chart); return; }
-          if (seenIds.has(chart.id)) { console.warn('Duplicate chart id:', chart.id); return; }
-          seenIds.add(chart.id);
-          if (chart.after_section < 0 || chart.after_section >= sArt.sections.length) {
-            console.warn('Chart after_section out of range:', chart.id, chart.after_section);
-            return;
-          }
-          if (!['poll_table','fiscal_table','poll_trend'].includes(chart.type)) {
-            console.warn('Unknown chart type:', chart.id, chart.type);
-            return;
-          }
-          var guide = byIdx[String(chart.after_section)];
-          if (!guide) {
-            console.warn('Anchored section has no chart_refs guide to anchor:', chart.id, chart.after_section);
-            return;
-          }
-          var span = document.createElement('span');
-          span.dataset.chartId = chart.id;
-          guide.parentNode.insertBefore(span, guide.nextSibling);
-        });
-      // Now render each chart
-      const spans = bodyEl.querySelectorAll('span[data-chart-id]');
-      spans.forEach(span => {
-        const id = span.dataset.chartId;
-        const chartDef = sArt.charts.find(c => c.id === id);
-        if (!chartDef) { span.remove(); return; }
-        const figure = document.createElement('figure');
-        figure.className = 'a-inline-chart';
-        const chartDiv = document.createElement('div');
-        figure.appendChild(chartDiv);
-        const figcap = document.createElement('figcaption');
-        figcap.textContent = chartDef.caption;
-        figure.appendChild(figcap);
-        span.parentNode.insertBefore(figure, span.nextSibling);
-        span.remove();
-        // Draw based on type
-        if (chartDef.type === 'poll_table') {
-          drawPollTable(chartDiv);
-        } else if (chartDef.type === 'fiscal_table') {
-          // For s articles, use default (else branch) of drawFiscalTable
-          drawFiscalTable(chartDiv, '');
-        } else if (chartDef.type === 'poll_trend') {
-          // Use national party trend
-          const latest = POLL_HISTORY.national[POLL_HISTORY.national.length - 1];
-          drawPartyTrend(chartDiv, 'national', 'National', latest, 200, { moemargin: chartDef.moemargin });
-        }
-      });
     } else {
       document.getElementById('a-date').textContent = (c.date || '') + ' · Beehive Political Intelligence';
       bodyEl.innerHTML = '<p>No full article has been produced for this story.</p>' +
@@ -1834,14 +1442,10 @@ function openArticle(c) {
     av.scrollTop = 0;
     return;
   }
-
-  av.scrollTop = 0;
-}
   if (c.full) {
-    bodyEl.innerHTML = '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
+      '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
-    setCaption('Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b> · Curia Research');
     requestAnimationFrame(function(){ drawPollChart(ch, 260); });
   } else {
     bodyEl.innerHTML =
@@ -1849,6 +1453,7 @@ function openArticle(c) {
       '<p>This story is tracked by the Beehive discovery pipeline and will receive a full evidence-led briefing when the news cycle warrants it.</p>';
     document.getElementById('a-chart').style.display = 'none';
   }
+  av.scrollTop = 0;
 }
 function showTreemap() {
   document.getElementById('article-view').classList.remove('active');
@@ -1867,16 +1472,9 @@ var CATS = [
 var catTimer = null;
 function setCat(cat) {
   pageNum = 1;
-  activeCat = cat; /* B3-3 fix: sync before updatePager so pager reads the NEW category */
   document.querySelectorAll('.cat-pill').forEach(function(p){
     p.classList.toggle('active', p.dataset.cat === cat);
   });
-  /* B3-3: flush the pager immediately after pageNum resets. Without this,
-     the visible page counter stays on the pre-switch value until
-     setTimeout(…,160) fires renderGrid→updatePager — user sees "3 / 4" for
-     up to 160ms after clicking a filter, then jumps to "1 / 1". updatePager
-     is idempotent; renderGrid calls it again at the end. */
-  updatePager();
   var fading = 0;
   if (cat !== 'all' && !reduced) {
     document.querySelectorAll('#grid .cell').forEach(function(el){
@@ -1970,37 +1568,12 @@ document.getElementById('grid').addEventListener('click', function(e){
   if (!e.target.closest('.cell')) clearMq(document.querySelector('.cell.armed'));
 });
 renderGrid();
-/* bfcache restore: re-render grid when page is restored from back/forward cache */
-window.addEventListener('pageshow', function(e){
-  if (e.persisted) {
-    if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
-  }
-});
-document.addEventListener('visibilitychange', function(){
-  if (document.visibilityState === 'visible' && !document.getElementById('grid').children.length) {
-    if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
-  }
-});
 var rs;
 window.addEventListener('resize', function(){
   clearTimeout(rs);
-  /* B3-5: clear the armed selection synchronously on every resize — not
-     after the 200ms debounce. The armed ring and marquee were already
-     positioned by pixel offsets that just changed; leaving them until
-     renderGrid would show a stale inset shadow and a marquee tracking the
-     old title rect during the debounce window. clearMq runs even when
-     article-view is open, but `document.querySelector('.cell.armed')`
-     safely returns null then. */
-  clearTimeout(armTimer); clearMq(document.querySelector('.cell.armed')); armedId = null;
   rs = setTimeout(function(){
     if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
   }, 200);
-});
-/* ADMIN-2: #art-sNN deep link (see reviews/TASK-XP-ADMIN2.md). ?v= is
-   carried by the admin deep link for provenance only; it is not consumed. */
-window.addEventListener('load', function(){
-  var m = /^#art-(s\d+)$/.exec(location.hash);
-  if (m) { var c = CELLS.filter(function(x){ return x.id === m[1]; })[0]; if (c) { pageNum = 1; renderGrid(); openArticle(c); } }
 });
 </script>
 </body>
