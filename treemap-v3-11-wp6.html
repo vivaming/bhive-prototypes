@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-<head><script>window.onerror=function(m,s,l){document.title="ERR:"+m+"@"+l};</script>
+<head><script>var __errTitled=false;window.onerror=function(m,s,l){console.error("Uncaught:",m,s,l);if(!__errTitled){__errTitled=true;document.title="ERR:"+m+"@"+l;}};/* FIX(wpn): C高2/高3/高4 */</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BEEHIVE — NZ Political Intelligence</title>
+<link rel="icon" href="data:,"><!-- FIX(wpn): A7 favicon 404 -->
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
@@ -182,8 +183,7 @@
 
 <!-- ================= TREEMAP VIEW ================= -->
 <div class="view active" id="treemap-view"><div class="header-logo"><div class="logo">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
-<div class="pager" id="pager"><button type="button" class="pg-btn" id="pg-prev">‹</button><span class="pg-num" id="pg-num">1 / 2</span><button type="button" class="pg-btn" id="pg-next">›</button></div></div>
-
+<div class="pager" id="pager"><button type="button" class="pg-btn" id="pg-prev" aria-label="Previous page">‹</button><span class="pg-num" id="pg-num">1 / 2</span><button type="button" class="pg-btn" id="pg-next" aria-label="Next page">›</button></div><!-- FIX(wpn): A9 -->
 <!-- ================= ARTICLE VIEW ================= -->
 <div class="view" id="article-view">
   <div class="article">
@@ -249,6 +249,8 @@
   /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
   function wireCard(el, story) {
     el.setAttribute('tabindex', '0'); /* Enter walks the same state machine */
+    el.setAttribute('role', 'button'); /* FIX(wpn): A9 */
+    el.setAttribute('aria-label', (story.title || '') + ' ' + (story.date || '')); /* FIX(wpn): A9 */
     var activate = function () {
       if (el.classList.contains('armed')) {
         if (performance.now() - armTime < 250) return; /* <250ms second tap is not a confirm */
@@ -266,7 +268,7 @@
 function isOldDate(dateStr) {
   if (!dateStr) return false;
   var parts = dateStr.split(' ');
-  if (parts.length !== 2) return false;
+  if (parts.length < 2) return false; /* FIX(wpn): C低15 — accept '12 SEP 2026' (use first two parts) */
   var day = parseInt(parts[0], 10);
   var monthStr = parts[1].toUpperCase();
   var monthMap = {
@@ -275,8 +277,10 @@ function isOldDate(dateStr) {
   };
   var month = monthMap[monthStr];
   if (isNaN(day) || month === undefined) return false;
-  var date = new Date(2026, month, day);
-  var ref = new Date(2026, 8, 16); // September is 8 (0-indexed), 16th
+  var year = parts.length >= 3 && /^\d{4}$/.test(parts[2]) ? parseInt(parts[2], 10) : 2026;
+  var date = new Date(year, month, day);
+  var now = new Date();
+  var ref = new Date(now.getFullYear(), now.getMonth(), now.getDate()); /* FIX(wpn): A6/B6/C14 — today midnight, no time bomb */
   var diffTime = ref - date;
   var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   return diffDays > 7;
@@ -298,9 +302,10 @@ function getSourceHtml(c) {
     return '<span class="source">via Curia</span>'; 
   } else if (c.id === 's09') {
     return '<span class="source">via REINZ</span>';
-  } else if (c.id === 's10' || c.id === 's11') {
+  } else if (c.id === 's15') { /* FIX(wpn): B1/C中5 — was unreachable dead branch */
     return '<span class="source">via RNZ</span>';
-  } else if (c.id === 's10' || c.id === 's11' || c.id === 's15') {
+  } else if (c.id === 's19' || c.id === 's20') { /* FIX(wpn): A5 */
+    return '<span class="source">via RNZ</span>';
   } else if (c.id === 's12') {
     return '<span class="source">via RNZ</span>';
   } else if (c.id === 's13' || c.id === 's14') {
@@ -337,7 +342,7 @@ function getSourceHtml(c) {
       var t = el.querySelector('.cell-title'), tr = el.querySelector('.tag-row');
       if (!t || !el.dataset.id) return; /* logo cell carries neither title nor date */
       if (el.classList.contains('p0')) return; /* hero card: fixed full-width headline, never demoted */
-      var cb = el.getBoundingClientRect().bottom;
+      var cb = el.getBoundingClientRect().bottom; /* FIX(wpn): regression — restore cb definition (fitAudit) */
       if (t.scrollHeight > t.clientHeight + 1) bad.push(el.dataset.id);                    /* title does not fit */
       else if (tr && tr.getBoundingClientRect().bottom > cb - 2) bad.push(el.dataset.id);  /* tag row cropped */
       if (/[?&]audit=1/.test(location.search)) {
@@ -378,7 +383,8 @@ var PARTY = {
   labour:  { name:'Labour',   color:'#D82A20', poll:25.9, reached:true },
   green:   { name:'Green',    color:'#3d9e5c', poll:13.9, reached:true },
   act:     { name:'ACT',      color:'#c9b026', poll:10.5, reached:true },
-  nzfirst: { name:'NZ First', color:'#8895a7', poll:8.4,  reached:true }
+  nzfirst: { name:'NZ First', color:'#8895a7', poll:8.4,  reached:true },
+  opp:     { name:'Opportunity Party', color:'#5b6472', poll:4.5, reached:false } /* FIX(wpn): B7 */
 };
 var POLL_HISTORY = {
   national:[31.5,31.3,28.4,29.8,30.0,30.1,30.5,31.0,29.0],
@@ -620,15 +626,7 @@ function renderGrid(cat) {
   var root = d3.hierarchy({children: leaves}).sum(function(d){ return d.v || 0; });
   root.sort(function(a,b){ return b.value - a.value; });
   d3.treemap().tile(d3.treemapSquarify).size([W,H]).paddingInner(3).paddingOuter(0)(root);
-  root.leaves().forEach(function(n){
-    n.px0 = Math.max(0, Math.floor(n.x0)); n.py0 = Math.max(0, Math.floor(n.y0));
-    n.px1 = Math.min(W, Math.ceil(n.x1));  n.py1 = Math.min(H, Math.ceil(n.y1));
-    // P0-3: right edge card fix for narrow leaves (width <60px and near right edge)
-    if ((n.px1 - n.px0) < 60 && n.px1 >= W - 8) {
-        n.px0 = Math.max(0, W - 60);
-        n.px1 = W;
-    }
-  });
+  /* FIX(wpn): A1 — removed dead px0/py0/px1/py1 rounding block (unused; cards read n.x0..n.y1 directly) */
   var rect = {};
   root.leaves().forEach(function(n){ rect[n.data.i] = n; });
 
@@ -697,7 +695,7 @@ var sparkParty = { s05:'act' }[c.id];
       var sparkH = narrow ? 48 : Math.max(48, Math.min(96, Math.round(h*0.30))); /* V44 §4: 160→48 · 240→72 · 265→80 · ≥320→96 cap */
       if (!narrow) el.querySelector('.spark-mini').style.height = sparkH + 'px';
       try { drawMiniSpark(el.querySelector('.spark-mini'), sparkParty, sparkH); }
-      catch(e) { document.title = 'SPARKERR ' + c.id + ': ' + e.message; }
+      catch(e) { console.warn('spark error ' + c.id + ':', e); document.title = 'SPARKERR ' + c.id + ': ' + e.message; } /* FIX(wpn): C高2 */
     }
   });
   updatePager();
@@ -1054,7 +1052,26 @@ function drawPollTable(container) {
 
 /* fiscal source-table: house-style horizontal bars with labels (wp7 cards) */
 function drawFiscalTable(container, wp7) {
-  var rows = wp7 === 'wp7-1' ? [
+  /* FIX(wpn): C高3 — wp8-1/wp8-3/wp8-4 were falling into the nurse rows; add wp8 data branches */
+  var rows;
+  if (/^wp8-/.test(wp7)) {
+    rows = wp7 === 'wp8-1' ? [
+      { label: 'Debt interest / day', value: 24.8, unit: '$m', color: '#d23528' },
+      { label: 'Cuts over 3 budgets', value: 14, unit: '$b', color: '#5a94d4' },
+      { label: 'Spending, % of GDP', value: 32.6, unit: '%', color: '#8895a7' },
+      { label: 'Surplus target', value: 2027, unit: '', color: '#3d9e5c' }
+    ] : wp7 === 'wp8-3' ? [
+      { label: 'First-home deposit', value: 5, unit: '%', color: '#5a94d4' },
+      { label: 'OPP near threshold', value: 4.5, unit: '%', color: '#c9b026' },
+      { label: 'Forum date', value: 14, unit: ' Sep', color: '#8895a7' },
+      { label: 'MMP threshold', value: 5, unit: '%', color: '#6b7684' }
+    ] : [
+      { label: 'Changes accepted', value: 65, unit: '', color: '#5a94d4' },
+      { label: 'Election date', value: 7, unit: ' Nov', color: '#3d9e5c' },
+      { label: 'Writ day', value: 4, unit: ' Oct', color: '#8895a7' },
+      { label: 'Nominations close', value: 8, unit: ' Oct', color: '#c9b026' }
+    ];
+  } else rows = wp7 === 'wp7-1' ? [
     { label: 'Cancelled 2027 hike', value: 12, unit: 'c/L', color: '#d23528' },
     { label: 'NLTF top-up', value: 1.476, unit: '$b', color: '#5a94d4' },
     { label: 'From contingency', value: 450, unit: '$m', color: '#8895a7' },
@@ -1083,7 +1100,7 @@ function drawFiscalTable(container, wp7) {
   svg.append('line').attr('x1', 0).attr('x2', w).attr('y1', h - 6).attr('y2', h - 6)
     .attr('stroke', 'rgba(255,255,255,0.14)');
   svg.append('text').attr('x', 0).attr('y', h - 8).attr('font-size', 8.5)
-    .attr('fill', '#6b7684').text('Source: RNZ / NZ Herald reporting · Beehive chart');
+    .attr('fill', '#6b7684').text(/^wp8-/.test(wp7) ? 'Source: NZ Herald reporting · figures illustrative · Beehive chart' : 'Source: RNZ / NZ Herald reporting · Beehive chart');
 }
 
 /* house-style party trend chart for a single party (colour + band + TODAY) */
@@ -1197,36 +1214,7 @@ function draw538Grid(svg, w, h, yTicks, labelW) {
   });
 }
 
-/* INZ accountability: horizontal bars, 538 style — muted palette, gridlines, direct labels */
-function drawInzBars(container, h) {
-  var w = container.clientWidth || 400;
-  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
-    .attr('preserveAspectRatio', 'none');
-  var rows = [
-    { label: 'Forecast savings (2024 biz case)', value: 453, color: '#5a94d4' },
-    { label: 'Benefits now ruled unlikely', value: 134, color: '#d23528' },
-    { label: 'OFS cost to date', value: 336, color: '#8895a7' },
-    { label: 'BCU cost (axed after 7 yrs)', value: 36, color: '#6b7684' }
-  ];
-  var max = 460;
-  var barH = 14, gap = 12, top = 8;
-  var labelW = w < 380 ? 118 : 168;
-  rows.forEach(function (r, i) {
-    var yy = top + i * (barH + gap);
-    svg.append('text').attr('x', 0).attr('y', yy + barH / 2 + 3)
-      .attr('font-size', 8).attr('fill', '#9aa7b4').text(r.label.slice(0, w < 380 ? 20 : 30));
-    svg.append('rect').attr('x', labelW).attr('y', yy)
-      .attr('width', (r.value / max) * (w - labelW - 40)).attr('height', barH)
-      .attr('fill', r.color).attr('opacity', 0.85);
-    svg.append('text').attr('x', labelW + (r.value / max) * (w - labelW - 40) + 4)
-      .attr('y', yy + barH / 2 + 3).attr('font-size', 9).attr('font-weight', 600)
-      .attr('fill', '#c7cfd8').text('$' + r.value + 'm');
-  });
-  svg.append('line').attr('x1', 0).attr('x2', w).attr('y1', h - 3).attr('y2', h - 3)
-    .attr('stroke', 'rgba(255,255,255,0.14)');
-  svg.append('text').attr('x', 0).attr('y', h - 4).attr('font-size', 8)
-    .attr('fill', '#6b7684').text('Source: Cabinet paper via RNZ · Beehive chart');
-}
+/* FIX(wpn): B5 — removed first (shadowed) drawInzBars definition; the one below wins */
 
 /* Threshold arithmetic chart (for Act list article):
    party bars with 5% threshold dashed line, seats projection right labels */
@@ -1354,7 +1342,7 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
     captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
@@ -1362,9 +1350,9 @@ function openArticle(c) {
     if (c.wp6 === 'wp6-1') {
       drawKiwiSaverTrend(ch, 260);
     } else if (c.wp6 === 'wp6-3') {
-      drawPartyTrend(ch, 'act', 'ACT', 13.1, 180);
+      drawPartyTrend(ch, 'act', 'ACT', 10.5, 180); /* FIX(wpn): B3 */
       var ch2 = document.createElement('div');
-      ch2.style.marginTop = '8px';
+      ch2.style.marginTop = '8px'; /* FIX(wpn): restore live spacing line (glm-5.3 final review) */
       ch.parentNode.insertBefore(ch2, ch.nextSibling);
       drawThresholdArithmetic(ch2, 200);
     } else {
@@ -1382,13 +1370,13 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
     captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
     if (c.wp7 === 'wp7-2') {
-      drawPartyTrend(ch, 'nzfirst', 'NZ First', 4.2, 200);
+      drawPartyTrend(ch, 'nzfirst', 'NZ First', 8.4, 200); /* FIX(wpn): B4 */
     } else {
       drawFiscalTable(ch, c.wp7);
     }
@@ -1404,7 +1392,7 @@ function openArticle(c) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>3 Sep 2026</b>';
+    var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
     captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
@@ -1443,7 +1431,7 @@ function openArticle(c) {
     return;
   }
   if (c.full) {
-      '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>';
+    bodyEl.innerHTML = '<p>Three things would move this picture: a shift of two points either way for National or Labour; NZ First crossing or decisively missing the threshold; and the coalition negotiations that follow. Until one of those occurs, the polls describe a likely centre-right government with a scramble for its third chair.</p>'; /* FIX(wpn): A2/C高1 */
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     requestAnimationFrame(function(){ drawPollChart(ch, 260); });
@@ -1474,6 +1462,7 @@ function setCat(cat) {
   pageNum = 1;
   document.querySelectorAll('.cat-pill').forEach(function(p){
     p.classList.toggle('active', p.dataset.cat === cat);
+    p.setAttribute('aria-pressed', p.dataset.cat === cat ? 'true' : 'false'); /* FIX(wpn): A9 */
   });
   var fading = 0;
   if (cat !== 'all' && !reduced) {
@@ -1494,7 +1483,7 @@ function setCat(cat) {
   var bar = document.getElementById('cat-bar');
   bar.innerHTML = CATS.map(function(c){
     return '<button type="button" class="cat-pill'+(c.key==='all'?' active':'')+
-      '" data-cat="'+c.key+'">'+c.label+'</button>';
+      '" data-cat="'+c.key+'" aria-pressed="'+(c.key==='all'?'true':'false')+'">'+c.label+'</button>'; /* FIX(wpn): A9 */
   }).join('');
   bar.querySelectorAll('.cat-pill').forEach(function(p){
     p.addEventListener('click', function(){
@@ -1572,8 +1561,10 @@ var rs;
 window.addEventListener('resize', function(){
   clearTimeout(rs);
   rs = setTimeout(function(){
+    /* FIX(wpn): A8/C中9 — same pageSize but different grid box: rebuild pages so demoted cards return */
+    pageMap = {}; demotedIds = {};
     if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
-  }, 200);
+  }, 200); /* FIX(wpn): restore original 200ms debounce (glm-5.3 final review) */
 });
 </script>
 </body>
