@@ -75,9 +75,11 @@
 .date-dim { font-size:10px; color:#909090; letter-spacing:.05em; white-space:nowrap; }
 .date-dim.old-date { opacity:0.45; }
 .source { font-size:8px; color:#909090; }
-  .cell-title { position:relative; flex:1 1 auto; min-height:0; overflow:hidden; transition:color .18s ease-out, transform .18s ease-out; color:#f0f0f0; font-family:'Pixeloid Sans','JetBrains Mono',ui-monospace,Consolas,monospace; font-weight:700; line-height:1.30; overflow-wrap:normal; word-break:normal; hyphens:manual; }
+  .cell-title { position:relative; flex:1 1 auto; min-height:0; overflow:hidden; transition:color .18s ease-out, transform .18s ease-out; color:#f0f0f0; font-weight:700; line-height:1.30; overflow-wrap:normal; word-break:normal; hyphens:manual; }
   .p0 .cell-title { line-height:1.22 !important; } .p2 .cell-title, .p3 .cell-title { line-height:1.38 !important; }
-  .cell.p0 .cell-title { font-size:clamp(16px, 1.7vw, 24px); letter-spacing:0; }
+  /* WP6: pixel font only on the p0 hero title — measured edge/ink anti-aliasing is ~45% at 10-13px (mushy) vs ~30% at 22px and 0% at 36px,
+     so p1(13px)/p2(11px)/p3(10px) keep the Inter body face for legibility */
+  .cell.p0 .cell-title { font-family:'Pixeloid Sans','JetBrains Mono',ui-monospace,Consolas,monospace; font-size:clamp(16px, 1.7vw, 24px); letter-spacing:0; }
   .cell.p1 .cell-title { font-size:13px; font-weight:600; }
   .cell.p2 .cell-title { font-size:11px; font-weight:600; }
   .cell.p3 .cell-title { font-size:10px; color:#f0f0f0; }

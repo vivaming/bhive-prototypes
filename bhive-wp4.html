@@ -106,42 +106,38 @@
   .logo-cell { justify-content:flex-end; align-items:flex-start; }
   .logo { font-family:'JetBrains Mono','IBM Plex Mono','SF Mono',ui-monospace,Consolas,monospace; font-size:clamp(28px,4.5vw,56px); font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:#ffffff; line-height:1.05; }
   .logo b { color:#c03020; }
-  /* WP4: glitch / distressed BEEHIVE title — ragged pixel-cut silhouette + RGB offset ghosts + stroke bite marks + stray pixels */
-  .header-logo .logo .gl { position:relative; display:inline-block; white-space:nowrap;
-    clip-path:polygon(
-      0% 3%, 2% 1%, 5% 4%, 9% 0%, 13% 4%, 17% 1%, 21% 3%, 25% 0%, 29% 4%, 33% 1%, 37% 3%,
-      41% 0%, 45% 4%, 49% 1%, 53% 3%, 57% 0%, 61% 4%, 65% 1%, 69% 3%, 73% 0%, 77% 4%,
-      81% 1%, 85% 3%, 89% 0%, 93% 4%, 97% 1%, 100% 3%,
-      99% 15%, 100% 27%, 97% 39%, 100% 51%, 98% 63%, 100% 75%, 97% 87%, 100% 97%,
-      96% 99%, 92% 96%, 88% 100%, 84% 97%, 80% 100%, 76% 96%, 72% 100%, 68% 97%, 64% 100%,
-      60% 96%, 56% 100%, 52% 97%, 48% 100%, 44% 96%, 40% 100%, 36% 97%, 32% 100%, 28% 96%,
-      24% 100%, 20% 97%, 16% 100%, 12% 96%, 8% 100%, 4% 97%, 0% 96%,
-      1% 83%, 0% 71%, 3% 59%, 0% 47%, 2% 35%, 0% 23%, 2% 11%
-    ); }
-  .header-logo .logo .gl::before, .header-logo .logo .gl::after {
-    content:attr(data-text); position:absolute; top:0; left:0; width:100%;
-    pointer-events:none; text-shadow:none; }
-  .header-logo .logo .gl::before { color:rgba(229,72,77,.78); transform:translate(-2px,1px); clip-path:inset(0 0 53% 0); }
-  .header-logo .logo .gl::after  { color:rgba(64,150,196,.78); transform:translate(2px,-1px); clip-path:inset(51% 0 0 0); }
-  .header-logo .logo .fx { position:absolute; z-index:2; pointer-events:none; } /* z>0: paint above ::before/::after ghosts */
-  .header-logo .logo .fx.b { background:#04080b; }        /* stroke bite / gap */
-  .header-logo .logo .fx.s { background:#ffffff; opacity:.92; } /* stray white pixel */
-  .header-logo .logo .fx.r { background:#e5484d; }         /* stray RGB chip */
-  .header-logo .logo .fx.c { background:#4096c4; }
-  .header-logo .logo .b1 { left:1.8%; top:26%; width:3px;  height:6px; }  /* B left stem */
-  .header-logo .logo .b2 { left:20%;  top:40%; width:12px; height:4px; }  /* E mid bar */
-  .header-logo .logo .b3 { left:50.5%;top:51%; width:3px;  height:8px; }  /* H right stem */
-  .header-logo .logo .b4 { left:62%;  top:16%; width:3px;  height:9px; }  /* I stem */
-  .header-logo .logo .b5 { left:90%;  top:72%; width:14px; height:4px; }  /* E bottom bar */
-  .header-logo .logo .b6 { left:74%;  top:22%; width:3px;  height:10px; } /* V left leg */
-  .header-logo .logo .s1 { left:3%;   top:8%;  width:4px;  height:3px; }
-  .header-logo .logo .s2 { left:47%;  top:6%;  width:3px;  height:4px; }
-  .header-logo .logo .s3 { left:96%;  top:4%;  width:4px;  height:3px; }
-  .header-logo .logo .s4 { left:12%;  top:90%; width:3px;  height:4px; }
-  .header-logo .logo .s5 { left:66%;  top:93%; width:4px;  height:3px; }
-  .header-logo .logo .s6 { left:30%;  top:4%;  width:3px;  height:3px; }
-  .header-logo .logo .r1 { left:59%;  top:5%;  width:3px;  height:3px; }
-  .header-logo .logo .c1 { left:17%;  top:93%; width:3px;  height:3px; }
+  /* WP4: distressed / glitch wordmark — pure CSS, no assets.
+     A) clip-path ragged outer edge  B) RGB chromatic ghost  C) mask slits = broken strokes */
+  .header-logo .logo { position:relative; }
+  .header-logo .logo {
+    /* ink sits at 11.2%..80.6% of this box: top edge stays in the clear (viewport already cuts the caps), bottom edge bites the glyph feet */
+    clip-path: polygon(0% 4%, 3% 0%, 7% 3%, 11% 0%, 16% 5%, 22% 1%, 28% 4%, 34% 0%,
+      41% 3%, 48% 0%, 55% 5%, 62% 1%, 69% 4%, 76% 0%, 83% 3%, 90% 0%, 100% 2%,
+      99% 10%, 100% 19%, 97% 28%, 100% 37%, 98% 46%, 100% 55%, 97% 64%, 100% 73%,
+      96% 86%, 89% 73%, 82% 85%, 75% 72%, 68% 86%, 61% 75%, 54% 84%, 47% 73%,
+      40% 86%, 33% 75%, 26% 85%, 19% 73%, 12% 86%, 5% 75%, 0% 84%,
+      3% 76%, 0% 66%, 2% 56%, 0% 46%, 3% 36%, 0% 26%, 2% 16%);
+    text-shadow:
+      1px 0 0 currentColor, -1px 0 0 currentColor, 0 1px 0 currentColor, 1px 1px 0 currentColor,
+      -3px 0 0 rgba(192,48,32,.85), 3px 0 0 rgba(32,144,192,.85);
+    mask-image:
+      linear-gradient(104deg, #000 0 43.5%, transparent 43.5% 44.6%, #000 44.6% 100%),
+      linear-gradient(76deg,  #000 0 69.5%, transparent 69.5% 70.7%, #000 70.7% 100%),
+      linear-gradient(178deg, #000 0 26.5%, transparent 26.5% 27.6%, #000 27.6% 100%);
+    -webkit-mask-image:
+      linear-gradient(104deg, #000 0 43.5%, transparent 43.5% 44.6%, #000 44.6% 100%),
+      linear-gradient(76deg,  #000 0 69.5%, transparent 69.5% 70.7%, #000 70.7% 100%),
+      linear-gradient(178deg, #000 0 26.5%, transparent 26.5% 27.6%, #000 27.6% 100%);
+    mask-size:100% 100%; mask-repeat:no-repeat;
+    -webkit-mask-size:100% 100%; -webkit-mask-repeat:no-repeat;
+  }
+  /* RGB tear: bottom-half blue ghost, offset right */
+  .header-logo .logo::after {
+    content: attr(data-text);
+    position:absolute; inset:0;
+    color:rgba(32,144,192,.8); transform:translate(3px,0);
+    clip-path: inset(48% 0 0 0); text-shadow:none;
+  }
   .logo-sub { font-size:13px; color:#909090; letter-spacing:.22em; margin-top:4px; }
   .header-logo {
     height: 48px;
@@ -229,7 +225,7 @@
 <body>
 
 <!-- ================= TREEMAP VIEW ================= -->
-<div class="view active" id="treemap-view"><div class="header-logo"><div class="logo"><span class="gl" data-text="BEEHIVE">BEE<b>HIVE</b><i class="fx b b1"></i><i class="fx b b2"></i><i class="fx b b3"></i><i class="fx b b4"></i><i class="fx b b5"></i><i class="fx b b6"></i><i class="fx s s1"></i><i class="fx s s2"></i><i class="fx s s3"></i><i class="fx s s4"></i><i class="fx s s5"></i><i class="fx s s6"></i><i class="fx r r1"></i><i class="fx c c1"></i></span></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
+<div class="view active" id="treemap-view"><div class="header-logo"><div class="logo" data-text="BEEHIVE">BEE<b>HIVE</b></div><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div id="grid"></div>
 <div class="pager" id="pager"><button type="button" class="pg-btn" id="pg-prev" aria-label="Previous page">‹</button><span class="pg-num" id="pg-num">1 / 2</span><button type="button" class="pg-btn" id="pg-next" aria-label="Next page">›</button></div></div><!-- FIX(wpn): A9 + FIX(nel): restore treemap-view closing div (xpi dropped it, nesting article-view inside hidden treemap-view => article page invisible) -->
 <!-- ================= ARTICLE VIEW ================= -->
 <div class="view" id="article-view">
