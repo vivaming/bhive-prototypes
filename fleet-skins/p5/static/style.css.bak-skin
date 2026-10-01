@@ -4,12 +4,12 @@
   --bg2: #0b0f1e;
   --panel: #0d1226;
   --line: #1c2450;
-  --cyan: #3bd6c6;
-  --purple: #ffd23f;
-  --amber: #ffd23f;
-  --red: #ef4a3c;
-  --green: #3bd6c6;
-  --dim: #8a94ab;
+  --cyan: #35e0e0;
+  --purple: #9d6bff;
+  --amber: #ffc857;
+  --red: #ff5d73;
+  --green: #4ade80;
+  --dim: #7c86b8;
   --text: #d8def5;
   --font: "Vera Sans", "Noto Sans SC", system-ui, sans-serif;
   --mono: "JetBrains Mono", "Courier New", monospace;
