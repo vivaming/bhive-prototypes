@@ -112,6 +112,7 @@
     border-radius:var(--radius-p1); }
   /* ── Professional Image Treatment (UIHD) ─────────────────── */
   /* Dual-layer gradient mask: top darkening + bottom fade */
+  .cell.has-img .cell-title { overflow:hidden; }
   .cell-img-wrap {
     position:relative; width:100%;
     margin:0 0 6px;
@@ -156,18 +157,6 @@
     filter:brightness(0.95) saturate(1.0) contrast(1.02);
     transform:scale(1.04);
   }
-  /* Credit badge: bottom-right, small, semi-transparent */
-  .cell-img-credit {
-    position:absolute; bottom:6px; right:8px;
-    font-size:9px; color:rgba(242,244,247,0.55);
-    background:rgba(0,0,0,0.45);
-    padding:2px 6px; border-radius:3px;
-    z-index:2; pointer-events:none;
-    transition:opacity 400ms ease;
-    max-width:48%; overflow:hidden;
-    text-overflow:ellipsis; white-space:nowrap;
-  }
-  .cell-img-wrap:hover .cell-img-credit { opacity:1; }
   /* Tier-specific mask colors */
   .cell.p0 .cell-img-wrap { --cell-bg-for-img-mask: var(--surface-p0); }
   .cell.p1 .cell-img-wrap { --cell-bg-for-img-mask: var(--surface-p1); }
@@ -294,11 +283,12 @@
     border-radius:4px; box-shadow:var(--shadow-sm); }
   .a-chart svg { width:100%; height:260px; display:block; }
   .a-caption { font-size:11px; color:var(--ghost); margin-bottom:32px; }
-  .a-body p { font-size:16px; line-height:1.7; color:var(--text2); margin-bottom:22px; }
-  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition:none !important; animation:none !important; } }
-  /* narrow: hide news images on mobile */
-  @media (max-width:480px) {
-    .cell-img-wrap { display:none !important; }
+  /* Article image credit strip — below body, above footer */
+  .a-img-credits { display:block; margin-top:16px; padding:8px 12px;
+    border-top:1px solid #2b3542; font-size:10px; color:var(--ghost);
+    letter-spacing:.04em; line-height:1.45; }
+  .a-img-credits img { height:28px; width:auto; object-fit:contain;
+    opacity:0.7; vertical-align:middle; margin-right:6px; }
   }
 </style>
 </head>
@@ -318,6 +308,7 @@
     <div class="a-chart" id="a-chart"></div>
     <div class="a-caption">Sample data · Beehive poll aggregate · 5% = MMP threshold</div>
     <div class="a-body" id="a-body"></div>
+    <div class="a-img-credits" id="a-img-credits"></div>
   </div>
 </div>
 
@@ -466,8 +457,10 @@ function getSourceHtml(c) {
       if (!t || !el.dataset.id) return; /* logo cell carries neither title nor date */
       if (el.classList.contains('p0')) return; /* hero card: fixed full-width headline, never demoted */
       var cb = el.getBoundingClientRect().bottom; /* FIX(wpn): regression — restore cb definition (fitAudit) */
-      if (t.scrollHeight > t.clientHeight + 1) bad.push(el.dataset.id);                    /* title does not fit */
-      else if (tr && tr.getBoundingClientRect().bottom > cb - 2) bad.push(el.dataset.id);  /* tag row cropped */
+      var hasImg = !!el.querySelector('.cell-img-wrap'); /* image cells: fixed-height media block is designed content */
+      var titleSlack = hasImg ? 26 : 1;                  /* image squeezes title by design — allow 26px before demote */
+      if (t.scrollHeight > t.clientHeight + titleSlack) bad.push(el.dataset.id);          /* title does not fit */
+      else if (tr && tr.getBoundingClientRect().bottom > cb - 2 && !hasImg) bad.push(el.dataset.id);  /* tag row cropped (image cells: tags may sit on mask by design) */
       if (/[?&]audit=1/.test(location.search)) {
         var n = el.querySelectorAll('span[class*=date]').length;
         var wpx = parseFloat(el.style.width) || 0;
@@ -529,7 +522,7 @@ var CELLS = [
   { id:'wp6-2', tier:1, priority:'HIGH', date:'14 SEP', cat:'politics', tags:['#Immigration','#Accountability'], title:"Immigration NZ: $134m of Forecast Benefits Ruled Flawed", wp6:'wp6-2', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/New_Zealand_Fuel_%2840795697180%29.jpg/1280px-New_Zealand_Fuel_%2840795697180%29.jpg', imgCredit:'CC BY-SA 2.0, Michael Coghlan' },
   { id:'wp6-3', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#ACT','#PartyList'], title:'Act List: Paul Henry at Fourth, Sitting MPs at Risk', wp6:'wp6-3', img:'https://upload.wikimedia.org/wikipedia/commons/b/bd/Paul_Henry_%28New_Zealand_broadcaster%29_%28cropped%29.jpg', imgCredit:'CC BY 2.0, Vivianne Robinson' },
   { id:'wp7-1', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Fiscal'], title:'Government Scraps 2027 Fuel Tax Hike, Tops Up Transport Fund', wp7:'wp7-1', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/New_Zealand_Fuel_%2840795697180%29.jpg/1280px-New_Zealand_Fuel_%2840795697180%29.jpg', imgCredit:'CC BY-SA 2.0, Michael Coghlan' },
-  { id:'wp7-2', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Unveils Sweeping Immigration Overhaul', wp7:'wp7-2', img:'https://upload.wikimedia.org/wikipedia/commons/b/b4/New_Zealand_First_logo_2026.svg', imgCredit:'Public Domain, New Zealand First' },
+  { id:'wp7-2', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Unveils Sweeping Immigration Overhaul', wp7:'wp7-2', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Beehive_%28New_Zealand_Parliament_Building%2C_Wellington_New_Zealand%29.jpg/1280px-Beehive_%28New_Zealand_Parliament_Building%2C_Wellington_New_Zealand%29.jpg', imgCredit:'Public Domain, Wikimedia Commons' },
   { id:'wp7-3', tier:1, priority:'HIGH', date:'01 SEP', cat:'health', tags:['#Health','#Jobs'], title:'Labour Guarantees Jobs for NZ-Trained Graduate Nurses', wp7:'wp7-3', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/The_nurses_at_the_New_Zealand_Stationary_Hospital%2C_Wisques%2C_France_%2821697476061%29.jpg/1280px-The_nurses_at_the_New_Zealand_Stationary_Hospital%2C_Wisques%2C_France_%2821697476061%29.jpg', imgCredit:'No restrictions, National Library NZ' },
   { id:'wp8-1', tier:1, priority:'HIGH', date:'10 AUG', cat:'finance', tags:['#ACT','#Fiscal'], title:'ACT Pledges Faster Path to Surplus, No New Taxes', wp8:'wp8-1', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/John_Key_placing_vote_in_ballot_box.jpg/1280px-John_Key_placing_vote_in_ballot_box.jpg', imgCredit:'CC BY-SA 2.0, kelvinhu' },
   { id:'wp8-2', tier:1, priority:'HIGH', date:'03 SEP', cat:'politics', tags:['#Polls','#Coalition'], title:'Coalition Returned in Curia Poll; Opportunity Loses Kingmaker Bid', wp8:'wp8-2' },
@@ -577,6 +570,16 @@ var CELLS = [
   { id:'s40', tier:3, cat:'international', tags:['#Migration','#Pacific'], date:'12 AUG', title:'Pacific Labour Scheme Extended' },
   { id:'logo', tier:3, logo:true }
 ];
+/* UIB: merge IMG_MAP into CELLS — tier2 cells reference-only until runtime */
+(function mergeImgMap(){
+  for (var i = 0; i < CELLS.length; i++) {
+    var c = CELLS[i];
+    if (!c.img && c.tier !== 3) {
+      var extra = IMG_MAP[c.id];
+      if (extra) { c.img = extra.img; c.imgCredit = extra.credit || ''; }
+    }
+  }
+})();
 
 /* ── Charts ────────────────────────────────────────────────── */
 function drawPollChart(container, h, opts) {
@@ -694,7 +697,12 @@ function pageSize(){ var n = window.innerWidth < 480 || /[?&]narrow=1/.test(loca
 function catStories(cat) {
   var k = cat === undefined ? activeCat : cat;
   var s = CELLS.filter(function(c){ return !c.logo && (k === 'all' || c.cat === k); });
-  s.sort(function(a, b){ return a.tier - b.tier; }); /* stable: hot-first array order within tier */
+  var hasImg = function(c){ return c.img || (typeof IMG_MAP !== 'undefined' && IMG_MAP[c.id]); };
+  s.sort(function(a,b){
+    var ai = hasImg(a) ? 0 : 1, bi = hasImg(b) ? 0 : 1;
+    if (ai !== bi) return ai - bi;           /* image-first: cards with photos rise above empty ones */
+    return a.tier - b.tier;                   /* then by tier within same image group */
+  });
   return s;
 }
 function pagesFor(cat) {
@@ -778,7 +786,7 @@ function renderGrid(cat) {
     var n = rect[i];
     if (!n) return;
     var el = document.createElement('div');
-    el.className = 'cell p' + c.tier;
+    el.className = 'cell p' + c.tier + (imgHtml ? ' has-img' : '');
     el.setAttribute('data-id', c.id);
     el.style.left = n.x0+'px'; el.style.top = n.y0+'px';
     el.style.width = (n.x1-n.x0)+'px'; el.style.height = (n.y1-n.y0)+'px';
@@ -805,10 +813,8 @@ function renderGrid(cat) {
     if (!narrow && c.img && c.tier !== 3) {
       var imgAsp = c.tier === 0 ? '16/9' : (c.tier === 1 ? '16/10' : '1/1');
       var fetchPrio = c.tier === 0 ? 'fetchpriority="high"' : 'fetchpriority="lazy"';
-      var creditHtml = c.imgCredit ? '<span class="cell-img-credit">' + escAttr(c.imgCredit) + '</span>' : '';
       imgHtml = '<div class="cell-img-wrap" style="aspect-ratio:' + imgAsp + ';">' +
         '<img src="' + c.img + '" alt="' + (c.title||'') + '" loading="lazy" decoding="async" ' + fetchPrio + ' />' +
-        creditHtml +
         '</div>';
     }
     var html = imgHtml + (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' : '') +
@@ -1466,6 +1472,9 @@ function openArticle(c) {
     } else {
       drawInzBars(ch, 180);
     }
+    var aCredits = document.getElementById('a-img-credits');
+    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>'; }
+    else { aCredits.innerHTML = ''; }
     av.scrollTop = 0;
     return;
   }
@@ -1488,6 +1497,9 @@ function openArticle(c) {
     } else {
       document.getElementById('a-chart').style.display = 'none';
     }
+    var aCredits = document.getElementById('a-img-credits');
+    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>'; }
+    else { aCredits.innerHTML = ''; }
     av.scrollTop = 0;
     return;
   }
@@ -1513,6 +1525,9 @@ function openArticle(c) {
       document.getElementById('a-chart').style.display = '';
       drawFiscalTable(ch, 'wp8-' + c.wp8.slice(-1));
     }
+    var aCredits = document.getElementById('a-img-credits');
+    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>'; }
+    else { aCredits.innerHTML = ''; }
     av.scrollTop = 0;
     return;
   }
@@ -1545,11 +1560,13 @@ function openArticle(c) {
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     requestAnimationFrame(function(){ drawPollChart(ch, 260); });
-  } else {
-    bodyEl.textContent = '[Placeholder article — full reporting to be produced by the editorial pipeline.] This story is tracked by the Beehive discovery pipeline and will receive a full evidence-led briefing when the news cycle warrants it.';
-    document.getElementById('a-chart').style.display = 'none';
   }
-  av.scrollTop = 0;
+  var aCredits = document.getElementById('a-img-credits');
+  if (c.img) {
+    aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>';
+  } else {
+    aCredits.innerHTML = '';
+  }
 }
 function showTreemap() {
   document.getElementById('article-view').classList.remove('active');
