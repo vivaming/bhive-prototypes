@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BEEHIVE — NZ Political Intelligence</title>
 <link rel="icon" href="data:,"><!-- FIX(wpn): A7 favicon 404 -->
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700;800&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <style>
@@ -55,7 +55,7 @@
     background-image:
       radial-gradient(ellipse at 25% 15%, var(--bg-glow-1) 0%, transparent 55%),
       radial-gradient(ellipse at 80% 85%, var(--bg-glow-2) 0%, transparent 55%);
-    font-family:'Chakra Petch', sans-serif; }
+    font-family:'Space Grotesk', 'JetBrains Mono', 'Chakra Petch', sans-serif; }
   /* text tiers: var(--text) / var(--muted) / var(--ghost) */
   .view { position:fixed; inset:0; display:none; }
   .view.active { display:flex; flex-direction:column; }
@@ -111,17 +111,16 @@
   .cell.p3 { background:var(--surface-p3); border-left:4px solid var(--border-p3);
     border-radius:var(--radius-p1); }
   /* ── Professional Image Treatment (UIHD) ─────────────────── */
-  /* Dual-layer gradient mask: top darkening + bottom fade */
+  /* UI-A1: badge above image; title overlays image bottom */
   .cell.has-img .cell-title { overflow:hidden; }
   .cell-img-wrap {
     position:relative; width:100%;
-    margin:0 0 6px;
+    margin:0;
     overflow:hidden;
     border-radius:var(--img-radius);
     aspect-ratio:16/9;
     flex:0 0 auto;
     background:var(--surface-p2);
-    /* loading placeholder: surface color + subtle noise texture */
     background-image:
       linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%),
       radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03) 0%, transparent 60%);
@@ -130,27 +129,51 @@
     width:100%; height:100%; object-fit:cover; display:block;
     filter:brightness(var(--img-brightness)) saturate(var(--img-saturate)) contrast(var(--img-contrast));
     transition:filter 400ms cubic-bezier(0.2,0.6,0.2,1), transform 400ms cubic-bezier(0.2,0.6,0.2,1);
-    /* loading: start transparent, opacity fades in */
     opacity:0;
     animation:imgFadeIn 300ms ease forwards;
   }
-  @keyframes imgFadeIn {
-    to { opacity:1; }
+  @keyframes imgFadeIn { to { opacity:1; } }
+  /* UI-A1: gradient mask for title legibility on lower portion */
+  .cell-img-mask {
+    position:absolute; inset:0; pointer-events:none;
+    background: linear-gradient(to bottom,
+      transparent 0%, transparent 35%,
+      var(--cell-bg-for-img-mask) 80%, var(--cell-bg-for-img-mask) 100%
+    );
+    border-radius:inherit; z-index:2;
   }
+  /* UI-A1: title absolute-positioned overlay inside image wrapper */
+  .cell.has-img .cell-title {
+    position:absolute; left:0; right:0; bottom:0;
+    padding:clamp(8px,1.4vw,18px); margin:0; min-height:auto; line-height:1.25;
+    background:linear-gradient(to bottom, transparent 0%, transparent 40%, rgba(0,0,0,0.55) 100%);
+    color:#ffffff; z-index:3;
+    overflow:hidden; text-overflow:ellipsis; display:-webkit-box;
+    -webkit-line-clamp:3; -webkit-box-orient:vertical;
+    transition:color .18s ease-out, transform .18s ease-out;
+  }
+  .cell.p0.has-img .cell-title {
+    font-size:clamp(16px,1.7vw,24px); font-weight:800; letter-spacing:-0.01em;
+    -webkit-line-clamp:2; line-height:1.22;
+  }
+  .cell.p1.has-img .cell-title { font-size:13px; font-weight:700; -webkit-line-clamp:3; }
+  .cell.p2.has-img .cell-title { font-size:11px; font-weight:600; -webkit-line-clamp:3; }
+  .cell.p3.has-img .cell-title { font-size:10px; color:var(--text2); font-weight:600; -webkit-line-clamp:3; }
+  .cell.armed.has-img .cell-title { color:#fff; }
+  .cell.has-img:hover .cell-title { transform:translateY(-1px); }
   /* Double-layer gradient mask */
   .cell-img-wrap::after {
     content:''; position:absolute; inset:0;
     background:
       linear-gradient(to bottom, rgba(0,0,0,0.18) 0%, transparent 30%),
       linear-gradient(to top, var(--cell-bg-for-img-mask) 0%, transparent 55%);
-    pointer-events:none; border-radius:inherit;
+    pointer-events:none; border-radius:inherit; z-index:1;
   }
   /* Vignette: inset shadow for photographic depth */
   .cell-img-wrap::before {
     content:''; position:absolute; inset:0;
     box-shadow:inset 0 0 40px rgba(0,0,0,0.25);
-    pointer-events:none; border-radius:inherit;
-    z-index:1;
+    pointer-events:none; border-radius:inherit; z-index:2;
   }
   /* Cinematic hover: slow breath effect */
   .cell-img-wrap:hover img {
@@ -161,7 +184,8 @@
   .cell.p0 .cell-img-wrap { --cell-bg-for-img-mask: var(--surface-p0); }
   .cell.p1 .cell-img-wrap { --cell-bg-for-img-mask: var(--surface-p1); }
   .cell.p2 .cell-img-wrap { --cell-bg-for-img-mask: var(--surface-p2); }
-  /* badge row below image */
+  .cell.p3 .cell-img-wrap { --cell-bg-for-img-mask: var(--surface-p3); }
+  /* badge row — sits above image on image cells */
   .badge-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
   .red-badge { font-size:10px; font-weight:700; letter-spacing:.12em; color:var(--red);
     text-transform:uppercase; border-left:3px solid var(--red); padding-left:6px; }
@@ -171,6 +195,20 @@
   .date-dim { font-size:10px; color:var(--dim); letter-spacing:.05em; white-space:nowrap; }
   .date-dim.old-date { opacity:0.45; }
   .source { font-size:8px; color:var(--ghost); }
+  /* ── Narrow-screen fallback (≤480px): overlay disabled, normal flow ── */
+  @media (max-width:480px) {
+    .cell-img-wrap { margin:0 0 6px; }
+    .cell.has-img .cell-title {
+      position:static !important; padding:0 !important;
+      margin:6px 0 0 !important;
+      background:none !important;
+      color:var(--text) !important;
+      -webkit-line-clamp:unset !important;
+      overflow:hidden !important;
+      display:block !important;
+    }
+    .cell.has-img:hover .cell-title { transform:none !important; }
+  }
   .cell-title { position:relative; flex:1 1 auto; min-height:0; overflow:hidden; transition:color .18s ease-out, transform .18s ease-out; color:var(--text); font-weight:700; line-height:1.30; overflow-wrap:normal; word-break:normal; hyphens:manual; }
   .p0 .cell-title { line-height:1.22 !important; } .p2 .cell-title, .p3 .cell-title { line-height:1.38 !important; }
   .cell.p0 .cell-title { font-size:clamp(16px, 1.7vw, 24px); font-weight:800; letter-spacing:-0.01em; }
@@ -252,6 +290,18 @@
   .pg-btn:hover { color:var(--text); }
   .pg-btn.disabled { opacity:.3; pointer-events:none; }
   .pg-num { font-variant-numeric:tabular-nums; }
+
+  /* UI-A1: image credit pill at bottom-right of image cells */
+  .cell-img-credit {
+    position:absolute; bottom:6px; right:8px; z-index:4;
+    background:rgba(10,13,17,0.72); color:var(--ghost);
+    font-size:7.5px; padding:2px 7px; border-radius:10px;
+    letter-spacing:.04em; max-width:48%;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    opacity:0; transition:opacity .25s ease-out;
+  }
+  .cell:hover .cell-img-credit { opacity:1; }
+  @media (max-width:480px) { .cell-img-credit { display:none; } }
 
   /* ---------- ARTICLE VIEW ---------- */
   #article-view { background:#0a0d11; overflow-y:auto; }
@@ -476,21 +526,27 @@ function getSourceHtml(c) {
     grid.querySelectorAll('.cell-title').forEach(function(ti){
       var cell = ti.closest('.cell');
       var availW = ti.clientWidth, availH = ti.clientHeight;
-      if (availW < 60 || availH < 20) return;            /* degenerate cells keep the tier default size */
-      var frozen = ti.style.flex;
-      ti.style.flex = '0 0 ' + availH + 'px';            /* hero: freeze the flex slack share before measuring */
-      var CAP = Math.max(13, Math.min(availW/16, availH/2, 44)); /* size-keyed cap — tier hierarchy reads from cell area, not font */
-      var lo = 13, hi = CAP, best = 13;
-      while (hi - lo >= 0.5) {                           /* 0.5px binary search */
+      if (availW < 60 || availH < 20) return;
+      var cellArea = availW * availH;
+      var sqrtArea = Math.sqrt(cellArea);
+      var targetSize = Math.max(11, Math.min(44, sqrtArea * 0.04));
+      var lo = 11, hi = Math.max(targetSize, 13);
+      var best = 11;
+      while (hi - lo >= 0.5) {
         var m = (lo + hi) / 2;
         ti.style.fontSize = m + 'px';
-        if (contentH(ti) <= availH * 0.90) { best = m; lo = m; } /* under 90% full → grow */
+        var h = contentH(ti);
+        if (h > 0 && h <= availH * 0.90) { best = m; lo = m; }
         else hi = m;
       }
       ti.style.fontSize = best + 'px';
-      if (contentH(ti) > availH) while (best > 6 && contentH(ti) > availH) { best -= 0.5; ti.style.fontSize = best + 'px'; } /* still overflowing → shrink so fitAudit never demotes */
-      ti.style.flex = frozen;
-      if (cell.classList.contains('p0')) ti.style.flex = '0 0 auto'; /* V44 §3: hero title hugs its content; chart (flex:1) absorbs the slack */
+      if (contentH(ti) > availH * 0.90) {
+        while (best > 11 && contentH(ti) > availH * 0.90) {
+          best -= 0.5; ti.style.fontSize = best + 'px';
+        }
+      }
+      ti.style.flex = '0 0 auto';
+      if (cell.classList.contains('p0')) ti.style.flex = '0 0 auto';
     });
   }
 /* ── Party colors (data-encoding only) ─────────────────────── */
@@ -815,9 +871,13 @@ function renderGrid(cat) {
       var fetchPrio = c.tier === 0 ? 'fetchpriority="high"' : 'fetchpriority="lazy"';
       imgHtml = '<div class="cell-img-wrap" style="aspect-ratio:' + imgAsp + ';">' +
         '<img src="' + c.img + '" alt="' + (c.title||'') + '" loading="lazy" decoding="async" ' + fetchPrio + ' />' +
+        '<div class="cell-img-mask"></div>' +
+        (c.imgCredit ? '<div class="cell-img-credit">' + escAttr(c.imgCredit) + '</div>' : '') +
         '</div>';
     }
-    var html = imgHtml + (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' : '') +
+    var html = (imgHtml && w >= 70)
+      ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' + imgHtml
+      : imgHtml + (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' : '') +
       '<div class="cell-title">'+c.title+'</div>' +
       (showTagRow ? '<div class="tag-row">'+tagsHtml+'</div>' : '') +
       (showSource ? getSourceHtml(c) : '');
