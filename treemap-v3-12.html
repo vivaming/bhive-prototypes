@@ -298,7 +298,8 @@
     opacity:0; transition:opacity .25s ease-out;
   }
   .cell:hover .cell-img-credit { opacity:1; }
-  @media (max-width:480px) { .cell-img-credit { display:none; } }
+@media (max-width:480px) { .cell-img-credit { display:block !important; opacity:0.5; font-size:8px; position:absolute; bottom:4px; right:6px; } }
+.cell.no-img-fallback .cell-title { position:static !important; background:none !important; color:var(--text); }
 
   /* ---------- ARTICLE VIEW ---------- */
   #article-view { background:#0a0d11; overflow-y:auto; }
@@ -409,25 +410,23 @@
     tr.style.setProperty('--mq-dur', (P / 28) + 's');
 
   }
-  /* two-level interaction: first tap = select (+marquee), second tap on the same card = article */
+  /* single-click: first tap opens article directly; armed state only triggers marquee on long title */
   function wireCard(el, story) {
-    el.setAttribute('tabindex', '0'); /* Enter walks the same state machine */
-    el.setAttribute('role', 'button'); /* FIX(wpn): A9 */
-    el.setAttribute('aria-label', (story.title || '') + ' ' + (story.date || '')); /* FIX(wpn): A9 */
-    var activate = function () {
-      if (el.classList.contains('armed')) {
-        if (performance.now() - armTime < 250) return; /* <250ms second tap is not a confirm */
-        clearMq(el); openArticle(story); return;
-      }
-      armCard(el);
-    };
-    el.addEventListener('click', activate);
-    el.addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') { e.preventDefault(); activate(); }
+    el.setAttribute('tabindex', '0');
+    el.setAttribute('role', 'button');
+    el.setAttribute('aria-label', (story.title || '') + ' ' + (story.date || ''));
+    el.addEventListener('click', function(e) {
+      clearMq(document.querySelector('.cell.armed'));
+      armedId = null;
+      openArticle(story);
+      history.replaceState(null, '', '?a=' + story.id);
+    });
+    el.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') { e.preventDefault(); el.click(); }
     });
   }
   /* single date emission point — every visible date goes through this helper */
-  function dateHtml(c, cls) { return '<span class="'+cls+'">'+(c.date||'')+'</span>'; }
+function dateHtml(c, cls) { var d=c.date||''; if (d && !/\b20\d{2}\b/.test(d)) d=d+' 2026'; return '<span class="'+cls+'">'+d+'</span>'; }
 function isOldDate(dateStr) {
   if (!dateStr) return false;
   var parts = dateStr.split(' ');
@@ -860,7 +859,7 @@ function renderGrid(cat) {
       var imgAsp = c.tier === 0 ? '16/9' : (c.tier === 1 ? '16/10' : '1/1');
       var fetchPrio = c.tier === 0 ? 'fetchpriority="high"' : 'fetchpriority="lazy"';
       imgHtml = '<div class="cell-img-wrap" style="aspect-ratio:' + imgAsp + ';">' +
-        '<img src="' + c.img + '" alt="' + (c.title||'') + '" loading="lazy" decoding="async" ' + fetchPrio + ' />' +
+        '<img src="' + c.img + '" alt="' + escAttr(c.title||'') + '" loading="lazy" decoding="async" ' + fetchPrio + ' onerror="this.parentElement.style.display=\'none\';this.closest(\'.cell\').classList.add(\'no-img-fallback\');" />' +
         '<div class="cell-img-mask"></div>' +
         (c.imgCredit ? '<div class="cell-img-credit">' + escAttr(c.imgCredit) + '</div>' : '') +
         '</div>';
@@ -1628,7 +1627,8 @@ var CATS = [
   { key:'politics', label:'Politics' },
   { key:'economy', label:'Economy' },
   { key:'finance', label:'Finance' },
-  { key:'international', label:'International' }
+  { key:'international', label:'International' },
+  { key:'health', label:'Health' }
 ];
 var catTimer = null;
 function setCat(cat) {
@@ -1729,6 +1729,23 @@ function goToPage(np, dir) {
 document.getElementById('grid').addEventListener('click', function(e){
   if (!e.target.closest('.cell')) clearMq(document.querySelector('.cell.armed'));
 });
+/* FIX(uip1): popstate handler for browser back button */
+window.addEventListener('popstate', function(){
+  var aId = (new URLSearchParams(location.search)).get('a');
+  if (aId) {
+    var story = CELLS.find(function(c){ return c.id === aId; });
+    if (story) { openArticle(story); return; }
+  }
+  showTreemap();
+});
+/* FIX(uip1): check URL for ?a= id on initial load */
+(function initFromUrl(){
+  var aId = (new URLSearchParams(location.search)).get('a');
+  if (aId) {
+    var story = CELLS.find(function(c){ return c.id === aId; });
+    if (story) { openArticle(story); return; }
+  }
+})();
 renderGrid();
 var rs;
 window.addEventListener('resize', function(){
