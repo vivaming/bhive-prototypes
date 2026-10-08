@@ -302,7 +302,7 @@
 
   /* ---------- ARTICLE VIEW ---------- */
   #article-view { background:#0a0d11; overflow-y:auto; }
-  .article { max-width:680px; margin:0 auto; padding:48px 24px 80px; }
+  .article { max-width:680px; margin:0 auto; padding:48px 24px 80px; color:var(--text); font-family:'Space Grotesk',sans-serif; }
   .back { font-size:13px; color:#9aa7b4; cursor:pointer; display:inline-block; margin-bottom:28px; }
   .back:hover { color:#f2f4f7; }
   .a-back { position:absolute; top:12px; left:12px; background:var(--barrier);
@@ -311,7 +311,7 @@
   .a-back:hover { background:var(--barrier-hover); box-shadow:var(--shadow-md); }
   .a-badge { font-size:10px; font-weight:700; letter-spacing:.08em; color:var(--red);
     text-transform:uppercase; border-left:3px solid var(--red); padding-left:8px; margin-bottom:14px; }
-  .a-title { font-size:28px; font-weight:800; color:var(--text); line-height:1.25; margin-bottom:10px; }
+  .a-title { font-size:32px; font-weight:800; color:#ffffff; line-height:1.22; margin-bottom:12px; letter-spacing:-0.02em; }
   .a-date { font-size:13px; color:var(--ghost); margin-bottom:32px; }
   /* related people — copyright-free portraits (CC0 / CC BY-SA, Wikimedia Commons) */
   .a-people { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:28px; }
@@ -329,7 +329,10 @@
   .a-chart { margin:0 0 8px 0; border:1px solid #1e2733; padding:12px; background:#0d1117;
     border-radius:4px; box-shadow:var(--shadow-sm); }
   .a-chart svg { width:100%; height:260px; display:block; }
-  .a-caption { font-size:11px; color:var(--ghost); margin-bottom:32px; }
+  .a-body { font-size:15px; line-height:1.65; color:var(--text); }
+  .a-body p { margin-bottom:14px; }
+  .a-body p:last-child { margin-bottom:0; }
+  .a-body strong { color:#ffffff; font-weight:700; letter-spacing:0.01em; }
   /* Article image credit strip — below body, above footer */
   .a-img-credits { display:block; margin-top:16px; padding:8px 12px;
     border-top:1px solid #2b3542; font-size:10px; color:var(--ghost);
@@ -352,7 +355,7 @@
     <div class="a-date" id="a-date"></div>
     <div class="a-people" id="a-people"></div>
     <div class="a-chart" id="a-chart"></div>
-    <div class="a-caption">Sample data · Beehive poll aggregate · 5% = MMP threshold</div>
+    <div class="a-caption" id="a-caption"></div>
     <div class="a-body" id="a-body"></div>
     <div class="a-img-credits" id="a-img-credits"></div>
   </div>
@@ -571,7 +574,7 @@ var CELLS = [
   { id:'wp8-2', tier:1, priority:'HIGH', date:'03 SEP', cat:'politics', tags:['#Polls','#Coalition'], title:'Coalition Returned in Curia Poll; Opportunity Loses Kingmaker Bid', wp8:'wp8-2' },
   { id:'wp8-3', tier:2, date:'14 SEP', cat:'economy', tags:['#Housing','#Election'], title:'Housing Election Forum: Parties to Face Direct Questions', wp8:'wp8-3' },
   { id:'wp8-4', tier:2, date:'08 SEP', cat:'politics', tags:['#Election','#Reform'], title:'Government Accepts 65 Election-Process Changes', wp8:'wp8-4' },
-  { id:'election', tier:0, priority:'HIGH', date:'12 SEP 2026', cat:'politics', tags:['#Polls','#MMP'], title:'ELECTION 2026 — Polls & the 5% Threshold', full:true, img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d8/Sunny_day_Auckland_Sky_Tower_%2810483733745%29.jpg/1280px-Sunny_day_Auckland_Sky_Tower_%2810483733745%29.jpg', imgCredit:'CC BY-SA 2.0, Wikimedia Commons contributor' },
+  { id:'election', tier:0, priority:'HIGH', date:'12 SEP 2026', cat:'politics', tags:['#Polls','#MMP'], title:'ELECTION 2026 — Polls & the 5% Threshold', full:true, img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Beehive_and_Parliament_House_-_Wellington_-_New_Zealand_-_DSC00165.jpg/1280px-Beehive_and_Parliament_House_-_Wellington_-_New_Zealand_-_DSC00165.jpg', imgCredit:'CC BY-SA 4.0, Daderot' },
   { id:'s02', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Coalition'], title:'Fuel Tax Retreat: The $1.4B Land Transport Fund Hole' },
   { id:'s03', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Immigration Platform Lands' },
   { id:'s04', tier:2, date:'10 SEP', cat:'politics', tags:['#Health','#Jobs'], title:'Labour Guarantees Graduate Nurse Jobs' },
@@ -647,7 +650,7 @@ function drawPollChart(container, h, opts) {
   svg.append('line').attr('x1',x(8.6)).attr('x2',x(8.6)).attr('y1',6).attr('y2',h-16)
     .attr('stroke','rgba(255,255,255,0.5)');
   svg.append('text').attr('x',x(8.6)).attr('y',4).attr('text-anchor','middle')
-    .attr('font-size',8).attr('letter-spacing','0.1em').attr('fill','#9aa7b4').text('TODAY');
+    .attr('font-size',8).attr('letter-spacing','0.1em').attr('fill','#9aa7b4').text('3 SEP');
   ['national','labour'].forEach(function(k){
     var c = PARTY[k].color;
     var data = POLL_HISTORY[k];
@@ -817,7 +820,7 @@ function renderGrid(cat) {
     hel.style.width=W+'px'; hel.style.height=heroH+'px';
     hel.innerHTML = '<div class="badge-row"><span class="red-badge">ELECTION 2026</span>' +
       dateHtml(heroStory, 'date-chip') + '</div>' +
-      '<div class="cell-title" style="font-size:17px;">'+
+      '<div class="cell-title" style="font-size:26px; font-weight:800;">'+
       (heroStory.title||'').replace('ELECTION 2026 —','—')+'</div>' +
       '<div class="tag-row">'+(heroStory.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
       '<div class="gap-callout"><span>GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span> · Curia 3 Sep</div>';
@@ -862,9 +865,7 @@ function renderGrid(cat) {
         (c.imgCredit ? '<div class="cell-img-credit">' + escAttr(c.imgCredit) + '</div>' : '') +
         '</div>';
     }
-    var html = (imgHtml && w >= 70)
-      ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' + imgHtml
-      : imgHtml + (w >= 70 ? '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' : '') +
+    var html = '<div class="badge-row date-only">' + dateHtml(c, 'date-dim' + (isOldDate(c.date) ? ' old-date' : '')) + '</div>' + imgHtml +
       '<div class="cell-title">'+c.title+'</div>' +
       (showTagRow ? '<div class="tag-row">'+tagsHtml+'</div>' : '') +
       (showSource ? getSourceHtml(c) : '');
@@ -951,7 +952,7 @@ var ARTICLE_DATA = {
    { "h": "What overhang is", "p": "Under MMP, the proportion of seats a party wins by electorate is not always the same as the proportion its party vote entitles it to. When a party wins more electorates than its party vote share warrants, the extra seats are added to the parliament as overhang, expanding the total above the base figure of 120. The mechanism exists to prevent a candidate from winning a district and then losing the seat to the party-vote arithmetic. In 2023 it produced the largest parliament in New Zealand's history, at 123 seats." },
    { "h": "What 2023 actually delivered", "p": "The 2023 overhang came from three sources. Te Pāti Māori won two electorate seats that its party vote share did not entitle it to, producing two overhang seats. A third overhang seat came from Port Waikato, where the ACT candidate died before the vote and the resulting by-election produced a seat that the party-vote arithmetic did not account for. The parliament ended at 123, and the overhang mechanism is the reason National's government held a majority it would not have had under the pure party-vote arithmetic. The lesson of 2023 is that overhang is not a footnote; it is the mechanism that decides who governs in a narrow result." },
    { "h": "The strategic question", "p": "The political question for the 2026 election is not whether overhang will occur but whether it will decide the government. In a hung result the overhang mechanism could add multiple seats to any party that wins electorates it would not otherwise represent. For a party whose party vote falls short of the threshold but which wins a handful of safe electorates, overhang is the difference between government and opposition. RNZ reported that there are concerns parties may deliberately create overhang to influence the outcome after the 7 November vote, which is a claim about strategy rather than about rules." },
-   { "h": "What the polls imply", "p": "On the most recent Curia Research poll National sits at 29.0%, Labour at 25.9%, the Greens at 13.9%, ACT at 10.5%, NZ First at 8.4% and the Opportunity Party at 4.5%. /* FIX(content): fabricated party names removed — canonical Curia list restored */ The party-vote gap between National and Labour is 3.1 points, which in a parliament of 123 is roughly four seats. Whether overhang fires depends on whether any party wins more electorates than its party vote share entitles it to, a condition that is more likely in a tightly contested result than in a two-party one. The 2023 precedent is the baseline: 123 seats, three overhang seats, and a government that would not have formed without them (RNZ, 16 September 2026)." }
+   { "h": "What the polls imply", "p": "On the most recent Curia Research poll National sits at 29.0%, Labour at 25.9%, the Greens at 13.9%, ACT at 10.5%, NZ First at 8.4% and the Opportunity Party at 4.5%. The party-vote gap between National and Labour is 3.1 points, which in a parliament of 123 is roughly four seats. Whether overhang fires depends on whether any party wins more electorates than its party vote share entitles it to, a condition that is more likely in a tightly contested result than in a two-party one. The 2023 precedent is the baseline: 123 seats, three overhang seats, and a government that would not have formed without them (RNZ, 16 September 2026)." }
   ]
 },
  "art-s17": {
@@ -967,7 +968,7 @@ var ARTICLE_DATA = {
   "title": "Herald Poll of Polls: Coalition at 47.8%",
   "sections": [
    { "h": "The model's headline", "p": "The NZ Herald's Poll of Polls, updated on 16 September, assigns a 47.8% probability to coalition government formation after the next election. The Poll of Polls is a model that aggregates multiple opinion polls into a single probability distribution, weighted by poll quality, fielding date and sample composition. A 47.8% figure is below the 50% threshold the model would need to call an outcome more likely than not, which is the most defensible reading of the number itself." },
-   { "h": "Why it is below 50%", "p": "The model is built on the underlying Curia Research poll, which gave National 29.0%, Labour 25.9%, the Greens 13.9%, ACT at 10.5%, NZ First 8.4% and the Opportunity Party 4.5%. /* FIX(content): fabricated party names removed — canonical Curia list restored */ The probability reflects the gap between National's party vote and the 50% threshold required for a majority, the likelihood of overhang seats expanding or contracting the parliament, and the difficulty of assembling a coalition when no party is close to half the vote. The 47.8% is not a forecast; it is a Bayesian aggregation of the uncertainty in the polling data itself." },
+   { "h": "Why it is below 50%", "p": "The model is built on the underlying Curia Research poll, which gave National 29.0%, Labour 25.9%, the Greens 13.9%, ACT at 10.5%, NZ First 8.4% and the Opportunity Party 4.5%. The probability reflects the gap between National's party vote and the 50% threshold required for a majority, the likelihood of overhang seats expanding or contracting the parliament, and the difficulty of assembling a coalition when no party is close to half the vote. The 47.8% is not a forecast; it is a Bayesian aggregation of the uncertainty in the polling data itself." },
    { "h": "What the model does not say", "p": "The NZ Herald's full analysis is behind a Premium paywall, and the reasoning behind the 47.8% figure was not available in the open crawl of 16 September. The 47.8% number comes from the page's meta description rather than the article body, which means it has not been verified against the model's published methodology. The model does not publish its sensitivity analysis, the weight it assigns to individual polls, or the confidence interval around the 47.8% figure. These are the details that would distinguish a model-based probability from a rounding of intuition, and they are not accessible." },
    { "h": "What the polls say", "p": "The polling data that feeds the model is clear: National leads by 3.1 points on party vote, the coalition arithmetic requires at least two additional parties to reach a majority, and the overhang mechanism could add seats in a tightly contested result. The 47.8% figure is a summary of that arithmetic, a number that says the coalition outcome is plausible rather than probable, and that the model's confidence in that assessment is not high enough to cross the 50% line. As of 16 September 2026 the Poll of Polls says the outcome is still open (NZ Herald, 16 September 2026, meta description)." }
   ]
@@ -1015,25 +1016,25 @@ var ARTICLE_DATA = {
    },
    {
     "h": "Who the list actually puts at risk",
-    "p": "The list's arithmetic turns on a single number: the party vote. In the latest Taxpayers' Union–Curia poll of 1–3 September, Act is on 10.5 percent, which would give it 12 or 13 seats on current projections — up from 11. At 10.5 percent, all 11 sitting members remain safe inside the top 12, and one additional seat opens up depending on how overhang seats fall. Todd Stephenson, at sixth, is secure; Parmjeet Parmar, ranked 10th, and Cameron Luxton at 12th are both clear of the cut-off. The leadership has shifted alongside the new entrant: Andrew Hoggard is up to third, and Nicole McKee is now deputy leader. Karen Chhour has been ranked on the list, and Henry's arrival at fourth pushes everyone below him down a place. The exposure is concentrated at the bottom of the ordering rather than spread evenly, which is what a two-seat gain looks like when the party vote sits more than five points above the threshold." /* FIX(content) */
+    "p": "The list's arithmetic turns on a single number: the party vote. In the latest Taxpayers' Union–Curia poll of 1–3 September, Act is on 10.5 percent, which would give it 12 or 13 seats on current projections — up from 11. At 10.5 percent, all 11 sitting members remain safe inside the top 12, and one additional seat opens up depending on how overhang seats fall. Todd Stephenson, at sixth, is secure; Parmjeet Parmar, ranked 10th, and Cameron Luxton at 12th are both clear of the cut-off. The leadership has shifted alongside the new entrant: Andrew Hoggard is up to third, and Nicole McKee is now deputy leader. Karen Chhour has been ranked on the list, and Henry's arrival at fourth pushes everyone below him down a place. The exposure is concentrated at the bottom of the ordering rather than spread evenly, which is what a two-seat gain looks like when the party vote sits more than five points above the threshold."
    },
    {
     "h": "Three pillars, and why the ordering is the point",
-    "p": "Act says its campaign rests on three pillars: ending government waste, cutting red tape, and \"one law for all and one future together\". David Seymour said the list's diversity was not intentional, but emerged from a shared belief and specialist knowledge. That claim sits uneasily with the list itself, where a celebrity entrant placed ahead of a minister and a former minister holding a specialist portfolio is the most visible feature of the ordering. Putting Henry fourth, ahead of sitting members with a record of work in Parliament, is a statement about what Act thinks electors will look at in 2026. It also carries a cost: one incumbent loses a seat on current polling at 10.5%, and the party is betting that a higher-profile list buys votes it does not always deliver. The calculus is political rather than fiscal: a list that signals change attracts donors and volunteers, and that may compensate for the loss of a seat held by someone who does not campaign in person. The risk is that the list ordering looks theatrical rather than strategic, which is the impression the party invites critics to form.", /* FIX(content): restore closing quote dropped by edit */
+    "p": "Act says its campaign rests on three pillars: ending government waste, cutting red tape, and \"one law for all and one future together\". David Seymour said the list's diversity was not intentional, but emerged from a shared belief and specialist knowledge. That claim sits uneasily with the list itself, where a celebrity entrant placed ahead of a minister and a former minister holding a specialist portfolio is the most visible feature of the ordering. Putting Henry fourth, ahead of sitting members with a record of work in Parliament, is a statement about what Act thinks electors will look at in 2026. It also carries a cost: one incumbent loses a seat on current polling at 10.5%, and the party is betting that a higher-profile list buys votes it does not always deliver. The calculus is political rather than fiscal: a list that signals change attracts donors and volunteers, and that may compensate for the loss of a seat held by someone who does not campaign in person. The risk is that the list ordering looks theatrical rather than strategic, which is the impression the party invites critics to form.",
    }
   ]
  },
  "art-wp7-1": {
   "title": "Government scraps 2027 fuel tax hike, tops up transport fund by $1.476b",
-  "sections": [{"h": "Policy reversal on fuel tax", "p": "The coalition government has cancelled the fuel tax increase that was set to take effect on 1 January 2027. Under the original plan, fuel taxes (including road user charges) would have risen by 12 cents per litre from that date. The new approach introduces a smaller first step: a 5 cent per litre increase from 1 January 2028. Thereafter, the tax will rise by another 5 cents every six months, so that by the end of 2029 the cumulative increase will be 20 cents per litre. From 2030 onward, the increase will revert to an annual 5 cent step, again inclusive of road user charges. The shift means the total additional cost to motorists over the next few years is lower than initially planned, though the tax will still climb over the decade."}, {"h": "Financing the Transport Fund", "p": "To offset the loss of revenue from the cancelled 12 cent hike, the government is directing $1.476 billion from the contingency reserve into the National Land Transport Fund. The transfer tops up the fund's medium-term forecast and removes the immediate funding gap that the original timetable would have created. The money comes from saved debt costs rather than new taxation, which is consistent with the coalition's fiscal stance. The top-up covers the shortfall through to 2029, when the revised timetable takes full effect, and does not commit to funding beyond that point. Whether the fund will need further injections depends on road construction costs and traffic growth, both of which are uncertain in an election year."}] /* FIX(content) */
+  "sections": [{"h": "Policy reversal on fuel tax", "p": "The coalition government has cancelled the fuel tax increase that was set to take effect on 1 January 2027. Under the original plan, fuel taxes (including road user charges) would have risen by 12 cents per litre from that date. The new approach introduces a smaller first step: a 5 cent per litre increase from 1 January 2028. Thereafter, the tax will rise by another 5 cents every six months, so that by the end of 2029 the cumulative increase will be 20 cents per litre. From 2030 onward, the increase will revert to an annual 5 cent step, again inclusive of road user charges. The shift means the total additional cost to motorists over the next few years is lower than initially planned, though the tax will still climb over the decade."}, {"h": "Financing the Transport Fund", "p": "To offset the loss of revenue from the cancelled 12 cent hike, the government is directing $1.476 billion from the contingency reserve into the National Land Transport Fund. The transfer tops up the fund's medium-term forecast and removes the immediate funding gap that the original timetable would have created. The money comes from saved debt costs rather than new taxation, which is consistent with the coalition's fiscal stance. The top-up covers the shortfall through to 2029, when the revised timetable takes full effect, and does not commit to funding beyond that point. Whether the fund will need further injections depends on road construction costs and traffic growth, both of which are uncertain in an election year."}]
  },
  "art-wp7-2": {
   "title": "NZ First unveils sweeping immigration overhaul: resident visa cap referendum, 10-year welfare stand-down",
-  "sections": [{"h": "NZ First announces immigration overhaul", "p": "On 11 September 2026, New Zealand First released a suite of 13 or more immigration policy proposals intended to shape the party's platform for the November general election. The centrepiece is a binding referendum that would set an annual ceiling of 20 000 resident visas, linked to a 30-year planning framework that coordinates immigration, housing and infrastructure. The package also tightens the path to citizenship: children born in New Zealand would no longer acquire automatic citizenship unless at least one parent is a citizen, permanent residence would be extended from two years to five years, and the qualifying period for citizenship would rise from five years to a minimum of ten years. A ten-year stand-down on most welfare benefits would apply to non-citizens, meaning they could not access Jobseeker Support or other main benefits for a decade. The proposals arrive as NZ First sits on 8.4 percent in the Taxpayers' Union–Curia poll, well above the 5 percent threshold that determines whether a party wins any list seats under MMP. That margin gives the party room to absorb a downturn without losing its parliamentary footing, which is the calculus behind hardening the immigration platform rather than moderating it."}, {"h": "The referendum mechanism", "p": "The resident visa cap would be decided by a binding national referendum, a first for New Zealand immigration policy. The government would be required to honour the outcome, setting an annual ceiling that caps the number of residence grants issued in each year. The 20 000 figure is framed as a planning anchor, not a quota that must be reached; it is a ceiling, not a floor. The referendum would be tied to a 30-year framework that links immigration targets to housing construction and infrastructure delivery, on the theory that population growth without matching capital investment drives the price pressures the party identifies as central to the cost-of-living crisis. Whether a binding referendum on immigration is constitutionally viable under existing law is a question the party has not yet answered."}, {"h": "Electoral arithmetic and threshold position", "p": "NZ First's 8.4 percent in the September Curia poll places it 3.4 points above the 5 percent MMP threshold, a comfortable buffer that insulates the party from the kind of seat loss that penalises parties hovering near the line. In the current parliament the party holds seven list seats and one electorate seat, giving it leverage in coalition negotiations that depends less on vote share than on the arithmetic of government formation. With National and Labour each sitting in the high 20s, a third party above threshold is routinely needed to assemble a majority. The immigration overhaul is designed to sharpen that leverage: by taking a position that is both electorally distinctive and structurally reinforcing, the party signals that its coalition value is tied to policy deliverables rather than procedural support. The risk is that a platform built on restriction narrows the party's appeal beyond its core electorate, but on current polling the threshold cushion makes that risk manageable through at least one election cycle."}] /* FIX(content) */
+  "sections": [{"h": "NZ First announces immigration overhaul", "p": "On 11 September 2026, New Zealand First released a suite of 13 or more immigration policy proposals intended to shape the party's platform for the November general election. The centrepiece is a binding referendum that would set an annual ceiling of 20 000 resident visas, linked to a 30-year planning framework that coordinates immigration, housing and infrastructure. The package also tightens the path to citizenship: children born in New Zealand would no longer acquire automatic citizenship unless at least one parent is a citizen, permanent residence would be extended from two years to five years, and the qualifying period for citizenship would rise from five years to a minimum of ten years. A ten-year stand-down on most welfare benefits would apply to non-citizens, meaning they could not access Jobseeker Support or other main benefits for a decade. The proposals arrive as NZ First sits on 8.4 percent in the Taxpayers' Union–Curia poll, well above the 5 percent threshold that determines whether a party wins any list seats under MMP. That margin gives the party room to absorb a downturn without losing its parliamentary footing, which is the calculus behind hardening the immigration platform rather than moderating it."}, {"h": "The referendum mechanism", "p": "The resident visa cap would be decided by a binding national referendum, a first for New Zealand immigration policy. The government would be required to honour the outcome, setting an annual ceiling that caps the number of residence grants issued in each year. The 20 000 figure is framed as a planning anchor, not a quota that must be reached; it is a ceiling, not a floor. The referendum would be tied to a 30-year framework that links immigration targets to housing construction and infrastructure delivery, on the theory that population growth without matching capital investment drives the price pressures the party identifies as central to the cost-of-living crisis. Whether a binding referendum on immigration is constitutionally viable under existing law is a question the party has not yet answered."}, {"h": "Electoral arithmetic and threshold position", "p": "NZ First's 8.4 percent in the September Curia poll places it 3.4 points above the 5 percent MMP threshold, a comfortable buffer that insulates the party from the kind of seat loss that penalises parties hovering near the line. In the current parliament the party holds seven list seats and one electorate seat, giving it leverage in coalition negotiations that depends less on vote share than on the arithmetic of government formation. With National and Labour each sitting in the high 20s, a third party above threshold is routinely needed to assemble a majority. The immigration overhaul is designed to sharpen that leverage: by taking a position that is both electorally distinctive and structurally reinforcing, the party signals that its coalition value is tied to policy deliverables rather than procedural support. The risk is that a platform built on restriction narrows the party's appeal beyond its core electorate, but on current polling the threshold cushion makes that risk manageable through at least one election cycle."}]
  },
  "art-wp7-3": {
   "title": "Labour guarantees a public-health job for every NZ-trained graduate nurse",
-  "sections": [{"h": "Labour’s graduate nurse job guarantee", "p": "Labour has committed to guaranteeing a public‑sector job for every newly qualified nurse who graduates from a New Zealand tertiary institution, should the party form the next government. The pledge would apply to the approximately 2 400 nursing graduates produced each year, directing them into existing pathways such as the graduate‑entry programme, hospital cadetships or other employment schemes already used by district health boards. Ayesha Verrall, the party’s health spokesperson, said the initiative is “about giving graduates certainty, strengthening the workforce, and improving care for patients.” She noted that the guarantee is a direct response to chronic staffing shortages, high overseas attrition and long waiting times for elective care, all of which have become prominent election issues. The guarantee is positioned as the centrepiece of Labour’s broader strategy to rebuild the nursing pipeline and retain talent within the public health system."}, {"h": "Cost and supporting measures", "p": "Labour estimates that guaranteeing a job for every graduate nurse would require about $525 million annually. This figure covers the salaries and associated on‑boarding expenses for the roughly 2 400 new nurses entering the workforce each year. In addition to the job guarantee, Labour proposes to double the existing recruitment subsidy for primary‑care nursing roles, increasing the financial incentive for clinics and iwi‑based health providers to hire nurses in community settings. The combined approach aims to boost both hospital‑based and community‑based nursing capacity while keeping the overall fiscal impact within the party’s announced election budget."}, {"h": "Background and electoral context", "p": "New Zealand’s health sector has been grappling with vacancy rates that strain district hospitals and long queues for specialist appointments. Many newly qualified nurses choose to work abroad shortly after registration, exacerbating domestic shortfalls. Waiting times for elective surgery and outpatient consultations have risen steadily, becoming a frequent topic in public debate and election coverage. Labour’s campaign has highlighted the graduate‑nurse guarantee as a way to offer immediate employment certainty, countering the perception that training investment is lost when nurses emigrate. By tying qualification to a guaranteed public‑sector role, the party seeks to strengthen the domestic pipeline and improve timely access to care for the population. The guarantee is presented as one pillar of Labour’s wider election commitment to rebuild the health workforce and reduce reliance on costly temporary staffing agencies."}] /* FIX(content) */
+  "sections": [{"h": "Labour’s graduate nurse job guarantee", "p": "Labour has committed to guaranteeing a public‑sector job for every newly qualified nurse who graduates from a New Zealand tertiary institution, should the party form the next government. The pledge would apply to the approximately 2 400 nursing graduates produced each year, directing them into existing pathways such as the graduate‑entry programme, hospital cadetships or other employment schemes already used by district health boards. Ayesha Verrall, the party’s health spokesperson, said the initiative is “about giving graduates certainty, strengthening the workforce, and improving care for patients.” She noted that the guarantee is a direct response to chronic staffing shortages, high overseas attrition and long waiting times for elective care, all of which have become prominent election issues. The guarantee is positioned as the centrepiece of Labour’s broader strategy to rebuild the nursing pipeline and retain talent within the public health system."}, {"h": "Cost and supporting measures", "p": "Labour estimates that guaranteeing a job for every graduate nurse would require about $525 million annually. This figure covers the salaries and associated on‑boarding expenses for the roughly 2 400 new nurses entering the workforce each year. In addition to the job guarantee, Labour proposes to double the existing recruitment subsidy for primary‑care nursing roles, increasing the financial incentive for clinics and iwi‑based health providers to hire nurses in community settings. The combined approach aims to boost both hospital‑based and community‑based nursing capacity while keeping the overall fiscal impact within the party’s announced election budget."}, {"h": "Background and electoral context", "p": "New Zealand’s health sector has been grappling with vacancy rates that strain district hospitals and long queues for specialist appointments. Many newly qualified nurses choose to work abroad shortly after registration, exacerbating domestic shortfalls. Waiting times for elective surgery and outpatient consultations have risen steadily, becoming a frequent topic in public debate and election coverage. Labour’s campaign has highlighted the graduate‑nurse guarantee as a way to offer immediate employment certainty, countering the perception that training investment is lost when nurses emigrate. By tying qualification to a guaranteed public‑sector role, the party seeks to strengthen the domestic pipeline and improve timely access to care for the population. The guarantee is presented as one pillar of Labour’s wider election commitment to rebuild the health workforce and reduce reliance on costly temporary staffing agencies."}]
  }
 ,
  "art-wp8-1": {
@@ -1286,7 +1287,7 @@ function drawFiscalTable(container, wp7) {
     .attr('fill', '#6b7684').text(/^wp8-/.test(wp7) ? 'Source: NZ Herald reporting · figures illustrative · Beehive chart' : 'Source: RNZ / NZ Herald reporting · Beehive chart');
 }
 
-/* house-style party trend chart for a single party (colour + band + TODAY) */
+/* house-style party trend chart for a single party (colour + band + snapshot date) */
 function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
@@ -1307,7 +1308,7 @@ function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
   svg.append('line').attr('x1', x(hist.length - 1)).attr('x2', x(hist.length - 1))
     .attr('y1', 6).attr('y2', h - 16).attr('stroke', 'rgba(255,255,255,0.5)');
   svg.append('text').attr('x', x(hist.length - 1)).attr('y', 4).attr('text-anchor', 'middle')
-    .attr('font-size', 8).attr('letter-spacing', '0.1em').attr('fill', '#9aa7b4').text('TODAY');
+    .attr('font-size', 8).attr('letter-spacing', '0.1em').attr('fill', '#9aa7b4').text('3 SEP');
   svg.append('path').datum(hist)
     .attr('d', d3.area().x(function (d, i) { return x(i); })
       .y0(function (d) { return y(d - 1.3); }).y1(function (d) { return y(d + 1.3); })
@@ -1492,11 +1493,11 @@ function openArticle(c) {
   av.classList.add('active');
   av.querySelector('.a-badge').textContent = c.tier===0 ? 'ELECTION 2026' : (c.priority || 'STORY');
   document.getElementById('a-title').textContent = c.title;
-  document.getElementById('a-date').textContent = (c.date||'') + ' · Beehive Political Intelligence · Sample article';
+  document.getElementById('a-date').textContent = (c.date||'') + ' 2026 · Beehive Political Intelligence';
   var bodyEl = document.getElementById('a-body');
   if (c.wp6) {
     var art = ARTICLE_DATA['art-' + c.wp6];
-    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp6 === 'wp6-2' ? 'ACCOUNTABILITY' : (c.wp6 === 'wp6-3' ? 'ELECTION WATCH' : 'POLICY'));
+    document.getElementById('a-badge').textContent = (c.cat||'politics').toUpperCase();
     renderPeople(c.wp6);
     var html = '';
     art.sections.forEach(function (s) {
@@ -1504,7 +1505,7 @@ function openArticle(c) {
     });
     bodyEl.innerHTML = html;
     var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    captionEl.innerHTML = 'Party-vote snapshot · Curia poll 3 Sep 2026 · 5% = MMP threshold';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
@@ -1527,7 +1528,7 @@ function openArticle(c) {
   }
   if (c.wp7) {
     var art = ARTICLE_DATA['art-' + c.wp7];
-    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp7 === 'wp7-2' ? 'ELECTION WATCH' : 'POLICY');
+    document.getElementById('a-badge').textContent = (c.cat||'politics').toUpperCase();
     renderPeople(c.wp7 || '');
     var html = '';
     art.sections.forEach(function (s) {
@@ -1535,7 +1536,7 @@ function openArticle(c) {
     });
     bodyEl.innerHTML = html;
     var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    captionEl.innerHTML = 'Party-vote snapshot · Curia poll 3 Sep 2026 · 5% = MMP threshold';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     if (c.wp7 !== 'wp7-2') { /* FIX(content): wp7-2 chart removed — party trend irrelevant to immigration policy piece; wp7-1/wp7-3 fiscal tables stay */
@@ -1552,7 +1553,7 @@ function openArticle(c) {
   }
   if (c.wp8) {
     var art = ARTICLE_DATA['art-' + c.wp8];
-    document.getElementById('a-badge').textContent = 'SAMPLE · ' + (c.wp8 === 'wp8-2' ? 'ELECTION WATCH' : 'POLICY');
+    document.getElementById('a-badge').textContent = (c.cat||'politics').toUpperCase();
     renderPeople('');
     var html = '';
     art.sections.forEach(function (s) {
@@ -1560,7 +1561,7 @@ function openArticle(c) {
     });
     bodyEl.innerHTML = html;
     var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
-    captionEl.innerHTML = 'Sample data · Beehive poll aggregate · 5% = MMP threshold · as of <b>14 Sep 2026</b> · Cabinet paper via RNZ';
+    captionEl.innerHTML = 'Party-vote snapshot · Curia poll 3 Sep 2026 · 5% = MMP threshold';
     var ch = document.getElementById('a-chart');
     ch.innerHTML = '';
     if (c.wp8 === 'wp8-2') {
