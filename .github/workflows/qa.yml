@@ -1,0 +1,43 @@
+name: BIHIVE reproducible QA
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.25.0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - name: Install locked dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run asset, static, build and browser QA
+        run: pnpm qa:all
+      - name: Upload structured QA output and browser failure artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bihive-qa-${{ github.run_id }}
+          if-no-files-found: ignore
+          path: |
+            work/qa-report.json
+            work/playwright-report.json
+            work/repro-a/build-manifest.json
+            work/repro-b/build-manifest.json
+            test-results/**

@@ -100,7 +100,7 @@
   #grid.desktop .badge-row, #grid.desktop .tag-row { flex-shrink:0; }
   /* V44 §3: desktop hero rhythm — title hugs content (fitTitle sets flex), chart breathes */
   #grid.desktop .cell.p0 .cell-title { margin-bottom:6px; min-height:22px; }
-  #grid.desktop .election-chart { margin:12px 0 8px; min-height:90px; }
+  #grid.desktop .election-chart { margin:12px 0 8px; flex:0 0 90px; height:90px; min-height:90px; }
   #grid.desktop .gap-callout { white-space:nowrap; margin:10px 0 8px; }
   #grid.desktop .th-row { margin-bottom:3px; }
   #grid.desktop .mmp-note { margin-top:4px; }
@@ -113,7 +113,7 @@
   .cell {
     position:absolute; overflow:hidden; cursor:pointer;
     display:flex; flex-direction:column;
-    max-width:100%;
+    min-width:0; min-height:0; max-width:100%;
         padding:12px 14px;
     transition:background-color .12s ease-out, box-shadow .12s ease-out;
     touch-action:manipulation; -webkit-tap-highlight-color:transparent; user-select:none;
@@ -255,7 +255,7 @@
     background:#f2f4f7; transform:scaleX(0); transform-origin:left; transition:transform .28s cubic-bezier(.22,.61,.36,1); }
   .cell.armed .cell-title::after { transform:scaleX(1); }
   /* election chart area */
-  .election-chart { flex:1; min-height:0; margin:8px 0 4px 0; }
+  .election-chart { flex:0 0 90px; height:90px; min-height:90px; margin:8px 0 4px 0; }
   .election-chart svg { width:100%; height:100%; display:block; }
   .legend-row { display:flex; gap:14px; flex-wrap:wrap; margin:4px 0 8px 0; }
   .legend-row .li { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); }
@@ -263,6 +263,7 @@
 .gap-callout { display:flex; align-items:baseline; gap:8px; margin:3px 0 4px 0; flex-wrap:wrap; min-width:0; }
 .gap-callout span { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
 .gap-callout b { font-size:16px; color:#ff6b57; font-variant-numeric:tabular-nums; }
+.gap-meta { display:inline-flex; align-items:center; width:max-content; max-width:100%; margin:0 0 6px; padding:3px 7px; border:1px solid #40505b; border-radius:999px; background:#202b33; color:#dce3e9; font:700 9px/1.2 var(--meta-font); letter-spacing:.08em; white-space:nowrap; }
   .spark-mini { margin-top:6px; height:48px; }
   .spark-mini svg { width:100%; height:100%; display:block; }
   .thresholds { margin-top:4px; }
@@ -448,6 +449,9 @@
     <div class="a-date" id="a-date"></div>
     <div class="a-people" id="a-people"></div>
     <figure class="a-media" id="a-media" hidden></figure>
+    <div class="a-chart" id="a-chart" style="display:none"></div>
+    <div class="a-caption" id="a-caption" style="display:none"></div>
+    <div class="a-body" id="a-body"></div>
     <div class="a-img-credits" id="a-img-credits"></div>
   </div>
 </div>
@@ -750,25 +754,29 @@ var PHOTO_MEDIA = {
 function drawPollChart(container, h, opts) {
   /* Shared cover/detail poll chart. Points are the recorded values, not a model or interval. */
   opts = opts || {};
+  /* The cover chart lives in a flex-sized treemap card; size its viewBox to that
+     rendered box so preserveAspectRatio cannot shrink otherwise readable text. */
+  if (opts.fitContainer) h = Math.max(72, container.clientHeight || h);
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h).attr('width',w).attr('height',h)
     .attr('preserveAspectRatio','xMidYMid meet');
-  var labelW = w < 340 ? 66 : 100;
+  var legendW = Math.min(160, Math.max(88, Math.round(w * (w < 420 ? 0.32 : 0.25))));
+  var plotLeft = w < 340 ? 38 : 44;
+  var plotRight = Math.max(plotLeft + 72, w - legendW - 14);
   var series = ['national','labour'];
   var maxPoints = Math.max.apply(null, series.map(function(k){return POLL_HISTORY[k].length;}));
   var lastIndex = maxPoints - 1;
-  var x = d3.scaleLinear().domain([0, lastIndex]).range([12, Math.max(20,w-labelW)]);
-  var y = d3.scaleLinear().domain([20, 42]).range([h-23, 19]);
+  var x = d3.scaleLinear().domain([0, lastIndex]).range([plotLeft, plotRight]);
+  var compact = !!opts.fitContainer && h < 150;
+  var y = d3.scaleLinear().domain([20, 42]).range([h-(compact?17:23), compact?10:19]);
   if (!opts.nogrid) [20,25,30,35,40].forEach(function(v){
-    svg.append('line').attr('x1',10).attr('x2',w-labelW).attr('y1',y(v)).attr('y2',y(v))
+    svg.append('line').attr('x1',plotLeft).attr('x2',plotRight).attr('y1',y(v)).attr('y2',y(v))
       .attr('stroke','#2a3640').attr('stroke-width',1);
-    svg.append('text').attr('x',w-labelW+6).attr('y',y(v)+3)
-      .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').text(v+'%');
+    svg.append('text').attr('x',plotLeft-8).attr('y',y(v)+3).attr('text-anchor','end')
+      .attr('font-size',compact?8:(w<380?8:10)).attr('fill','#a6b2bc').text(v+'%');
   });
-  svg.append('line').attr('x1',x(lastIndex)).attr('x2',x(lastIndex)).attr('y1',12).attr('y2',h-20)
+  svg.append('line').attr('x1',x(lastIndex)).attr('x2',x(lastIndex)).attr('y1',compact?8:14).attr('y2',h-(compact?16:20))
     .attr('stroke','#a6b2bc').attr('stroke-width',1);
-  svg.append('text').attr('x',x(lastIndex)).attr('y',10).attr('text-anchor','middle')
-    .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').text('3 SEP');
   ['national','labour'].forEach(function(k){
     var c = PARTY[k].color;
     var data = POLL_HISTORY[k];
@@ -785,17 +793,29 @@ function drawPollChart(container, h, opts) {
     var last = data[lastIndex];
     var ly = y(last);
     svg.append('circle').attr('cx',x(lastIndex)).attr('cy',ly).attr('r',3.7).attr('fill',c);
-    var nameFs = w < 340 ? 9 : 12;
-    var valFs = w < 340 ? 10 : 12;
-    svg.append('text').attr('x',w-labelW+6).attr('y',ly-2)
-      .attr('font-size',nameFs).attr('font-weight',600).attr('fill',c).text(PARTY[k].name);
-    svg.append('text').attr('x',w-labelW+6).attr('y',ly+9)
-      .attr('font-size',valFs).attr('fill','#c7cfd8').text(last+'%');
+  });
+  var legendX = plotRight + 12;
+  var legendFont = w < 380 ? 9 : (w < 640 ? 9 : 11);
+  svg.append('line').attr('class','poll-legend-divider').attr('x1',plotRight+5).attr('x2',plotRight+5).attr('y1',compact?8:14).attr('y2',h-(compact?16:20))
+    .attr('stroke','#33414b').attr('stroke-width',1);
+  svg.append('text').attr('class','poll-legend-kicker').attr('x',legendX).attr('y',compact?10:22)
+    .attr('font-size',legendFont).attr('font-weight',700).attr('letter-spacing','.08em')
+    .attr('fill','#a6b2bc').text('LATEST · 3 SEP');
+  series.forEach(function(k,i){
+    var data=POLL_HISTORY[k],last=data[data.length-1],rowY=compact?31+i*23:45+i*44,color=PARTY[k].color;
+    svg.append('line').attr('x1',legendX).attr('x2',legendX+8).attr('y1',rowY-3).attr('y2',rowY-3)
+      .attr('stroke',color).attr('stroke-width',2.5);
+    svg.append('circle').attr('cx',legendX+8).attr('cy',rowY-3).attr('r',2.5).attr('fill',color);
+    svg.append('text').attr('class','poll-legend-name').attr('data-series',k).attr('x',legendX+(compact?12:16)).attr('y',rowY)
+      .attr('font-size',legendFont).attr('font-weight',600).attr('fill','#dce3e9').text(PARTY[k].name);
+    svg.append('text').attr('class','poll-legend-value').attr('data-series',k)
+      .attr('x',compact?w-3:legendX+16).attr('y',compact?rowY:rowY+19).attr('text-anchor',compact?'end':'start')
+      .attr('font-size',compact?10:(w<380?11:13)).attr('font-weight',700).attr('fill','#f2f4f7').text(last.toFixed(1)+'%');
   });
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'];
   months.forEach(function(m,i){
     svg.append('text').attr('x', x(i)).attr('y', h-4)
-    .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').attr('text-anchor','middle').text(m);
+    .attr('font-size',compact?8:(w<340?9:11)).attr('fill','#a6b2bc').attr('text-anchor','middle').text(m);
   });
 }
 
@@ -844,7 +864,7 @@ function legendRow() {
 /* ── Treemap layout ────────────────────────────────────────── */
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var motionSequence = 0, motionTimer = null;
-function beginMotion() { motionSequence++; clearTimeout(motionTimer); document.querySelectorAll('#grid .cell').forEach(function(el){if(el.getAnimations)el.getAnimations().forEach(function(a){a.cancel();});el.style.transform='';el.style.opacity='';}); return motionSequence; }
+function beginMotion() { motionSequence++; clearTimeout(motionTimer); flipping=false; document.querySelectorAll('#grid .cell').forEach(function(el){if(el.getAnimations)el.getAnimations().forEach(function(a){a.cancel();});el.style.transform='';el.style.opacity='';}); return motionSequence; }
 function settleMotion(id, callback, delay) { clearTimeout(motionTimer); motionTimer=setTimeout(function(){ if(id===motionSequence) callback(); },reduced?0:delay); }
 window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',function(e){ reduced=e.matches;beginMotion();document.querySelectorAll('#grid .cell').forEach(function(el){el.style.transform='';el.style.opacity='';}); });
 
@@ -933,7 +953,8 @@ function renderGrid(cat) {
       '<div class="cell-title" style="font-size:26px; font-weight:800;">'+
       (heroStory.title||'').replace('ELECTION 2026 —','—')+'</div>' +
       '<div class="tag-row">'+(heroStory.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
-      '<div class="gap-callout"><span>GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span> · Curia 3 Sep</div>';
+      '<div class="gap-callout"><span>GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span></div>' +
+      '<div class="gap-meta">CURIA POLL · 3 SEP</div>';
     wireCard(hel, heroStory);
     grid.appendChild(hel);
     }
@@ -951,6 +972,7 @@ function renderGrid(cat) {
     }
     if (c.logo) {
       if (narrow || (n.x1-n.x0) < 96) {
+        el.style.padding='0';
         el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;">BIHIVE</div>';
         grid.appendChild(el);
         return;
@@ -997,14 +1019,15 @@ function renderGrid(cat) {
     }
     if (big) {
       html += '<div class="election-chart"></div>' +
-        '<div class="gap-callout"><span>NAT–LAB GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span> · Curia 3 Sep</div>' +
+        '<div class="gap-callout"><span>NAT–LAB GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span></div>' +
+        '<div class="gap-meta">CURIA POLL · 3 SEP</div>' +
         '<div class="thresholds"></div>';
     } /* FIX(content): spark branch removed (s05 decorative spark cut); original else-if dropped cleanly */
     el.innerHTML = html + '<span class="cell-corners" aria-hidden="true"></span>';
     wireCard(el, c);
     grid.appendChild(el);
     if (big) {
-      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55));
+      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55), {fitContainer:true});
       thresholdBars(el.querySelector('.thresholds'));
     }
     if (chartKind === 'inz' && el.querySelector('.inz-mini')) drawInzBars(el.querySelector('.inz-mini'), true);
