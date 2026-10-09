@@ -2,6 +2,7 @@ import {test,expect} from '@playwright/test';
 import sharp from 'sharp';
 
 async function settled(page){
+  await expect.poll(()=>page.evaluate(()=>window.BIHIVE_QA.getSnapshot().layout.resizePending)).toBe(false);
   await page.evaluate(()=>document.fonts.ready);
   await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   await expect.poll(()=>page.evaluate(()=>window.BIHIVE_QA.getSnapshot().motion.flipping)).toBe(false);
@@ -16,7 +17,7 @@ test('photos fade into captions, portraits preserve their framing and filler cov
     const count=await page.evaluate(()=>window.BIHIVE_QA.getSnapshot().pageCount);
     for(let n=1;n<=count;n++){
       await expect(page.locator('#grid img[src*="/assets/editorial/"]')).toHaveCount(0);
-      const geometry=await page.locator('#grid .has-photo').evaluateAll(cards=>cards.map(card=>{
+      const geometry=await page.evaluate(()=>Array.from(document.querySelectorAll('#grid .has-photo')).map(card=>{
         const photo=card.querySelector('.cell-photo'),title=card.querySelector('.cell-title'),caption=card.querySelector('.cell-caption');
         const p=photo.getBoundingClientRect(),t=title.getBoundingClientRect();
         const img=card.querySelector('img');
