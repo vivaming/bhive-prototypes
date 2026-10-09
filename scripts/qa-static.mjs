@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 
 const html=fs.readFileSync('treemap-v3-12.html','utf8');
+const canonicalTextBytes=file=>Buffer.from(fs.readFileSync(file,'utf8').replace(/\r\n?/g,'\n'));
 const problems=[];const ok=[];
 function check(name, condition, detail='') { (condition?ok:problems).push({name,detail}); }
 const scripts=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/gi)].map(m=>m[1]).filter(s=>s.trim());
@@ -22,7 +23,7 @@ check('reduced-motion changes are observed',/prefers-reduced-motion: reduce/.tes
 check('QA snapshot API',/window\.BIHIVE_QA=\{getSnapshot:function/.test(html));
 const lock=JSON.parse(fs.readFileSync('assets/photos/photo-catalog.lock.json','utf8'));
 const policy=JSON.parse(fs.readFileSync('content/media-policy.json','utf8'));
-const evidence=lock.assets.every(a=>fs.existsSync(a.sourceEvidencePath)&&crypto.createHash('sha256').update(fs.readFileSync(a.sourceEvidencePath)).digest('hex')===a.sourceEvidenceSha256);
+const evidence=lock.assets.every(a=>fs.existsSync(a.sourceEvidencePath)&&crypto.createHash('sha256').update(canonicalTextBytes(a.sourceEvidencePath)).digest('hex')===a.sourceEvidenceSha256);
 check('photo source evidence',evidence,`${lock.assets.length} assets`);
 const storyIds=[...new Set([...html.matchAll(/\{\s*id:'([^']+)'/g)].map(m=>m[1]))].filter(id=>id!=='logo');
 check('photo coverage and exclusions recorded',storyIds.every(id=>policy.storyMedia[id]||policy.coverPreservedForChartStories.includes(id)||policy.unmatchedPhotoStories[id]?.reason),`${Object.keys(policy.storyMedia).length} photos; ${Object.keys(policy.unmatchedPhotoStories).length} NO_APPROVED_PHOTO decisions`);

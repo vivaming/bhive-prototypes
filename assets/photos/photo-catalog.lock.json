@@ -44,7 +44,7 @@
         "960": "01d3420ec2d8c9961992714213d1139288989b962b62154454746d7f88491e33",
         "1440": "e3122de2fee41d7a681b4600b7e949a7418f4026cc5c34c49b4de61f4a337a81"
       },
-      "sourceEvidenceSha256": "0a395668322e69d44bfc614c45dace1655adbfe81ffde32dffad4a3fc009016d",
+      "sourceEvidenceSha256": "c43dc7b94199659a2ea83c2a2a6d09a8aaf584d8a276c8f5b7e47bf675b21b2a",
       "encoder": {
         "name": "sharp",
         "version": "0.35.5",
@@ -94,7 +94,7 @@
       "variantsSha256": {
         "480": "557783dae78e8090fc0bca5d5f6779295cb68be3db320ba95778d3423a896b3d"
       },
-      "sourceEvidenceSha256": "a11dba566130236467b35f3e57114625579afe06118bda44b4ec01641789a9ba",
+      "sourceEvidenceSha256": "4002f8b018416033e802deef37a7306286fffe8075c0594294e2cf6322a1d595",
       "encoder": {
         "name": "sharp",
         "version": "0.35.5",
@@ -149,7 +149,7 @@
         "960": "308071f71acce03c306d35a2ac323870db60eb4b1edee27d86aa6478650037cd",
         "1440": "4d1f074fbbd5771b256d28714a87a2d52d9d49c39034b080c302e1f440926ce9"
       },
-      "sourceEvidenceSha256": "0d48e5a39cbb6f1b836087981057172174050d99e4d593b2ac27bee385c87336",
+      "sourceEvidenceSha256": "9ae453c02305d0c273385b46283a9ab02dd771c970a9f20506e2641a2de62f5b",
       "encoder": {
         "name": "sharp",
         "version": "0.35.5",
@@ -329,6 +329,229 @@
       },
       "sourceFileSha256": "8647982ea006f6b3f8ccde295f198dc3584a9144e25fa4ed533e253824099cde",
       "derivativeLicense": "CC-BY-SA-4.0"
+    },
+    {
+      "assetId": "house-hutchinson",
+      "storyIds": [
+        "s09"
+      ],
+      "kind": "photo",
+      "src": "assets/photos/house-hutchinson-960.webp",
+      "variants": {
+        "480": "assets/photos/house-hutchinson-480.webp",
+        "960": "assets/photos/house-hutchinson-960.webp",
+        "1440": "assets/photos/house-hutchinson-1440.webp"
+      },
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:House_at_12_Hutchinson_Avenue.jpg",
+      "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/9/97/House_at_12_Hutchinson_Avenue.jpg",
+      "creator": "Bjankuloski06",
+      "licenseId": "CC-BY-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "attributionText": "Photo: Bjankuloski06, CC BY 4.0 (7 July 2025); New Lynn Auckland home, archive/context image, not a property in the cited REINZ data.",
+      "modifications": "Resized and encoded as WebP variants; no content edits.",
+      "sourceEvidencePath": "assets/photos/evidence/house-hutchinson.json",
+      "subjectTags": [
+        "house",
+        "New Lynn",
+        "Auckland",
+        "housing"
+      ],
+      "relevanceReason": "The image directly depicts a house in Auckland, fitting the New Zealand housing-price and inventory story. It is explicitly an archive/context image, not a property in the REINZ dataset.",
+      "archiveDate": "7 July 2025",
+      "alt": "House at 12 Hutchinson Avenue, New Lynn, Auckland; archive/context photograph, 7 July 2025.",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.55
+      },
+      "objectPosition": "center",
+      "width": 6000,
+      "height": 4000,
+      "verifiedAt": "2026-10-09",
+      "fallbackAssetId": "editorial-s09",
+      "fileSha256": "07f0035d87112bc03aced59a79622b2978db10813fb5b530e453f3854e450bf7",
+      "variantsSha256": {
+        "480": "34f96914a4b3f0847f5e593d12ccaf6305880899aed8b7f5c76b41ebff410c53",
+        "960": "07f0035d87112bc03aced59a79622b2978db10813fb5b530e453f3854e450bf7",
+        "1440": "4bce876437ebb3ef464b5355b2c1172cd34619203b033b0143dadb7f214bcfb2"
+      },
+      "sourceEvidenceSha256": "0683b44fa8294973c202224c49819729afc8b0cc61893108b994cba5a2d922b2",
+      "encoder": {
+        "name": "sharp",
+        "version": "0.35.5",
+        "format": "webp",
+        "quality": 86,
+        "effort": 6,
+        "smartSubsample": true,
+        "orientation": "rotate from source metadata"
+      },
+      "sourceFileSha256": "fc7c53eaddfe95872b94a8385c7e52f7708ccd69b5bc05cd3c67653b013cd82c",
+      "derivativeLicense": "CC-BY-4.0"
+    },
+    {
+      "assetId": "ballot-boxes-2008",
+      "storyIds": [
+        "wp8-4"
+      ],
+      "kind": "photo",
+      "src": "assets/photos/ballot-boxes-2008-960.webp",
+      "variants": {
+        "480": "assets/photos/ballot-boxes-2008-480.webp",
+        "960": "assets/photos/ballot-boxes-2008-960.webp",
+        "1440": "assets/photos/ballot-boxes-2008-1440.webp"
+      },
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:BallotBoxes_NZ_2008.jpg",
+      "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2e/BallotBoxes_NZ_2008.jpg",
+      "creator": "SimonLyall",
+      "licenseId": "PD-self",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:BallotBoxes_NZ_2008.jpg",
+      "attributionText": "Photo: SimonLyall (8 November 2008); released into the public domain worldwide. Archive photograph of ballot boxes.",
+      "modifications": "Resized and encoded as WebP variants; no content edits.",
+      "sourceEvidencePath": "assets/photos/evidence/ballot-boxes-2008.json",
+      "subjectTags": [
+        "ballot boxes",
+        "polling place",
+        "New Zealand general election"
+      ],
+      "relevanceReason": "The photo directly depicts ballot boxes at a New Zealand polling place during the 2008 general election, matching the election-process recommendations story. It is labeled archive, not 2026 campaign coverage.",
+      "archiveDate": "8 November 2008",
+      "alt": "Ballot boxes for several electorates at a New Zealand polling place during the 2008 general election; archive photograph.",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.62
+      },
+      "objectPosition": "center 62%",
+      "width": 2048,
+      "height": 1536,
+      "verifiedAt": "2026-10-09",
+      "fallbackAssetId": "editorial-wp8-4",
+      "fileSha256": "a00eca2f17c6978c755ad4eb83c420554e39102eb1d250ba0e42cad37804dd0e",
+      "variantsSha256": {
+        "480": "9dfe9354b554ffbd8904ccf8000d2db701816a1ebb2e86b9a89e01ec78d16fbc",
+        "960": "a00eca2f17c6978c755ad4eb83c420554e39102eb1d250ba0e42cad37804dd0e",
+        "1440": "0b610ef3602305c95783c11f60a94730496003fd8ff73857a8ee6656a479e36d"
+      },
+      "sourceEvidenceSha256": "22d9a062a236f5eb4dc464affe3695764fe6bf2bfd7ed1fe5facfa099638b81c",
+      "encoder": {
+        "name": "sharp",
+        "version": "0.35.5",
+        "format": "webp",
+        "quality": 86,
+        "effort": 6,
+        "smartSubsample": true,
+        "orientation": "rotate from source metadata"
+      },
+      "sourceFileSha256": "f4122d54bf0b9e04df2d29ac1a2907b6bf55e56c3ae55a4fa7b7907a7aa6bba4"
+    },
+    {
+      "assetId": "wellington-airport-pa01",
+      "storyIds": [
+        "s06"
+      ],
+      "kind": "photo",
+      "src": "assets/photos/wellington-airport-pa01-960.webp",
+      "variants": {
+        "480": "assets/photos/wellington-airport-pa01-480.webp",
+        "960": "assets/photos/wellington-airport-pa01-960.webp",
+        "1440": "assets/photos/wellington-airport-pa01-1440.webp"
+      },
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Wellington_Airport_PA01.jpg",
+      "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/0/06/Wellington_Airport_PA01.jpg",
+      "creator": "Paora",
+      "licenseId": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attributionText": "Photo: Paora, CC0 1.0 (29 December 2025); Wellington Airport terminal, viewed from a departing flight. Illustrative/context image, not an immigration event photograph.",
+      "modifications": "Resized and encoded as WebP variants; no content edits.",
+      "sourceEvidencePath": "assets/photos/evidence/wellington-airport-pa01.json",
+      "subjectTags": [
+        "Wellington Airport",
+        "migration",
+        "travel"
+      ],
+      "relevanceReason": "The image directly depicts Wellington Airport, a relevant New Zealand travel context for the migration story. Its description says it was photographed from a departing flight; it is not evidence of the migration event or arrival flows.",
+      "archiveDate": "29 December 2025",
+      "alt": "Wellington Airport terminal and airfield viewed from a departing flight; archive/context photograph, 29 December 2025.",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.63
+      },
+      "objectPosition": "center 63%",
+      "width": 4477,
+      "height": 3748,
+      "verifiedAt": "2026-10-09",
+      "fallbackAssetId": "editorial-s06",
+      "fileSha256": "fb6f4240eb2dcfa85a0b888c725ee0d653ac8859e6d0c32a141e4d8fb3531c2f",
+      "variantsSha256": {
+        "480": "aa62141357fe3c97cac772c68fecc90762f0be0315f372b51ad212002d1b2501",
+        "960": "fb6f4240eb2dcfa85a0b888c725ee0d653ac8859e6d0c32a141e4d8fb3531c2f",
+        "1440": "f7622eb8689e99b7f624012fbcadf1a4f6ee95ad621a779f79ace3fc3bfc0c40"
+      },
+      "sourceEvidenceSha256": "ee58932695158f35ceeb73d1a9cf7581f4938c16a1a312d3d8abfb7a4bd26c7c",
+      "encoder": {
+        "name": "sharp",
+        "version": "0.35.5",
+        "format": "webp",
+        "quality": 86,
+        "effort": 6,
+        "smartSubsample": true,
+        "orientation": "rotate from source metadata"
+      },
+      "sourceFileSha256": "724f8b6303850b6aaf9ef009d6694beeb054a4cd7079b005692975d9754ec9b4",
+      "derivativeLicense": "CC0-1.0"
+    },
+    {
+      "assetId": "wairakei-geothermal",
+      "storyIds": [
+        "s17"
+      ],
+      "kind": "photo",
+      "src": "assets/photos/wairakei-geothermal-960.webp",
+      "variants": {
+        "480": "assets/photos/wairakei-geothermal-480.webp",
+        "960": "assets/photos/wairakei-geothermal-960.webp",
+        "1440": "assets/photos/wairakei-geothermal-1440.webp"
+      },
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",
+      "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Wairakei_Geothermal_Power_Plant.jpg",
+      "creator": "Ingolfson",
+      "licenseId": "PD-self",
+      "licenseUrl": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",
+      "attributionText": "Photo: Ingolfson (25 November 2007); released into the public domain worldwide. Wairakei geothermal plant, historical energy-sector context; not a TPM project.",
+      "modifications": "Resized and encoded as WebP variants; no content edits.",
+      "sourceEvidencePath": "assets/photos/evidence/wairakei-geothermal.json",
+      "subjectTags": [
+        "Wairakei",
+        "geothermal power plant",
+        "New Zealand energy"
+      ],
+      "relevanceReason": "The photo directly depicts a New Zealand geothermal power plant, matching the energy-sector subject of the TPM fund story. It is explicitly historical sector context, not a TPM-funded facility or project.",
+      "archiveDate": "25 November 2007",
+      "alt": "Wairakei geothermal power plant in Waikato; historical energy-sector context photograph, 25 November 2007.",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.58
+      },
+      "objectPosition": "center 58%",
+      "width": 1600,
+      "height": 1200,
+      "verifiedAt": "2026-10-09",
+      "fallbackAssetId": "editorial-s17",
+      "fileSha256": "83f5041e6821ba0dc0f09a194b6ab2f7a1cb62d11f370cc6946efc3184023f0f",
+      "variantsSha256": {
+        "480": "4faecc69ace5598a0aafa726d73d0206b81ea824b16fe1cff14ec8d1b5d3fb86",
+        "960": "83f5041e6821ba0dc0f09a194b6ab2f7a1cb62d11f370cc6946efc3184023f0f",
+        "1440": "ce0695a3fef0c3166c630a7b14c007931ca744c442071b18887745b5cc52ceac"
+      },
+      "sourceEvidenceSha256": "ee92a7a34ec203129176073537cad1552e6586ef23b01ef0fb7efa861ea76dd4",
+      "encoder": {
+        "name": "sharp",
+        "version": "0.35.5",
+        "format": "webp",
+        "quality": 86,
+        "effort": 6,
+        "smartSubsample": true,
+        "orientation": "rotate from source metadata"
+      },
+      "sourceFileSha256": "465e68bc0801e2b9ebfe7d36536e203f262fdd048ec5f73f2ec7e21612be3c18"
     }
   ]
 }

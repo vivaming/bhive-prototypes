@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:House_at_12_Hutchinson_Avenue.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page and original upload reviewed",
+  "creator": "Bjankuloski06",
+  "date": "7 July 2025",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "sourceFileSha256": "fc7c53eaddfe95872b94a8385c7e52f7708ccd69b5bc05cd3c67653b013cd82c",
+  "sourceDimensions": {
+    "width": 6000,
+    "height": 4000
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "The Commons file page identifies the house in New Lynn Auckland, date 7 July 2025, author Bjankuloski06, and CC BY 4.0."
+}

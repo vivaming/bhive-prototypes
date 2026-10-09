@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page and original upload reviewed",
+  "creator": "Ingolfson",
+  "date": "25 November 2007",
+  "license": "Public domain (worldwide release)",
+  "licenseUrl": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",
+  "sourceFileSha256": "465e68bc0801e2b9ebfe7d36536e203f262fdd048ec5f73f2ec7e21612be3c18",
+  "sourceDimensions": {
+    "width": 1600,
+    "height": 1200
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "The Commons file page identifies the Wairakei geothermal plant in Waikato, date 25 November 2007, author Ingolfson, and the holder’s worldwide public-domain release."
+}

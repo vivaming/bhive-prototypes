@@ -5,9 +5,10 @@ import sharp from 'sharp';
 
 const root = process.cwd();
 const fail = [];
+const canonicalTextBytes = file => Buffer.from(fs.readFileSync(file, 'utf8').replace(/\r\n?/g, '\n'));
 const lock = JSON.parse(fs.readFileSync('assets/photos/photo-catalog.lock.json', 'utf8'));
 const policy = JSON.parse(fs.readFileSync('content/media-policy.json', 'utf8'));
-const allowed = new Set(['CC-BY-4.0', 'CC-BY-2.0', 'CC-BY-SA-4.0', 'CC0-1.0']);
+const allowed = new Set(['CC-BY-4.0', 'CC-BY-2.0', 'CC-BY-SA-4.0', 'CC0-1.0', 'PD-self']);
 for (const asset of lock.assets) {
   for (const field of ['assetId','storyIds','src','variants','sourcePage','creator','licenseId','licenseUrl','attributionText','modifications','sourceEvidencePath','sourceEvidenceSha256','fileSha256','sourceFileSha256','subjectTags','relevanceReason','archiveDate','alt','objectPosition']) {
     if (!asset[field]) fail.push(`${asset.assetId}: missing ${field}`);
@@ -22,7 +23,7 @@ for (const asset of lock.assets) {
     if (meta.format !== 'webp' || !meta.width || !meta.height) fail.push(`${asset.assetId}: invalid image ${file}`);
   }
   if (!fs.existsSync(asset.sourceEvidencePath)) fail.push(`${asset.assetId}: missing source evidence`);
-  else if (crypto.createHash('sha256').update(fs.readFileSync(asset.sourceEvidencePath)).digest('hex') !== asset.sourceEvidenceSha256) fail.push(`${asset.assetId}: source evidence hash mismatch`);
+  else if (crypto.createHash('sha256').update(canonicalTextBytes(asset.sourceEvidencePath)).digest('hex') !== asset.sourceEvidenceSha256) fail.push(`${asset.assetId}: source evidence hash mismatch`);
   for (const storyId of asset.storyIds) if (!policy.storyMedia[storyId] || policy.storyMedia[storyId].preferred !== asset.assetId) fail.push(`${asset.assetId}: no locked policy for ${storyId}`);
 }
 if (fail.length) { console.error(fail.join('\n')); process.exit(1); }

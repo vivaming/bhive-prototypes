@@ -31,6 +31,22 @@
     "s12": {
       "preferred": "supermarket-tapawera",
       "reason": "The photo depicts a New Zealand supermarket and directly fits the Foodstuffs competition story. It is an illustrative local-store image, not a scene from the article’s reported events."
+    },
+    "s09": {
+      "preferred": "house-hutchinson",
+      "reason": "The image directly depicts a house in Auckland, fitting the New Zealand housing-price and inventory story. It is explicitly an archive/context image, not a property in the REINZ dataset."
+    },
+    "wp8-4": {
+      "preferred": "ballot-boxes-2008",
+      "reason": "The photo directly depicts ballot boxes at a New Zealand polling place during the 2008 general election, matching the election-process recommendations story. It is labeled archive, not 2026 campaign coverage."
+    },
+    "s06": {
+      "preferred": "wellington-airport-pa01",
+      "reason": "The image directly depicts Wellington Airport, a relevant New Zealand travel context for the migration story. Its description says it was photographed from a departing flight; it is not evidence of the migration event or arrival flows."
+    },
+    "s17": {
+      "preferred": "wairakei-geothermal",
+      "reason": "The photo directly depicts a New Zealand geothermal power plant, matching the energy-sector subject of the TPM fund story. It is explicitly historical sector context, not a TPM-funded facility or project."
     }
   },
   "unmatchedPhotoStories": {
@@ -46,9 +62,6 @@
     "wp8-3": {
       "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
     },
-    "wp8-4": {
-      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
-    },
     "s02": {
       "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
     },
@@ -61,13 +74,7 @@
     "s05": {
       "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
     },
-    "s06": {
-      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
-    },
     "s08": {
-      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
-    },
-    "s09": {
       "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
     },
     "s10": {
@@ -80,9 +87,6 @@
       "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
     },
     "s16": {
-      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
-    },
-    "s17": {
       "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
     },
     "s18": {
