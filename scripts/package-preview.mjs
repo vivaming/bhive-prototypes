@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import {execFileSync} from 'node:child_process';
+const root=process.cwd(),outputs=path.resolve(root,'../../outputs');
+const reportPath=path.resolve('work/qa-report.json');
+if(!fs.existsSync(reportPath))throw new Error('Run pnpm qa:all first; a status report is required for every preview bundle.');
+const report=JSON.parse(fs.readFileSync(reportPath,'utf8'));
+const stage=path.resolve('work/preview-site'),dest=path.join(outputs,'bihive-treemap-next-pass-diagnostic-2026-10-09');
+execFileSync(process.execPath,['scripts/build-repro.mjs',stage],{stdio:'inherit'});
+fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(path.dirname(dest),{recursive:true});fs.cpSync(stage,dest,{recursive:true});
+fs.copyFileSync(reportPath,path.join(dest,'QA_STATUS.json'));
+fs.writeFileSync(path.join(dest,'QA_NOT_ACCEPTED.txt'),'Diagnostic preview. Q3-Q5 and Q7-Q8 are BLOCKED pending an explicitly permitted browser QA target. Do not treat this bundle as visually accepted.\n');
+console.log(JSON.stringify({previewDirectory:dest,status:report.status,qaReport:path.join(dest,'QA_STATUS.json')},null,2));

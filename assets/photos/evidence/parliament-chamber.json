@@ -1,0 +1,18 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:New_Zealand_House_of_Representatives_debating_chamber.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page review",
+  "creator": "Office of the Clerk of the House of Representatives of New Zealand",
+  "date": "13 October 2016",
+  "license": "CC BY 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+  "sourceFileSha1": "",
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "Commons page says the image is the New Zealand House of Representatives debating chamber; source is Parliament NZ; author is Office of the Clerk. It states licensed by the Clerk/Parliamentary Corporation for reuse under CC BY 4.0."
+}

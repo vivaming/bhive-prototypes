@@ -1,0 +1,7 @@
+# BIHIVE QA
+
+`pnpm install --frozen-lockfile` restores exact build/test dependencies. `pnpm media:verify` checks derivative hashes, local WebP decoding, license fields, evidence hashes and locked story mappings. To reproduce the photo transcodes when you possess the licensed source files, place them at `<source-dir>/<assetId>.jpg` and run `pnpm media:rebuild -- <source-dir>`; the script checks their SHA-256 and confirms the generated variants match the committed hashes. `pnpm build:repro` makes a local preview tree under `work/build`. `pnpm qa:static` validates inline JS syntax and high-value data/media invariants. `pnpm qa:all` runs those checks twice and writes a structured report at `work/qa-report.json`.
+
+The Playwright suite is opt-in and requires `BIHIVE_QA_URL` to point to an explicitly permitted browser target. It does not launch a server, open a `file:` URL, proxy a page or deploy a preview. Run `pnpm qa:browser` only in an environment where that target and browser navigation are permitted. Q3–Q8 remain BLOCKED in the current task when that environment is unavailable; an empty screenshot set is never treated as a pass.
+
+Photo coverage is intentionally conservative. Each admitted Commons image has a saved description-page record, license, author, date, file hash and a written story-specific relevance explanation. Other stories use their existing original illustration or text card and a recorded `NO_APPROVED_PHOTO` reason.

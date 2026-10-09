@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:Supermarket_in_Tapawera,_New_Zealand.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page and original upload reviewed",
+  "creator": "Michal Klajban",
+  "date": "2 January 2020",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "sourceFileSha256": "8647982ea006f6b3f8ccde295f198dc3584a9144e25fa4ed533e253824099cde",
+  "sourceDimensions": {
+    "width": 4483,
+    "height": 2527
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "File-description page identifies the depicted place or subject, author, date, and CC BY-SA 4.0 terms. Original file downloaded from upload.wikimedia.org; source bytes are retained locally only in the ignored work directory."
+}

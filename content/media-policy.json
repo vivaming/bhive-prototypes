@@ -1,0 +1,166 @@
+{
+  "policyVersion": 1,
+  "selectionOrder": [
+    "chart",
+    "verified-photo",
+    "licensed-fallback",
+    "original-illustration",
+    "text"
+  ],
+  "storyMedia": {
+    "wp6-1": {
+      "preferred": "parliament-chamber",
+      "reason": "Official archive image of New Zealand's parliamentary debating chamber; contextual fallback for a KiwiSaver policy story, clearly labeled archive."
+    },
+    "wp6-3": {
+      "preferred": "paul-henry-archive",
+      "reason": "The pictured person is the named subject, Paul Henry; the photograph is explicitly dated 2008 and labeled archive."
+    },
+    "s11": {
+      "preferred": "nz-parliament-buildings",
+      "reason": "The image identifies New Zealand Parliament Buildings and the Beehive, matching the cabinet reshuffle story; clearly labeled archive."
+    },
+    "wp7-1": {
+      "preferred": "gas-waikari",
+      "reason": "The photo directly depicts a New Zealand petrol station in Waikari. It is an illustrative location image, not the government decision or a 2026 event photograph."
+    },
+    "s15": {
+      "preferred": "dairy-rotorua",
+      "reason": "The photo directly depicts dairy cows in Rotorua and is a relevant New Zealand dairy-sector context image. It does not depict the payout announcement."
+    },
+    "s12": {
+      "preferred": "supermarket-tapawera",
+      "reason": "The photo depicts a New Zealand supermarket and directly fits the Foodstuffs competition story. It is an illustrative local-store image, not a scene from the article’s reported events."
+    }
+  },
+  "unmatchedPhotoStories": {
+    "wp7-2": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "wp7-3": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "wp8-1": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "wp8-3": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "wp8-4": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s02": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s03": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s04": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s05": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s06": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s08": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s09": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s10": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s13": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s14": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s16": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s17": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s18": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s19": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s20": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s21": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s22": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s23": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s24": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s25": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s26": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s27": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s28": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s29": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s30": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s31": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s32": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s33": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s34": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s35": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s36": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s37": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s38": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s39": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    },
+    "s40": {
+      "reason": "NO_APPROVED_PHOTO: no source-verified image meeting this story’s subject and licensing requirements was admitted in this pass; retain the original editorial illustration or text card."
+    }
+  },
+  "coverAndArticleMediaAreIndependent": true,
+  "photoDoesNotChangeStoryOrder": true,
+  "coverPreservedForChartStories": [
+    "election",
+    "wp6-2",
+    "wp8-2",
+    "s07"
+  ]
+}

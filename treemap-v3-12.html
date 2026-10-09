@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BIHIVE &#8212; NZ Political Intelligence</title>
 <link rel="icon" href="data:,"><!-- FIX(wpn): A7 favicon 404 -->
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="./assets/vendor/d3-7.9.0.min.js"></script>
 <style>
   /* ── UI2 DESIGN TOKENS ───────────────────────────────────── */
   :root {
@@ -47,6 +45,15 @@
     --radius-p1: 8px;
     --radius-pill: 14px;
     --radius-pager: 16px;
+    --border-p1: rgba(167,185,204,.32);
+    --border-p2: rgba(167,185,204,.25);
+    --border-p3: rgba(167,185,204,.2);
+    --cell-gap: 6px;
+    --cell-border: rgba(167,185,204,.22);
+    --cell-border-active: rgba(194,212,231,.48);
+    --motion-fast: 140ms;
+    --motion-medium: 240ms;
+    --motion-slow: 340ms;
     --radius-catbar: 18px;
   }
   @font-face {
@@ -56,6 +63,13 @@
     font-weight:700;
     font-display:swap;
   }
+  @font-face { font-family:'Space Grotesk';src:url('./assets/vendor/fonts/space-grotesk-400.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap; }
+  @font-face { font-family:'Space Grotesk';src:url('./assets/vendor/fonts/space-grotesk-500.ttf') format('truetype');font-style:normal;font-weight:500;font-display:swap; }
+  @font-face { font-family:'Space Grotesk';src:url('./assets/vendor/fonts/space-grotesk-700.ttf') format('truetype');font-style:normal;font-weight:700;font-display:swap; }
+  @font-face { font-family:'Roboto Condensed';src:url('./assets/vendor/fonts/roboto-condensed-400.ttf') format('truetype');font-style:normal;font-weight:400;font-display:swap; }
+  @font-face { font-family:'Roboto Condensed';src:url('./assets/vendor/fonts/roboto-condensed-500.ttf') format('truetype');font-style:normal;font-weight:500;font-display:swap; }
+  @font-face { font-family:'Roboto Condensed';src:url('./assets/vendor/fonts/roboto-condensed-600.ttf') format('truetype');font-style:normal;font-weight:600;font-display:swap; }
+  @font-face { font-family:'Roboto Condensed';src:url('./assets/vendor/fonts/roboto-condensed-700.ttf') format('truetype');font-style:normal;font-weight:700;font-display:swap; }
   * { margin:0; padding:0; box-sizing:border-box; }
   svg text,.th-val,.date-dim,.date-chip { font-variant-numeric:tabular-nums; }
   html, body { width:100%; height:100%; overflow:hidden;
@@ -109,20 +123,26 @@
   .cell.p2:hover { background:var(--surface-hover-p2) !important; box-shadow:var(--shadow-md); }
   .cell.p3:hover { background:var(--surface-hover-p3) !important; box-shadow:var(--shadow-md); }
   .cell.p0:hover { background:var(--surface-hover-p0) !important; box-shadow:var(--shadow-hero-hover); }
-  .cell:not(:hover) { box-shadow: none; }
+  .cell { border:1px solid var(--cell-border); box-shadow:inset 0 0 0 1px rgba(0,0,0,.18); transition:border-color var(--motion-fast) ease,background-color var(--motion-fast) ease; }
+  .cell:hover,.cell:focus-within { border-color:var(--cell-border-active); }
+  .cell:focus-visible { outline:2px solid #f2f4f7; outline-offset:-3px; }
+  .cell-img-wrap img { transition:opacity 160ms ease,transform 260ms cubic-bezier(.22,.61,.36,1); }
+  .cell:hover .cell-img-wrap img,.cell:focus-within .cell-img-wrap img { transform:scale(1.018); }
+  .cell-corners { position:absolute;inset:5px;pointer-events:none;opacity:0;z-index:8;transition:opacity var(--motion-fast) ease;background:linear-gradient(#f2f4f7,#f2f4f7) left top/8px 1px no-repeat,linear-gradient(#f2f4f7,#f2f4f7) left top/1px 8px no-repeat,linear-gradient(#f2f4f7,#f2f4f7) right top/8px 1px no-repeat,linear-gradient(#f2f4f7,#f2f4f7) right top/1px 8px no-repeat,linear-gradient(#f2f4f7,#f2f4f7) left bottom/8px 1px no-repeat,linear-gradient(#f2f4f7,#f2f4f7) left bottom/1px 8px no-repeat,linear-gradient(#f2f4f7,#f2f4f7) right bottom/8px 1px no-repeat,linear-gradient(#f2f4f7,#f2f4f7) right bottom/1px 8px no-repeat; }
+  .cell:hover .cell-corners,.cell:focus-within .cell-corners { opacity:.78; }
   .cell:hover .cell-title { color:#ffffff; }
   /* p0 hero */
   .cell.p0 { background:var(--surface-p0); border-left:4px solid var(--red-accent);
     border-radius:var(--radius-hero); }
   .cell.p0:hover { background:var(--surface-hover-p0); }
   /* p1 HIGH */
-  .cell.p1 { background:var(--surface-p1); border-left:4px solid var(--border-p1);
+  .cell.p1 { background:var(--surface-p1); border-left:3px solid var(--border-p1);
     border-radius:var(--radius-p1); }
   /* p2 MEDIUM */
-  .cell.p2 { background:var(--surface-p2); border-left:4px solid var(--border-p2);
+  .cell.p2 { background:var(--surface-p2); border-left:3px solid var(--border-p2);
     border-radius:var(--radius-p1); }
   /* p3 LOW */
-  .cell.p3 { background:var(--surface-p3); border-left:4px solid var(--border-p3);
+  .cell.p3 { background:var(--surface-p3); border-left:3px solid var(--border-p3);
     border-radius:var(--radius-p1); }
   /* ── Professional Image Treatment (UIHD) ─────────────────── */
   /* UI-A1: badge above image; title overlays image bottom */
@@ -141,12 +161,12 @@
       radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03) 0%, transparent 60%);
   }
   @keyframes imgFadeIn { from { opacity:0; } to { opacity:1; } }
-.cell-img-wrap img { object-position:center 36%;
+.cell-img-wrap img { object-position:var(--img-focus,center);
     width:100%; height:100%; object-fit:cover; display:block;
     filter:brightness(var(--img-brightness)) saturate(var(--img-saturate)) contrast(var(--img-contrast));
-    transition:filter 400ms cubic-bezier(0.2,0.6,0.2,1), transform 400ms cubic-bezier(0.2,0.6,0.2,1);
+    transition:filter 260ms cubic-bezier(.22,.61,.36,1), transform 260ms cubic-bezier(.22,.61,.36,1);
     opacity:0;
-    animation:imgFadeIn 300ms ease forwards;
+    animation:imgFadeIn 160ms ease forwards;
   }
   .cell-img-wrap::after {
     content:none;
@@ -197,10 +217,9 @@
   }
   .cell-caption::before {
     content:''; position:absolute; z-index:0; pointer-events:none; left:0; right:0;
-    top:-84px; height:84px;
+    top:-24px; height:24px;
     background:linear-gradient(to bottom,
-      rgba(5,7,10,0) 0%, rgba(5,7,10,.22) 30%,
-      rgba(5,7,10,.64) 72%, var(--cell-bg-for-img-mask, var(--surface-p1)) 100%);
+      rgba(5,7,10,0), var(--cell-bg-for-img-mask, var(--surface-p1)));
   }
   .cell-caption > .cell-title, .cell-caption > .tag-row, .cell-caption > .source {
     position:relative; z-index:1; flex:0 0 auto;
@@ -299,12 +318,12 @@
     border-radius:var(--radius-catbar); padding:4px; max-width:calc(100vw - 16px); margin:8px auto 0 auto;
     overflow-x:auto; scrollbar-width:none; }
   .cat-bar::-webkit-scrollbar { display: none; }
-  .cat-pill { font-family:var(--meta-font); font-size:12px; font-weight:600; letter-spacing:.04em;
+  .cat-pill { font-family:var(--meta-font); font-size:12px; font-weight:600; letter-spacing:.04em; transition:color 200ms ease,background-color 200ms ease;
     text-transform:uppercase; color:var(--muted); background:none; border:none; border-radius:var(--radius-pill);
     padding:6px 12px; cursor:pointer; position:relative; white-space:nowrap; flex-shrink:0; }
   .cat-pill:hover { color:var(--text); }
   .cat-pill.active { color:var(--text); }
-  .cat-pill.active::after { content:''; position:absolute; left:12px; right:12px; bottom:3px;
+  .cat-pill.active::after { content:''; position:absolute; left:12px; right:12px; bottom:3px; animation:categoryMark 200ms cubic-bezier(.22,.61,.36,1) both;
     height:2px; background:var(--red); border-radius:1px; }
   @media (max-width:640px) {
     .cat-bar { top:10px; }
@@ -339,7 +358,9 @@
 
   /* ---------- ARTICLE VIEW ---------- */
   #article-view { background:#0a0d11; overflow-y:auto; }
-  .article { max-width:680px; margin:0 auto; padding:48px 24px 80px; color:var(--text); font-family:'Space Grotesk',sans-serif; }
+  .article { max-width:680px; margin:0 auto; padding:48px 24px 80px; color:var(--text); font-family:'Space Grotesk',sans-serif; animation:articleReveal 180ms cubic-bezier(.22,.61,.36,1) both; }
+  @keyframes categoryMark { from { transform:scaleX(.2); opacity:.4; } to { transform:scaleX(1); opacity:1; } }
+  @keyframes articleReveal { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
   .back { font-size:13px; color:#9aa7b4; cursor:pointer; display:inline-block; margin-bottom:28px; }
   .back:hover { color:#f2f4f7; }
   .a-back { position:absolute; top:12px; left:12px; background:var(--barrier);
@@ -402,6 +423,15 @@
     letter-spacing:.04em; line-height:1.45; }
   .a-img-credits img { height:28px; width:auto; object-fit:contain;
     opacity:0.7; vertical-align:middle; margin-right:6px; }
+  .a-img-credits a { color:var(--text2); text-decoration:underline; }
+  .a-media { margin:14px 0 16px; }
+  .a-media[hidden] { display:none; }
+  .a-media img { display:block;width:100%;max-height:300px;aspect-ratio:16/9;object-fit:cover;border-radius:8px;background:#111820; }
+  .a-media figcaption { margin-top:6px;color:var(--muted);font:400 12px/1.45 var(--meta-font); }
+  .a-media figcaption a { color:inherit; }
+  .a-progress { position:sticky;top:0;height:2px;z-index:12;transform-origin:left center;transform:scaleX(0);background:#ef6754; }
+  @media(max-width:520px) { .a-media img { max-height:220px; } }
+  @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important; } }
 </style>
 </head>
 <body>
@@ -410,15 +440,14 @@
 <div class="view active" id="treemap-view"><div class="header-logo"><img class="header-logo-mark" src="./logo-new.jpg" alt="BIHIVE"><div class="logo-sub">NZ POLITICAL INTELLIGENCE</div></div><div class="cat-bar" id="cat-bar"></div><div class="slogan-strip">EVIDENCE <span class="hl">BEFORE</span> NARRATIVE</div><div id="grid"></div><div class="pager" id="pager"><button type="button" class="pg-btn" id="pg-prev" aria-label="Previous page">‹</button><span class="pg-num" id="pg-num">1 / 2</span><button type="button" class="pg-btn" id="pg-next" aria-label="Next page">›</button></div></div><!-- FIX(wpn): A9 + FIX(nel): restore treemap-view closing div (xpi dropped it, nesting article-view inside hidden treemap-view => article page invisible) -->
 <!-- ================= ARTICLE VIEW ================= -->
 <div class="view" id="article-view">
+  <div class="a-progress" id="a-progress" aria-hidden="true"></div>
   <div class="article">
     <button class="a-back" onclick="showTreemap()">‹ BACK</button>
     <div class="a-badge" id="a-badge">ELECTION 2026</div>
     <h1 class="a-title" id="a-title"></h1>
     <div class="a-date" id="a-date"></div>
     <div class="a-people" id="a-people"></div>
-    <div class="a-chart" id="a-chart"></div>
-    <div class="a-caption" id="a-caption"></div>
-    <div class="a-body" id="a-body"></div>
+    <figure class="a-media" id="a-media" hidden></figure>
     <div class="a-img-credits" id="a-img-credits"></div>
   </div>
 </div>
@@ -483,7 +512,7 @@
       history.replaceState(null, '', '?a=' + story.id);
     });
     el.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') { e.preventDefault(); el.click(); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
     });
   }
   /* single date emission point — every visible date goes through this helper */
@@ -612,6 +641,7 @@ function getSourceHtml(c) {
           ti.style.fontSize = size.toFixed(1) + 'px';
         }
       }
+      if (ti.scrollHeight > ti.clientHeight + 1) cell.setAttribute('title',ti.textContent||''); else cell.removeAttribute('title');
     });
   }
 /* ── Party colors (data-encoding only) ─────────────────────── */
@@ -691,12 +721,23 @@ var CELLS = [
   { id:'s40', tier:3, cat:'international', tags:['#Migration','#Pacific'], date:'12 AUG', title:'Pacific Labour Scheme Extended' },
   { id:'logo', tier:3, logo:true }
 ];
+/* Verified, locally stored photographs. Subject relevance and license records live in assets/photos/photo-catalog.lock.json. */
+var PHOTO_MEDIA = {
+  'wp6-1':{assetId:'parliament-chamber',src:'./assets/photos/parliament-chamber-960.webp',alt:'New Zealand House of Representatives debating chamber; archive photograph, 2016.',attribution:'Photo: Office of the Clerk of the House of Representatives of New Zealand, CC BY 4.0 (2016); archive image.',source:'https://commons.wikimedia.org/wiki/File:New_Zealand_House_of_Representatives_debating_chamber.jpg',objectPosition:'center'},
+  'wp6-3':{assetId:'paul-henry-archive',src:'./assets/photos/paul-henry-archive-480.webp',alt:'Broadcaster Paul Henry at Venice Beach, California, 9 October 2008; archive photograph.',attribution:'Photo: Vivianne Robinson, CC BY 2.0 (2008); cropped archive image.',source:'https://commons.wikimedia.org/wiki/File:Paul_Henry_(New_Zealand_broadcaster)_(cropped).jpg',objectPosition:'center 24%'},
+  's11':{assetId:'nz-parliament-buildings',src:'./assets/photos/nz-parliament-buildings-960.webp',alt:'New Zealand Parliament Buildings and the Beehive from Parliament Lawn, Wellington; 26 June 2020.',attribution:'Photo: Tom Ackroyd / Quilt Phase, CC BY-SA 4.0 (2020); archive image.',source:'https://commons.wikimedia.org/wiki/File:NZ_Parliament_Buildings_2020-06-26.jpg',objectPosition:'center'},
+  'wp7-1':{assetId:'gas-waikari',src:'./assets/photos/gas-waikari-960.webp',alt:"G.A.S. fuel station in Waikari, Canterbury; archive photograph, 4 January 2021.",attribution:"Photo: Michal Klajban, CC BY-SA 4.0 (4 January 2021); Waikari fuel station, archive/context image.",source:"https://commons.wikimedia.org/wiki/File:Gas_station,_Waikari,_Canterbury,_New_Zealand.jpg",objectPosition:"center"},
+  's15':{assetId:'dairy-rotorua',src:'./assets/photos/dairy-rotorua-960.webp',alt:"Dairy cows in a Rotorua pasture; archive photograph, 17 November 2022.",attribution:"Photo: AnnWoolliams, CC BY-SA 4.0 (17 November 2022); archive/context image.",source:"https://commons.wikimedia.org/wiki/File:Dairy_cows,_Rotorua,_New_Zealand.jpg",objectPosition:"center 70%"},
+  's12':{assetId:'supermarket-tapawera',src:'./assets/photos/supermarket-tapawera-960.webp',alt:"Supermarket in Tapawera, New Zealand; archive photograph, 2 January 2020.",attribution:"Photo: Michal Klajban, CC BY-SA 4.0 (2 January 2020); archive/context image.",source:"https://commons.wikimedia.org/wiki/File:Supermarket_in_Tapawera,_New_Zealand.jpg",objectPosition:"center 72%"}
+};
 /* Original local editorial media and data visuals are merged into story records. */
 (function mergeImgMap(){
   for (var i = 0; i < CELLS.length; i++) {
     var c = CELLS[i];
     var extra = IMG_MAP[c.id];
     if (extra) { c.img = extra.img; c.imgCredit = extra.credit || ''; c.imgAlt = extra.alt || c.title || ''; }
+    var photo = PHOTO_MEDIA[c.id];
+    if (photo) { c.imgFallback=c.img; c.img=photo.src; c.imgCredit=photo.attribution; c.imgAlt=photo.alt; c.mediaAssetId=photo.assetId; c.mediaSource=photo.source; c.imgFocus=photo.objectPosition; c.mediaKind='photo'; }
     if (['wp6-2','wp8-2','election','s07','s18'].includes(c.id)) c.img = null;
   }
 })();
@@ -729,7 +770,9 @@ function drawPollChart(container, h, opts) {
     var data = POLL_HISTORY[k];
     svg.selectAll(null).data(data).enter().append('circle')
       .attr('cx',function(d,i){return x(i);}).attr('cy',function(d){return y(d);})
-      .attr('r',2.2).attr('fill',c).attr('opacity',0.45);
+      .attr('r',3.2).attr('fill',c).attr('opacity',0.45).attr('tabindex',0)
+      .attr('aria-label',function(d,i){return PARTY[k].name+' poll observation '+(i+1)+': '+d+' percent';})
+      .each(function(d,i){d3.select(this).append('title').text(PARTY[k].name+' · observation '+(i+1)+': '+d+'%');});
     svg.append('path').datum(data)
       .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
         .curve(d3.curveLinear))
@@ -796,6 +839,10 @@ function legendRow() {
 
 /* ── Treemap layout ────────────────────────────────────────── */
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var motionSequence = 0, motionTimer = null;
+function beginMotion() { motionSequence++; clearTimeout(motionTimer); document.querySelectorAll('#grid .cell').forEach(function(el){if(el.getAnimations)el.getAnimations().forEach(function(a){a.cancel();});el.style.transform='';el.style.opacity='';}); return motionSequence; }
+function settleMotion(id, callback, delay) { clearTimeout(motionTimer); motionTimer=setTimeout(function(){ if(id===motionSequence) callback(); },reduced?0:delay); }
+window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',function(e){ reduced=e.matches;beginMotion();document.querySelectorAll('#grid .cell').forEach(function(el){el.style.transform='';el.style.opacity='';}); });
 
 var activeCat = 'all';
 var PAGE_SIZE = 30, pageNum = 1, flipping = false;
@@ -805,11 +852,8 @@ function pageSize(){ var n = window.innerWidth < 480 || /[?&]narrow=1/.test(loca
 function catStories(cat) {
   var k = cat === undefined ? activeCat : cat;
   var s = CELLS.filter(function(c){ return !c.logo && (k === 'all' || c.cat === k); });
-  var hasImg = function(c){ return c.img || !!c.wp6 || c.wp8 === 'wp8-2' || c.id === 'election' || c.id === 's07' || c.id === 's18' || (typeof IMG_MAP !== 'undefined' && IMG_MAP[c.id]); };
   s.sort(function(a,b){
-    var ai = hasImg(a) ? 0 : 1, bi = hasImg(b) ? 0 : 1;
-    if (ai !== bi) return ai - bi;           /* image-first: cards with photos rise above empty ones */
-    return a.tier - b.tier;                   /* then by tier within same image group */
+    return a.tier - b.tier;
   });
   return s;
 }
@@ -869,7 +913,7 @@ function renderGrid(cat) {
   }
   var root = d3.hierarchy({children: leaves}).sum(function(d){ return d.v || 0; });
   root.sort(function(a,b){ return b.value - a.value; });
-  d3.treemap().tile(d3.treemapSquarify).size([Math.floor(W)-2,H]).paddingInner(3).paddingOuter(0)(root);
+  d3.treemap().tile(d3.treemapSquarify).size([Math.floor(W)-2,H]).paddingInner(window.innerWidth<768?4:(window.innerWidth<1024?5:6)).paddingOuter(2)(root);
   /* FIX(wpn): A1 — removed dead px0/py0/px1/py1 rounding block (unused; cards read n.x0..n.y1 directly) */
   var rect = {};
   root.leaves().forEach(function(n){ rect[n.data.i] = n; });
@@ -915,22 +959,22 @@ function renderGrid(cat) {
     var w = n.x1-n.x0, h = n.y1-n.y0;
     var big = c.full && !narrow;
     var tagsHtml = (c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('');
-    var showTagRow = c.tier !== 3 || w >= 104;
+    var showTagRow = c.tier !== 3 || w >= 88;
     var showSource = c.tier !== 3 || w >= 118;
-    var chartKind = c.wp6 === 'wp6-2' ? 'inz' : ((c.wp8 === 'wp8-2' || c.id === 's18') ? 'poll' : (c.id === 's07' ? 'threshold' : ''));
+    var chartKind = c.wp6 === 'wp6-2' ? 'inz' : (c.wp8 === 'wp8-2' ? 'poll' : (c.id === 's07' ? 'threshold' : ''));
     var mediaRoom = w >= 96 && h >= (w < 150 ? 132 : 112);
     var showMedia = (chartKind && w >= 120 && h >= 118) || (!!c.img && mediaRoom);
     var imgHtml = '';
     if (showMedia) {
       el.classList.add('has-img');
-      var mediaHeight = Math.min(112, Math.max(42, Math.floor(h * 0.34)));
+      var mediaHeight = Math.min(w>=300?200:(w>=170?128:(w>=100?92:42)), Math.max(42, Math.floor(h * (w>=300?.42:(w>=170?.36:.30)))));
       if (chartKind === 'inz') imgHtml = '<div class="cell-img-wrap cell-mini-chart inz-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
       else if (chartKind === 'poll') imgHtml = '<div class="cell-img-wrap cell-mini-chart poll-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
       else if (chartKind === 'threshold') imgHtml = '<div class="cell-img-wrap cell-mini-chart threshold-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
       else {
-        var fetchPrio = c.tier === 0 ? 'fetchpriority="high"' : 'fetchpriority="lazy"';
-        imgHtml = '<div class="cell-img-wrap" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px">' +
-          '<img src="' + escAttr(c.img) + '" alt="' + escAttr((IMG_MAP[c.id] && IMG_MAP[c.id].alt) || (c.title||'Editorial illustration')) + '" loading="lazy" decoding="async" ' + fetchPrio + ' onerror="this.parentElement.style.display=\'none\';this.closest(\'.cell\').classList.add(\'no-img-fallback\');" />' +
+        var fetchPrio = c.tier === 0 ? 'fetchpriority="high"' : 'fetchpriority="low"';
+        imgHtml = '<div class="cell-img-wrap" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px;--img-focus:'+escAttr(c.imgFocus||'center')+'">' +
+          '<img src="' + escAttr(c.img) + '" data-fallback="'+escAttr(c.imgFallback||'')+'" alt="' + escAttr(c.imgAlt || (c.title||'Editorial illustration')) + '" loading="lazy" decoding="async" ' + fetchPrio + ' onerror="if(this.dataset.fallback&&!this.dataset.retried){this.dataset.retried=\'1\';this.src=this.dataset.fallback;}else{this.parentElement.style.display=\'none\';this.closest(\'.cell\').classList.add(\'no-img-fallback\');}" />' +
           (c.imgCredit ? '<div class="cell-img-credit">' + escAttr(c.imgCredit) + '</div>' : '') +
           '</div>';
       }
@@ -952,7 +996,7 @@ function renderGrid(cat) {
         '<div class="gap-callout"><span>NAT–LAB GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span> · Curia 3 Sep</div>' +
         '<div class="thresholds"></div>';
     } /* FIX(content): spark branch removed (s05 decorative spark cut); original else-if dropped cleanly */
-    el.innerHTML = html;
+    el.innerHTML = html + '<span class="cell-corners" aria-hidden="true"></span>';
     wireCard(el, c);
     grid.appendChild(el);
     if (big) {
@@ -1034,10 +1078,8 @@ var ARTICLE_DATA = {
  "art-s18": {
   "title": "Herald Poll of Polls: Coalition at 47.8%",
   "sections": [
-   { "h": "The model's headline", "p": "The NZ Herald's Poll of Polls, updated on 16 September, assigns a 47.8% probability to coalition government formation after the next election. The Poll of Polls is a model that aggregates multiple opinion polls into a single probability distribution, weighted by poll quality, fielding date and sample composition. A 47.8% figure is below the 50% threshold the model would need to call an outcome more likely than not, which is the most defensible reading of the number itself." },
-   { "h": "Why it is below 50%", "p": "The model is built on the underlying Curia Research poll, which gave National 29.0%, Labour 25.9%, the Greens 13.9%, ACT at 10.5%, NZ First 8.4% and the Opportunity Party 4.5%. The probability reflects the gap between National's party vote and the 50% threshold required for a majority, the likelihood of overhang seats expanding or contracting the parliament, and the difficulty of assembling a coalition when no party is close to half the vote. The 47.8% is not a forecast; it is a Bayesian aggregation of the uncertainty in the polling data itself." },
-   { "h": "What the model does not say", "p": "The NZ Herald's full analysis is behind a Premium paywall, and the reasoning behind the 47.8% figure was not available in the open crawl of 16 September. The 47.8% number comes from the page's meta description rather than the article body, which means it has not been verified against the model's published methodology. The model does not publish its sensitivity analysis, the weight it assigns to individual polls, or the confidence interval around the 47.8% figure. These are the details that would distinguish a model-based probability from a rounding of intuition, and they are not accessible." },
-   { "h": "What the polls say", "p": "The polling data that feeds the model is clear: National leads by 3.1 points on party vote, the coalition arithmetic requires at least two additional parties to reach a majority, and the overhang mechanism could add seats in a tightly contested result. The 47.8% figure is a summary of that arithmetic, a number that says the coalition outcome is plausible rather than probable, and that the model's confidence in that assessment is not high enough to cross the 50% line. As of 16 September 2026 the Poll of Polls says the outcome is still open (NZ Herald, 16 September 2026, meta description)." }
+   { "h": "Reported headline", "p": "The NZ Herald Poll of Polls headline reports the coalition at 47.8% (16 September 2026). This page displays that single aggregate as reported. It does not substitute a separate party-level poll or infer how individual parties contribute to the figure." },
+   { "h": "Limits of the available figure", "p": "The cited headline supplies one aggregate value. No party-level series, confidence interval, or calculation method is represented here; those details should not be inferred from this number." }
   ]
 },
  "art-wp6-1": {
@@ -1494,7 +1536,7 @@ function drawPollSnapshot(container, compact) {
   container.classList.add('poll-snapshot');
   container.innerHTML = (compact ? '' : '<div class="chart-title">Latest party-vote snapshot</div><div class="chart-subtitle">Curia poll · 3 September 2026</div>') + keys.map(function(key){
     var p = PARTY[key];
-    return '<div class="poll-snapshot-row"><span>'+escAttr(p.name)+'</span><div class="poll-snapshot-track"><div class="poll-snapshot-fill" style="width:'+Math.min(100,p.poll/30*100)+'%;background:'+(p.reached?p.color:'#66727e')+'"></div></div><span class="poll-snapshot-value">'+p.poll.toFixed(1)+'%</span></div>';
+    return '<div class="poll-snapshot-row" tabindex="0" title="'+escAttr(p.name+' · '+p.poll.toFixed(1)+' percent party vote')+'" aria-label="'+escAttr(p.name+' '+p.poll.toFixed(1)+' percent party vote')+'"><span>'+escAttr(p.name)+'</span><div class="poll-snapshot-track"><div class="poll-snapshot-fill" style="width:'+Math.min(100,p.poll/30*100)+'%;background:'+(p.reached?p.color:'#66727e')+'"></div></div><span class="poll-snapshot-value">'+p.poll.toFixed(1)+'%</span></div>';
   }).join('') + (compact ? '' : '<div class="chart-source">Source: Curia poll, 3 September 2026 · BIHIVE visualization.</div>');
 }
 
@@ -1502,6 +1544,11 @@ function drawThresholdMini(container, compact) {
   var p = PARTY.nzfirst;
   container.classList.add('threshold-snapshot');
   container.innerHTML = (compact ? '<div class="threshold-mini-title">NZ First · party vote</div>' : '<div class="chart-title">NZ First party vote and 5% threshold</div><div class="chart-subtitle">Current Curia snapshot · percentage of party vote</div>') + '<div class="threshold-mini-track"><i style="width:'+Math.min(100,p.poll/15*100)+'%"></i><b></b></div><div class="threshold-mini-labels"><span>0%</span><strong>'+p.poll.toFixed(1)+'%</strong><span>5% threshold</span><span>15%</span></div>' + (compact ? '' : '<div class="chart-source">Source: Curia poll, 3 September 2026 · BIHIVE visualization.</div>');
+}
+function drawHeraldCoalitionMetric(container) {
+  container.setAttribute('role','img');
+  container.setAttribute('aria-label','NZ Herald Poll of Polls headline: coalition aggregate 47.8 percent, 16 September 2026.');
+  container.innerHTML='<div class="chart-title">Coalition aggregate</div><div class="chart-subtitle">Herald Poll of Polls headline · 16 September 2026</div><div style="display:flex;align-items:baseline;gap:10px;margin:18px 0 8px"><strong style="font:700 42px/1 var(--meta-font);color:#e7edf2">47.8%</strong><span style="color:#a6b2bc;font:400 13px var(--meta-font)">as reported</span></div><div style="height:8px;background:#1d2932"><i style="display:block;width:47.8%;height:100%;background:#71889a"></i></div><div class="chart-source">Source: NZ Herald Poll of Polls, 16 September 2026 · Single reported aggregate; no party-level breakdown inferred.</div>';
 }
 
 /* ── JS string escaper (XSS prevention) ───────────────────── */
@@ -1518,13 +1565,25 @@ function jsEscape(s) {
 function escAttr(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
+function renderArticleMedia(c) {
+  var host=document.getElementById('a-media'), photo=PHOTO_MEDIA[c.id];
+  host.hidden=true;host.innerHTML='';
+  if (!photo || ['wp6-1','wp6-2','wp6-3','wp7-1','wp7-3','wp8-1','wp8-2','wp8-4','election','s07','s18'].includes(c.id)) return;
+  var im=document.createElement('img'); im.src=photo.src;im.alt=photo.alt;im.loading='lazy';im.decoding='async';im.width=960;im.height=540;
+  var cap=document.createElement('figcaption');cap.innerHTML=escAttr(photo.attribution)+' · <a href="'+escAttr(photo.source)+'" target="_blank" rel="noopener">Source and license</a>';
+  host.appendChild(im);host.appendChild(cap);host.hidden=false;
+}
+var articleScrollHandler=function(){var el=document.getElementById('article-view'),bar=document.getElementById('a-progress');var max=el.scrollHeight-el.clientHeight;bar.style.transform='scaleX('+(max>0?Math.max(0,Math.min(1,el.scrollTop/max)):0)+')';};
+document.getElementById('article-view').addEventListener('scroll',articleScrollHandler,{passive:true});
 
 /* ── Article view ──────────────────────────────────────────── */
 function openArticle(c) {
   clearTimeout(armTimer); clearMq(document.querySelector('.cell.armed')); armedId = null;
+  beginMotion(); currentStoryId=c.id;
   var chartHost = document.getElementById('a-chart');
   var captionHost = document.getElementById('a-caption');
   var creditsHost = document.getElementById('a-img-credits');
+  renderArticleMedia(c);
   var extraChart = document.getElementById('a-chart-extra');
   if (extraChart) extraChart.remove();
   chartHost.innerHTML = ''; chartHost.style.display = 'none';
@@ -1568,7 +1627,7 @@ function openArticle(c) {
       captionHost.textContent = 'Immigration New Zealand systems review · NZ$ million · Cabinet paper as reported by RNZ.'; captionHost.style.display = '';
     }
     var aCredits = document.getElementById('a-img-credits');
-    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>'; }
+    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + (c.mediaSource ? ' · <a href="'+escAttr(c.mediaSource)+'" target="_blank" rel="noopener">Source and license</a>' : '') + '</span>'; }
     else { aCredits.innerHTML = ''; }
     av.scrollTop = 0;
     return;
@@ -1591,7 +1650,7 @@ function openArticle(c) {
       document.getElementById('a-chart').style.display = 'none';
     }
     var aCredits = document.getElementById('a-img-credits');
-    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>'; }
+    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + (c.mediaSource ? ' · <a href="'+escAttr(c.mediaSource)+'" target="_blank" rel="noopener">Source and license</a>' : '') + '</span>'; }
     else { aCredits.innerHTML = ''; }
     av.scrollTop = 0;
     return;
@@ -1618,7 +1677,7 @@ function openArticle(c) {
       captionHost.textContent = c.wp8 === 'wp8-1' ? 'Fiscal claims and target year as reported by NZ Herald.' : 'Election-process dates and changes as reported by NZ Herald.'; captionHost.style.display = '';
     }
     var aCredits = document.getElementById('a-img-credits');
-    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>'; }
+    if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + (c.mediaSource ? ' · <a href="'+escAttr(c.mediaSource)+'" target="_blank" rel="noopener">Source and license</a>' : '') + '</span>'; }
     else { aCredits.innerHTML = ''; }
     av.scrollTop = 0;
     return;
@@ -1627,7 +1686,7 @@ function openArticle(c) {
     var sArt = ARTICLE_DATA['art-' + c.id];
     document.getElementById('a-badge').textContent = c.priority || 'STORY';
     renderAuthor(c);
-    if (c.id === 's18') { chartHost.style.display = ''; drawPollSnapshot(chartHost, false); captionHost.textContent = 'Party-vote snapshot · Curia poll, 3 September 2026.'; captionHost.style.display = ''; }
+    if (c.id === 's18') { chartHost.style.display = ''; drawHeraldCoalitionMetric(chartHost); captionHost.textContent = 'The headline reports a 47.8% coalition aggregate. Party-level data is not shown because the cited story does not establish it.'; captionHost.style.display = ''; }
     else if (c.id === 's07') { chartHost.style.display = ''; drawThresholdMini(chartHost, false); captionHost.textContent = 'NZ First share compared with the 5% MMP party-vote threshold · Curia poll, 3 September 2026.'; captionHost.style.display = ''; }
     else chartHost.style.display = 'none';
     var srcEl = getSourceHtml(c);
@@ -1657,15 +1716,17 @@ function openArticle(c) {
   }
   var aCredits = document.getElementById('a-img-credits');
   if (c.img) {
-    aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>';
+    aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + (c.mediaSource ? ' · <a href="'+escAttr(c.mediaSource)+'" target="_blank" rel="noopener">Source and license</a>' : '') + '</span>';
   } else {
     aCredits.innerHTML = '';
   }
 }
 function showTreemap() {
+  beginMotion(); currentStoryId=null;
   document.getElementById('article-view').classList.remove('active');
   document.getElementById('treemap-view').classList.add('active');
   document.getElementById('a-chart').style.display = '';
+  document.getElementById('a-progress').style.transform='scaleX(0)';
 }
 
 /* ── Category filter ───────────────────────────────────────── */
@@ -1679,6 +1740,8 @@ var CATS = [
 ];
 var catTimer = null;
 function setCat(cat) {
+  var tx=beginMotion();
+  activeCat=cat;
   pageNum = 1;
   document.querySelectorAll('.cat-pill').forEach(function(p){
     p.classList.toggle('active', p.dataset.cat === cat);
@@ -1696,8 +1759,7 @@ function setCat(cat) {
       }
     });
   }
-  clearTimeout(catTimer);
-  catTimer = setTimeout(function(){ renderGrid(cat); }, fading ? 160 : 0);
+  settleMotion(tx,function(){renderGrid(cat);if(!reduced)Array.from(document.querySelectorAll('#grid .cell')).forEach(function(el,i){if(el.animate)el.animate([{opacity:0},{opacity:1}],{duration:180,delay:Math.min(80,i*3),easing:'cubic-bezier(.22,.61,.36,1)'});});},fading?120:0);
 }
 (function initCatBar(){
   var bar = document.getElementById('cat-bar');
@@ -1714,36 +1776,32 @@ function setCat(cat) {
 
 /* ── Pagination: GSAP page-flip ────────────────────────────── */
 function goToPage(np, dir) {
-  if (flipping || np === pageNum || np < 1 || np > pageCount()) return;
+  if (np === pageNum || np < 1 || np > pageCount()) return;
+  var tx=beginMotion();
   pageNum = np;
   flipping = true;
   updatePager();
   var animate = !reduced;
   if (animate) {
     /* exit: whole batch slides out toward -dir, 12ms stagger */
-    gsap.to(document.querySelectorAll('#grid .cell'),
-      { x: -40 * dir, opacity: 0, duration: 0.18, stagger: 0.012, ease: 'power2.in' });
+    Array.from(document.querySelectorAll('#grid .cell')).forEach(function(el,i){if(el.animate)el.animate([{transform:'translateX(0)',opacity:1},{transform:'translateX('+(-16*dir)+'px)',opacity:0}],{duration:100,delay:Math.min(80,i*3),easing:'cubic-bezier(.22,.61,.36,1)',fill:'forwards'});});
   }
   /* state transitions run on timers so the flip never stalls,
      even where rAF is throttled (hidden tabs); GSAP is paint only */
-  setTimeout(function() {
+  settleMotion(tx,function() {
     renderGrid();
     if (animate) {
       var fresh = document.querySelectorAll('#grid .cell');
       /* enter: new batch slides in from +dir, 12ms stagger */
-      gsap.fromTo(fresh,
-        { x: 40 * dir, opacity: 0 },
-        { x: 0, opacity: 1, duration: 0.2, stagger: 0.012, ease: 'power2.out' });
+      fresh.forEach(function(el,i){if(el.animate)el.animate([{transform:'translateX('+(16*dir)+'px)',opacity:0},{transform:'translateX(0)',opacity:1}],{duration:200,delay:Math.min(80,i*3),easing:'cubic-bezier(.22,.61,.36,1)',fill:'both'});});
       /* settle guard: where the GSAP ticker never ticks (headless capture,
          hidden tabs) the enter tween's immediateRender leaves cells at
          opacity 0 — strip inline animation styles once the tween window
          has passed; a no-op in browsers where the tween completed */
-      setTimeout(function() {
-        fresh.forEach(function(el) { el.style.transform = ''; el.style.opacity = ''; });
-      }, 560);
+      settleMotion(tx,function(){fresh.forEach(function(el){el.style.transform='';el.style.opacity='';});flipping=false;},280);
     }
-    setTimeout(function() { flipping = false; }, animate ? 480 : 0);
-  }, animate ? 240 : 0);
+    if(!animate) flipping=false;
+  },animate?120:0);
 }
 (function initPager(){
   document.getElementById('pg-prev').addEventListener('click', function(){ goToPage(pageNum - 1, -1); });
@@ -1773,6 +1831,8 @@ function goToPage(np, dir) {
 })();
 
 /* ── Boot ──────────────────────────────────────────────────── */
+var currentStoryId=null;
+window.BIHIVE_QA={getSnapshot:function(){return {category:activeCat,page:pageNum,pageCount:pageCount(),view:document.getElementById('article-view').classList.contains('active')?'article':'treemap',storyId:currentStoryId,cards:Array.from(document.querySelectorAll('#grid .cell')).map(function(el){var r=el.getBoundingClientRect(),c=CELLS.find(function(x){return x.id===el.dataset.id});return {id:el.dataset.id,rect:{x:r.x,y:r.y,width:r.width,height:r.height},assetId:c&&c.mediaAssetId||null,mediaKind:c&&c.mediaKind||'illustration',fallbackReason:c&&c.mediaKind==='photo'?null:'NO_APPROVED_PHOTO',title:el.querySelector('.cell-title')&&el.querySelector('.cell-title').textContent};}),motion:{transactionId:motionSequence,reducedMotion:reduced,flipping:flipping},chart:{storyId:currentStoryId,sourceId:currentStoryId==='s18'?'nz-herald-poll-of-polls':null,dataVersion:currentStoryId==='s18'?'herald-aggregate-2026-09-16':null}};}};
 document.getElementById('grid').addEventListener('click', function(e){
   if (!e.target.closest('.cell')) clearMq(document.querySelector('.cell.armed'));
 });
