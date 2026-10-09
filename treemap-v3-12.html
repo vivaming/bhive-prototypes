@@ -263,6 +263,7 @@
 .gap-callout { display:flex; align-items:baseline; gap:8px; margin:3px 0 4px 0; flex-wrap:wrap; min-width:0; }
 .gap-callout span { font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%; }
 .gap-callout b { font-size:16px; color:#ff6b57; font-variant-numeric:tabular-nums; }
+.gap-meta { display:inline-flex; align-items:center; width:max-content; max-width:100%; margin:0 0 6px; padding:3px 7px; border:1px solid #40505b; border-radius:999px; background:#202b33; color:#dce3e9; font:700 9px/1.2 var(--meta-font); letter-spacing:.08em; white-space:nowrap; }
   .spark-mini { margin-top:6px; height:48px; }
   .spark-mini svg { width:100%; height:100%; display:block; }
   .thresholds { margin-top:4px; }
@@ -756,22 +757,22 @@ function drawPollChart(container, h, opts) {
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h).attr('width',w).attr('height',h)
     .attr('preserveAspectRatio','xMidYMid meet');
-  var labelW = w < 340 ? 66 : 100;
+  var legendW = Math.min(160, Math.max(88, Math.round(w * (w < 420 ? 0.32 : 0.25))));
+  var plotLeft = w < 340 ? 38 : 44;
+  var plotRight = Math.max(plotLeft + 72, w - legendW - 14);
   var series = ['national','labour'];
   var maxPoints = Math.max.apply(null, series.map(function(k){return POLL_HISTORY[k].length;}));
   var lastIndex = maxPoints - 1;
-  var x = d3.scaleLinear().domain([0, lastIndex]).range([12, Math.max(20,w-labelW)]);
+  var x = d3.scaleLinear().domain([0, lastIndex]).range([plotLeft, plotRight]);
   var y = d3.scaleLinear().domain([20, 42]).range([h-23, 19]);
   if (!opts.nogrid) [20,25,30,35,40].forEach(function(v){
-    svg.append('line').attr('x1',10).attr('x2',w-labelW).attr('y1',y(v)).attr('y2',y(v))
+    svg.append('line').attr('x1',plotLeft).attr('x2',plotRight).attr('y1',y(v)).attr('y2',y(v))
       .attr('stroke','#2a3640').attr('stroke-width',1);
-    svg.append('text').attr('x',w-labelW+6).attr('y',y(v)+3)
-      .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').text(v+'%');
+    svg.append('text').attr('x',plotLeft-8).attr('y',y(v)+3).attr('text-anchor','end')
+      .attr('font-size',w<380?8:10).attr('fill','#a6b2bc').text(v+'%');
   });
-  svg.append('line').attr('x1',x(lastIndex)).attr('x2',x(lastIndex)).attr('y1',12).attr('y2',h-20)
+  svg.append('line').attr('x1',x(lastIndex)).attr('x2',x(lastIndex)).attr('y1',14).attr('y2',h-20)
     .attr('stroke','#a6b2bc').attr('stroke-width',1);
-  svg.append('text').attr('x',x(lastIndex)).attr('y',10).attr('text-anchor','middle')
-    .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').text('3 SEP');
   ['national','labour'].forEach(function(k){
     var c = PARTY[k].color;
     var data = POLL_HISTORY[k];
@@ -788,12 +789,23 @@ function drawPollChart(container, h, opts) {
     var last = data[lastIndex];
     var ly = y(last);
     svg.append('circle').attr('cx',x(lastIndex)).attr('cy',ly).attr('r',3.7).attr('fill',c);
-    var nameFs = w < 340 ? 9 : 12;
-    var valFs = w < 340 ? 10 : 12;
-    svg.append('text').attr('x',w-labelW+6).attr('y',ly-2)
-      .attr('font-size',nameFs).attr('font-weight',600).attr('fill',c).text(PARTY[k].name);
-    svg.append('text').attr('x',w-labelW+6).attr('y',ly+9)
-      .attr('font-size',valFs).attr('fill','#c7cfd8').text(last+'%');
+  });
+  var legendX = plotRight + 12;
+  var legendFont = w < 380 ? 9 : (w < 640 ? 9 : 11);
+  svg.append('line').attr('class','poll-legend-divider').attr('x1',plotRight+5).attr('x2',plotRight+5).attr('y1',14).attr('y2',h-20)
+    .attr('stroke','#33414b').attr('stroke-width',1);
+  svg.append('text').attr('class','poll-legend-kicker').attr('x',legendX).attr('y',22)
+    .attr('font-size',legendFont).attr('font-weight',700).attr('letter-spacing','.08em')
+    .attr('fill','#a6b2bc').text('LATEST · 3 SEP');
+  series.forEach(function(k,i){
+    var data=POLL_HISTORY[k],last=data[data.length-1],rowY=45+i*44,color=PARTY[k].color;
+    svg.append('line').attr('x1',legendX).attr('x2',legendX+10).attr('y1',rowY-3).attr('y2',rowY-3)
+      .attr('stroke',color).attr('stroke-width',2.5);
+    svg.append('circle').attr('cx',legendX+10).attr('cy',rowY-3).attr('r',2.5).attr('fill',color);
+    svg.append('text').attr('class','poll-legend-name').attr('data-series',k).attr('x',legendX+16).attr('y',rowY)
+      .attr('font-size',legendFont).attr('font-weight',600).attr('fill','#dce3e9').text(PARTY[k].name);
+    svg.append('text').attr('class','poll-legend-value').attr('data-series',k).attr('x',legendX+16).attr('y',rowY+19)
+      .attr('font-size',w<380?11:13).attr('font-weight',700).attr('fill','#f2f4f7').text(last.toFixed(1)+'%');
   });
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'];
   months.forEach(function(m,i){
@@ -936,7 +948,8 @@ function renderGrid(cat) {
       '<div class="cell-title" style="font-size:26px; font-weight:800;">'+
       (heroStory.title||'').replace('ELECTION 2026 —','—')+'</div>' +
       '<div class="tag-row">'+(heroStory.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('')+'</div>' +
-      '<div class="gap-callout"><span>GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span> · Curia 3 Sep</div>';
+      '<div class="gap-callout"><span>GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span></div>' +
+      '<div class="gap-meta">CURIA POLL · 3 SEP</div>';
     wireCard(hel, heroStory);
     grid.appendChild(hel);
     }
@@ -1001,7 +1014,8 @@ function renderGrid(cat) {
     }
     if (big) {
       html += '<div class="election-chart"></div>' +
-        '<div class="gap-callout"><span>NAT–LAB GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span> · Curia 3 Sep</div>' +
+        '<div class="gap-callout"><span>NAT–LAB GAP</span><b>3.1 pts</b><span>NAT 29.0 · LAB 25.9</span></div>' +
+        '<div class="gap-meta">CURIA POLL · 3 SEP</div>' +
         '<div class="thresholds"></div>';
     } /* FIX(content): spark branch removed (s05 decorative spark cut); original else-if dropped cleanly */
     el.innerHTML = html + '<span class="cell-corners" aria-hidden="true"></span>';
