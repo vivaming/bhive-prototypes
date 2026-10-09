@@ -2077,7 +2077,7 @@ function goToPage(np, dir) {
 
 /* ── Boot ──────────────────────────────────────────────────── */
 var currentStoryId=null;
-window.BIHIVE_QA={getSnapshot:function(){return {category:activeCat,page:pageNum,pageCount:pageCount(),view:document.getElementById('article-view').classList.contains('active')?'article':'treemap',storyId:currentStoryId,cards:Array.from(document.querySelectorAll('#grid .cell')).map(function(el){var r=el.getBoundingClientRect(),c=CELLS.find(function(x){return x.id===el.dataset.id});return {id:el.dataset.id,rect:{x:r.x,y:r.y,width:r.width,height:r.height},assetId:c&&c.mediaAssetId||null,mediaKind:c&&c.mediaKind||'text',fallbackReason:c&&c.mediaKind==='text'?'NO_APPROVED_PHOTO':null,title:el.querySelector('.cell-title')&&el.querySelector('.cell-title').textContent};}),motion:{transactionId:motionSequence,reducedMotion:reduced,flipping:flipping},chart:{storyId:currentStoryId,sourceId:currentStoryId==='s18'?'nz-herald-poll-of-polls':null,dataVersion:currentStoryId==='s18'?'herald-aggregate-2026-09-16':null}};}};
+window.BIHIVE_QA={getSnapshot:function(){return {category:activeCat,page:pageNum,pageCount:pageCount(),view:document.getElementById('article-view').classList.contains('active')?'article':'treemap',storyId:currentStoryId,cards:Array.from(document.querySelectorAll('#grid .cell')).map(function(el){var r=el.getBoundingClientRect(),c=CELLS.find(function(x){return x.id===el.dataset.id});return {id:el.dataset.id,rect:{x:r.x,y:r.y,width:r.width,height:r.height},assetId:c&&c.mediaAssetId||null,mediaKind:c&&c.mediaKind||'text',fallbackReason:c&&c.mediaKind==='text'?'NO_APPROVED_PHOTO':null,title:el.querySelector('.cell-title')&&el.querySelector('.cell-title').textContent};}),layout:{resizePending:!!rs},motion:{transactionId:motionSequence,reducedMotion:reduced,flipping:flipping},chart:{storyId:currentStoryId,sourceId:currentStoryId==='s18'?'nz-herald-poll-of-polls':null,dataVersion:currentStoryId==='s18'?'herald-aggregate-2026-09-16':null}};}};
 document.getElementById('grid').addEventListener('click', function(e){
   if (!e.target.closest('.cell')) clearMq(document.querySelector('.cell.armed'));
 });
@@ -2103,6 +2103,7 @@ var rs;
 window.addEventListener('resize', function(){
   clearTimeout(rs);
   rs = setTimeout(function(){
+    rs = null;
     /* FIX(wpn): A8/C中9 — same pageSize but different grid box: rebuild pages so demoted cards return */
     pageMap = {}; demotedIds = {};
     if (document.getElementById('treemap-view').classList.contains('active')) renderGrid();
