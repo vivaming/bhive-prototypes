@@ -27,7 +27,10 @@ test('reduced motion preference is honored after runtime media change',async({pa
 });
 test('rapid page and article actions settle on the last requested view',async({page})=>{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/');
+  await page.evaluate(()=>document.fonts.ready);
+  await expect.poll(()=>page.evaluate(()=>window.BIHIVE_QA.getSnapshot().layout.resizePending)).toBe(false);
   await page.locator('#pg-next').click();await page.locator('#pg-prev').click();
+  await expect.poll(()=>page.evaluate(()=>{const s=window.BIHIVE_QA.getSnapshot();return {page:s.page,flipping:s.motion.flipping};})).toEqual({page:1,flipping:false});
   await page.locator('#grid .cell[role="button"]').first().focus();await page.keyboard.press('Enter');
   await expect(page.locator('#article-view')).toHaveClass(/active/);
   await page.getByRole('button',{name:/BACK/}).click();
