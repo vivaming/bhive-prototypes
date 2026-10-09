@@ -23,8 +23,14 @@ test('hero poll chart keeps the latest values and source badge readable at deskt
       });
       const hero=document.querySelector('#grid .cell[data-id="election"]');
       const gap=hero.querySelector('.gap-callout').getBoundingClientRect(),source=hero.querySelector('.gap-meta').getBoundingClientRect();
-      return {viewBox:{width:box.width,height:box.height},dividerX:divider.x,labels,gapBottom:gap.bottom,sourceTop:source.top,sourceText:hero.querySelector('.gap-meta').textContent};
+      const rendered=svg.getBoundingClientRect();
+      const legendFont=parseFloat(getComputedStyle(svg.querySelector('.poll-legend-name')).fontSize);
+      const scale=Math.min(rendered.width/box.width,rendered.height/box.height);
+      return {viewBox:{width:box.width,height:box.height},rendered:{width:rendered.width,height:rendered.height},legendFont,renderedLegendFont:legendFont*scale,dividerX:divider.x,labels,gapBottom:gap.bottom,sourceTop:source.top,sourceText:hero.querySelector('.gap-meta').textContent};
     });
+    expect(geometry.rendered.width/geometry.viewBox.width).toBeGreaterThanOrEqual(0.95);
+    expect(geometry.rendered.height/geometry.viewBox.height).toBeGreaterThanOrEqual(0.95);
+    expect(geometry.renderedLegendFont,`legend renders at ${geometry.renderedLegendFont.toFixed(1)} CSS px`).toBeGreaterThanOrEqual(8.5);
     expect(geometry.labels.every(label=>label.x>geometry.dividerX+4)).toBe(true);
     expect(geometry.labels.every(label=>label.x>=0&&label.x+label.width<=geometry.viewBox.width)).toBe(true);
     for(let i=0;i<geometry.labels.length;i++)for(let j=i+1;j<geometry.labels.length;j++){

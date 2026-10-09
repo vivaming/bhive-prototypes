@@ -100,7 +100,7 @@
   #grid.desktop .badge-row, #grid.desktop .tag-row { flex-shrink:0; }
   /* V44 §3: desktop hero rhythm — title hugs content (fitTitle sets flex), chart breathes */
   #grid.desktop .cell.p0 .cell-title { margin-bottom:6px; min-height:22px; }
-  #grid.desktop .election-chart { margin:12px 0 8px; min-height:90px; }
+  #grid.desktop .election-chart { margin:12px 0 8px; flex:0 0 90px; height:90px; min-height:90px; }
   #grid.desktop .gap-callout { white-space:nowrap; margin:10px 0 8px; }
   #grid.desktop .th-row { margin-bottom:3px; }
   #grid.desktop .mmp-note { margin-top:4px; }
@@ -255,7 +255,7 @@
     background:#f2f4f7; transform:scaleX(0); transform-origin:left; transition:transform .28s cubic-bezier(.22,.61,.36,1); }
   .cell.armed .cell-title::after { transform:scaleX(1); }
   /* election chart area */
-  .election-chart { flex:1; min-height:0; margin:8px 0 4px 0; }
+  .election-chart { flex:0 0 90px; height:90px; min-height:90px; margin:8px 0 4px 0; }
   .election-chart svg { width:100%; height:100%; display:block; }
   .legend-row { display:flex; gap:14px; flex-wrap:wrap; margin:4px 0 8px 0; }
   .legend-row .li { display:flex; align-items:center; gap:5px; font-size:11px; color:var(--muted); }
@@ -754,6 +754,9 @@ var PHOTO_MEDIA = {
 function drawPollChart(container, h, opts) {
   /* Shared cover/detail poll chart. Points are the recorded values, not a model or interval. */
   opts = opts || {};
+  /* The cover chart lives in a flex-sized treemap card; size its viewBox to that
+     rendered box so preserveAspectRatio cannot shrink otherwise readable text. */
+  if (opts.fitContainer) h = Math.max(72, container.clientHeight || h);
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h).attr('width',w).attr('height',h)
     .attr('preserveAspectRatio','xMidYMid meet');
@@ -764,14 +767,15 @@ function drawPollChart(container, h, opts) {
   var maxPoints = Math.max.apply(null, series.map(function(k){return POLL_HISTORY[k].length;}));
   var lastIndex = maxPoints - 1;
   var x = d3.scaleLinear().domain([0, lastIndex]).range([plotLeft, plotRight]);
-  var y = d3.scaleLinear().domain([20, 42]).range([h-23, 19]);
+  var compact = !!opts.fitContainer && h < 150;
+  var y = d3.scaleLinear().domain([20, 42]).range([h-(compact?17:23), compact?10:19]);
   if (!opts.nogrid) [20,25,30,35,40].forEach(function(v){
     svg.append('line').attr('x1',plotLeft).attr('x2',plotRight).attr('y1',y(v)).attr('y2',y(v))
       .attr('stroke','#2a3640').attr('stroke-width',1);
     svg.append('text').attr('x',plotLeft-8).attr('y',y(v)+3).attr('text-anchor','end')
-      .attr('font-size',w<380?8:10).attr('fill','#a6b2bc').text(v+'%');
+      .attr('font-size',compact?8:(w<380?8:10)).attr('fill','#a6b2bc').text(v+'%');
   });
-  svg.append('line').attr('x1',x(lastIndex)).attr('x2',x(lastIndex)).attr('y1',14).attr('y2',h-20)
+  svg.append('line').attr('x1',x(lastIndex)).attr('x2',x(lastIndex)).attr('y1',compact?8:14).attr('y2',h-(compact?16:20))
     .attr('stroke','#a6b2bc').attr('stroke-width',1);
   ['national','labour'].forEach(function(k){
     var c = PARTY[k].color;
@@ -792,25 +796,26 @@ function drawPollChart(container, h, opts) {
   });
   var legendX = plotRight + 12;
   var legendFont = w < 380 ? 9 : (w < 640 ? 9 : 11);
-  svg.append('line').attr('class','poll-legend-divider').attr('x1',plotRight+5).attr('x2',plotRight+5).attr('y1',14).attr('y2',h-20)
+  svg.append('line').attr('class','poll-legend-divider').attr('x1',plotRight+5).attr('x2',plotRight+5).attr('y1',compact?8:14).attr('y2',h-(compact?16:20))
     .attr('stroke','#33414b').attr('stroke-width',1);
-  svg.append('text').attr('class','poll-legend-kicker').attr('x',legendX).attr('y',22)
+  svg.append('text').attr('class','poll-legend-kicker').attr('x',legendX).attr('y',compact?10:22)
     .attr('font-size',legendFont).attr('font-weight',700).attr('letter-spacing','.08em')
     .attr('fill','#a6b2bc').text('LATEST · 3 SEP');
   series.forEach(function(k,i){
-    var data=POLL_HISTORY[k],last=data[data.length-1],rowY=45+i*44,color=PARTY[k].color;
-    svg.append('line').attr('x1',legendX).attr('x2',legendX+10).attr('y1',rowY-3).attr('y2',rowY-3)
+    var data=POLL_HISTORY[k],last=data[data.length-1],rowY=compact?31+i*23:45+i*44,color=PARTY[k].color;
+    svg.append('line').attr('x1',legendX).attr('x2',legendX+8).attr('y1',rowY-3).attr('y2',rowY-3)
       .attr('stroke',color).attr('stroke-width',2.5);
-    svg.append('circle').attr('cx',legendX+10).attr('cy',rowY-3).attr('r',2.5).attr('fill',color);
-    svg.append('text').attr('class','poll-legend-name').attr('data-series',k).attr('x',legendX+16).attr('y',rowY)
+    svg.append('circle').attr('cx',legendX+8).attr('cy',rowY-3).attr('r',2.5).attr('fill',color);
+    svg.append('text').attr('class','poll-legend-name').attr('data-series',k).attr('x',legendX+(compact?12:16)).attr('y',rowY)
       .attr('font-size',legendFont).attr('font-weight',600).attr('fill','#dce3e9').text(PARTY[k].name);
-    svg.append('text').attr('class','poll-legend-value').attr('data-series',k).attr('x',legendX+16).attr('y',rowY+19)
-      .attr('font-size',w<380?11:13).attr('font-weight',700).attr('fill','#f2f4f7').text(last.toFixed(1)+'%');
+    svg.append('text').attr('class','poll-legend-value').attr('data-series',k)
+      .attr('x',compact?w-3:legendX+16).attr('y',compact?rowY:rowY+19).attr('text-anchor',compact?'end':'start')
+      .attr('font-size',compact?10:(w<380?11:13)).attr('font-weight',700).attr('fill','#f2f4f7').text(last.toFixed(1)+'%');
   });
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'];
   months.forEach(function(m,i){
     svg.append('text').attr('x', x(i)).attr('y', h-4)
-    .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').attr('text-anchor','middle').text(m);
+    .attr('font-size',compact?8:(w<340?9:11)).attr('fill','#a6b2bc').attr('text-anchor','middle').text(m);
   });
 }
 
@@ -1022,7 +1027,7 @@ function renderGrid(cat) {
     wireCard(el, c);
     grid.appendChild(el);
     if (big) {
-      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55));
+      drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55), {fitContainer:true});
       thresholdBars(el.querySelector('.thresholds'));
     }
     if (chartKind === 'inz' && el.querySelector('.inz-mini')) drawInzBars(el.querySelector('.inz-mini'), true);
