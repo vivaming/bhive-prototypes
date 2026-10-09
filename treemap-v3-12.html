@@ -131,6 +131,7 @@
       linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%),
       radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03) 0%, transparent 60%);
   }
+  @keyframes imgFadeIn { from { opacity:0; } to { opacity:1; } }
   .cell-img-wrap img { object-position:center 30%;
     width:100%; height:100%; object-fit:cover; display:block;
     filter:brightness(var(--img-brightness)) saturate(var(--img-saturate)) contrast(var(--img-contrast));
@@ -228,6 +229,21 @@
     border-radius:0 0 var(--img-radius) var(--img-radius);
     min-height:32px;
   }
+
+  /* UIV4B: img zone flexes to fill leftover space (title takes only what it needs) */
+  .cell.has-img .cell-img-wrap { flex:1 1 auto; min-height:0; aspect-ratio:auto !important; }
+  .cell.has-img .cell-img-wrap img { height:100%; }
+  .cell.has-img .cell-title { flex:0 0 auto; max-height:none; }
+  /* p0 hero: image as full-bleed background layer; chart floats above */
+  .cell.p0.has-img .cell-img-wrap { position:absolute; inset:0; z-index:0; aspect-ratio:auto !important; }
+  .cell.p0.has-img .cell-img-wrap::after { background: linear-gradient(to bottom, rgba(5,7,10,.25) 0%, rgba(5,7,10,.55) 55%, rgba(5,7,10,.88) 100%) !important; }
+  .cell.p0.has-img .cell-title,
+  .cell.p0.has-img .tag-row,
+  .cell.p0.has-img .badge-row,
+  .cell.p0.has-img .election-chart,
+  .cell.p0.has-img .gap-callout,
+  .cell.p0.has-img .thresholds { position:relative; z-index:1; }
+
   /* Narrow-screen fallback for title band */
   @media (max-width:480px) {
     .cell-title-band { display:none !important; }
