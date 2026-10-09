@@ -38,13 +38,13 @@
       "height": 640,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-wp6-1",
-      "fileSha256": "01d3420ec2d8c9961992714213d1139288989b962b62154454746d7f88491e33",
+      "fileSha256": "4fed9da844b3e6b0db1c1904516dced7fe05789addf74a3b2c80f8bd4777b4e2",
       "variantsSha256": {
-        "480": "d4a6113db1d1eb913cd34a9f16fe8bbf7a18a1b67a471c7d1a8665e7f5ef3367",
-        "960": "01d3420ec2d8c9961992714213d1139288989b962b62154454746d7f88491e33",
+        "480": "3210588246492a543689377dca57ea31dfd645570888ecf72c1a578f81be9417",
+        "960": "4fed9da844b3e6b0db1c1904516dced7fe05789addf74a3b2c80f8bd4777b4e2",
         "1440": "e3122de2fee41d7a681b4600b7e949a7418f4026cc5c34c49b4de61f4a337a81"
       },
-      "sourceEvidenceSha256": "c43dc7b94199659a2ea83c2a2a6d09a8aaf584d8a276c8f5b7e47bf675b21b2a",
+      "sourceEvidenceSha256": "89c332a042e845d67180ce9e61092abf7a95b4a7d3f22e3a0fcc72f4ab9e32b1",
       "encoder": {
         "name": "sharp",
         "version": "0.35.5",
@@ -54,7 +54,26 @@
         "smartSubsample": true,
         "orientation": "rotate from source metadata"
       },
-      "sourceFileSha256": "a7f35961ff10fce3af343c2152d621fcbdc1862e9577a88abe6d0deaa97a9a23"
+      "sourceFileSha256": "a7f35961ff10fce3af343c2152d621fcbdc1862e9577a88abe6d0deaa97a9a23",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/parliament-chamber-1440.webp",
+        "masterSha256": "e3122de2fee41d7a681b4600b7e949a7418f4026cc5c34c49b4de61f4a337a81",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "paul-henry-archive",
@@ -94,7 +113,7 @@
       "variantsSha256": {
         "480": "557783dae78e8090fc0bca5d5f6779295cb68be3db320ba95778d3423a896b3d"
       },
-      "sourceEvidenceSha256": "4002f8b018416033e802deef37a7306286fffe8075c0594294e2cf6322a1d595",
+      "sourceEvidenceSha256": "17f5d803d0ac61a6a082837421e140c4de6c9626b401adc75c2d83457b53e4e1",
       "encoder": {
         "name": "sharp",
         "version": "0.35.5",
@@ -104,7 +123,23 @@
         "smartSubsample": true,
         "orientation": "rotate from source metadata"
       },
-      "sourceFileSha256": "6bdf3a7ec59cacea4f4ec8c83a520bc3909eee565b717c685771072aa4c896c8"
+      "sourceFileSha256": "6bdf3a7ec59cacea4f4ec8c83a520bc3909eee565b717c685771072aa4c896c8",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 480,
+        "masterFile": "assets/photos/paul-henry-archive-480.webp",
+        "masterSha256": "557783dae78e8090fc0bca5d5f6779295cb68be3db320ba95778d3423a896b3d",
+        "derivedWidths": [],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "nz-parliament-buildings",
@@ -143,13 +178,13 @@
       "height": 317,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-s11",
-      "fileSha256": "308071f71acce03c306d35a2ac323870db60eb4b1edee27d86aa6478650037cd",
+      "fileSha256": "9587ee050248867445b082c2148434024bfa5b1129c55ad56bd473fd361af534",
       "variantsSha256": {
-        "480": "4529d2720bd98ed63b009c5d48454e2e98983e7450e5da259b1440569fe21db7",
-        "960": "308071f71acce03c306d35a2ac323870db60eb4b1edee27d86aa6478650037cd",
+        "480": "b5c4369565faa0ec4a456ac3c1480f9481009152235a5c558930c4aa71124fd2",
+        "960": "9587ee050248867445b082c2148434024bfa5b1129c55ad56bd473fd361af534",
         "1440": "4d1f074fbbd5771b256d28714a87a2d52d9d49c39034b080c302e1f440926ce9"
       },
-      "sourceEvidenceSha256": "9ae453c02305d0c273385b46283a9ab02dd771c970a9f20506e2641a2de62f5b",
+      "sourceEvidenceSha256": "41c8d6950ff7999bc38d349428735c719e8009b560fa2c10a1353cced4d86847",
       "encoder": {
         "name": "sharp",
         "version": "0.35.5",
@@ -159,7 +194,26 @@
         "smartSubsample": true,
         "orientation": "rotate from source metadata"
       },
-      "sourceFileSha256": "4575f6f3986a7cd55bedca4d540cf936147a6620bb20b8ee104b45cc1ee9f1e3"
+      "sourceFileSha256": "4575f6f3986a7cd55bedca4d540cf936147a6620bb20b8ee104b45cc1ee9f1e3",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/nz-parliament-buildings-1440.webp",
+        "masterSha256": "4d1f074fbbd5771b256d28714a87a2d52d9d49c39034b080c302e1f440926ce9",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "gas-waikari",
@@ -199,10 +253,10 @@
       "height": 3538,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-wp7-1",
-      "fileSha256": "d9b29f761d8784f15274f3f667d7f99aa595b916f3d1eb9395896cb9c31fcb5c",
+      "fileSha256": "3a55eb27ef2e4e23f1c39ef164680df99c8ad64058c89eeeb321f00abaee6b2e",
       "variantsSha256": {
-        "480": "c27585c8df6a06d82073582f9d5f84e30898037c54d3b29cd4ef864312b238b4",
-        "960": "d9b29f761d8784f15274f3f667d7f99aa595b916f3d1eb9395896cb9c31fcb5c",
+        "480": "6b13d27fbf1e8e78369a2eb281fddf044a4fba6ca349b56dde92fd672c195dff",
+        "960": "3a55eb27ef2e4e23f1c39ef164680df99c8ad64058c89eeeb321f00abaee6b2e",
         "1440": "c4ada4e2401c88a1f246051048bc40be9e30a502bd595a3da4849aa5b3192582"
       },
       "sourceEvidenceSha256": "4d5afd0f483031bf0280705d86beaa2f16abe3be152689df89f001efd7f31bed",
@@ -216,7 +270,26 @@
         "orientation": "rotate from source metadata"
       },
       "sourceFileSha256": "eda1c13d52e1b6e024ff1d86bd6a12f42f96edaf8880d6adcf116f5c8fa0817f",
-      "derivativeLicense": "CC-BY-SA-4.0"
+      "derivativeLicense": "CC-BY-SA-4.0",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/gas-waikari-1440.webp",
+        "masterSha256": "c4ada4e2401c88a1f246051048bc40be9e30a502bd595a3da4849aa5b3192582",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "dairy-rotorua",
@@ -255,10 +328,10 @@
       "height": 3021,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-s15",
-      "fileSha256": "72aa820eaaee0533de43d79315e78c81e94b168b2d7ac2577fee9b02369a62b6",
+      "fileSha256": "50703823765c3f472f1da97b3989a3073ce99c5b76ee164ef07d767ffb6d67ab",
       "variantsSha256": {
-        "480": "3eb1da2124f6989b9e895dc0df803c73751d4ea397b27385126dc05f617a4144",
-        "960": "72aa820eaaee0533de43d79315e78c81e94b168b2d7ac2577fee9b02369a62b6",
+        "480": "1af779ae08667cf67121e522900fe4c5c63e5aca9274c200979308c3bf48617d",
+        "960": "50703823765c3f472f1da97b3989a3073ce99c5b76ee164ef07d767ffb6d67ab",
         "1440": "48fb5ab9a030c9d1a91e6e01cd173d714affeb460d7b190795552017536b1943"
       },
       "sourceEvidenceSha256": "0a74cdb318c79e07c1a9d2d2cdc94bb9030870d1f40bfac0abece31b3f0cf320",
@@ -272,7 +345,26 @@
         "orientation": "rotate from source metadata"
       },
       "sourceFileSha256": "44b787bd6a5515ec82174621291ce0f72de3ea770a746e5da9ba6cf170815e23",
-      "derivativeLicense": "CC-BY-SA-4.0"
+      "derivativeLicense": "CC-BY-SA-4.0",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/dairy-rotorua-1440.webp",
+        "masterSha256": "48fb5ab9a030c9d1a91e6e01cd173d714affeb460d7b190795552017536b1943",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "supermarket-tapawera",
@@ -311,10 +403,10 @@
       "height": 2527,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-s12",
-      "fileSha256": "72379d268258020a5720aa1f6e338d16693722777888e72fce933f411fae45c1",
+      "fileSha256": "c221f6a5e0782a65087a6008fecf53cf99bac4b81095f70d8e61e996e880e210",
       "variantsSha256": {
-        "480": "a7f8c7851518ae2bba96f19dda56aed76c9b679172084f290ae6c45a777115b5",
-        "960": "72379d268258020a5720aa1f6e338d16693722777888e72fce933f411fae45c1",
+        "480": "74ef6ab4b3afd34373e42d83792ea56c4d1288390e895864a44851930c5a4c28",
+        "960": "c221f6a5e0782a65087a6008fecf53cf99bac4b81095f70d8e61e996e880e210",
         "1440": "812a95f652a1facf5a1ccbd3780965c62cee41b9636be7a68e407cf74e275bad"
       },
       "sourceEvidenceSha256": "b85a71fe4049e46fbf3c7d511d095af6c3a7c33141d8df0957dd390e2b9faaca",
@@ -328,7 +420,26 @@
         "orientation": "rotate from source metadata"
       },
       "sourceFileSha256": "8647982ea006f6b3f8ccde295f198dc3584a9144e25fa4ed533e253824099cde",
-      "derivativeLicense": "CC-BY-SA-4.0"
+      "derivativeLicense": "CC-BY-SA-4.0",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/supermarket-tapawera-1440.webp",
+        "masterSha256": "812a95f652a1facf5a1ccbd3780965c62cee41b9636be7a68e407cf74e275bad",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "house-hutchinson",
@@ -368,10 +479,10 @@
       "height": 4000,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-s09",
-      "fileSha256": "07f0035d87112bc03aced59a79622b2978db10813fb5b530e453f3854e450bf7",
+      "fileSha256": "2a4f960c880f4337cbc6e7977c1f5d0f42c283cb33a6fcbd6e16ab2a30445dca",
       "variantsSha256": {
-        "480": "34f96914a4b3f0847f5e593d12ccaf6305880899aed8b7f5c76b41ebff410c53",
-        "960": "07f0035d87112bc03aced59a79622b2978db10813fb5b530e453f3854e450bf7",
+        "480": "52ed64f666fbe856aae49afb8c5f96b08108c6557ca5a41cc6efc2e56e118dfd",
+        "960": "2a4f960c880f4337cbc6e7977c1f5d0f42c283cb33a6fcbd6e16ab2a30445dca",
         "1440": "4bce876437ebb3ef464b5355b2c1172cd34619203b033b0143dadb7f214bcfb2"
       },
       "sourceEvidenceSha256": "0683b44fa8294973c202224c49819729afc8b0cc61893108b994cba5a2d922b2",
@@ -385,7 +496,26 @@
         "orientation": "rotate from source metadata"
       },
       "sourceFileSha256": "fc7c53eaddfe95872b94a8385c7e52f7708ccd69b5bc05cd3c67653b013cd82c",
-      "derivativeLicense": "CC-BY-4.0"
+      "derivativeLicense": "CC-BY-4.0",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/house-hutchinson-1440.webp",
+        "masterSha256": "4bce876437ebb3ef464b5355b2c1172cd34619203b033b0143dadb7f214bcfb2",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "ballot-boxes-2008",
@@ -424,10 +554,10 @@
       "height": 1536,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-wp8-4",
-      "fileSha256": "a00eca2f17c6978c755ad4eb83c420554e39102eb1d250ba0e42cad37804dd0e",
+      "fileSha256": "227c57afc9f69639da3bbe0a72b56e465d1861b593a755d8cd633ee0135ddf76",
       "variantsSha256": {
-        "480": "9dfe9354b554ffbd8904ccf8000d2db701816a1ebb2e86b9a89e01ec78d16fbc",
-        "960": "a00eca2f17c6978c755ad4eb83c420554e39102eb1d250ba0e42cad37804dd0e",
+        "480": "0263e3cd0ab7f6b227ab4dd0c9b49febd2c46af26d31705ea6dc1a301883486c",
+        "960": "227c57afc9f69639da3bbe0a72b56e465d1861b593a755d8cd633ee0135ddf76",
         "1440": "0b610ef3602305c95783c11f60a94730496003fd8ff73857a8ee6656a479e36d"
       },
       "sourceEvidenceSha256": "22d9a062a236f5eb4dc464affe3695764fe6bf2bfd7ed1fe5facfa099638b81c",
@@ -440,7 +570,26 @@
         "smartSubsample": true,
         "orientation": "rotate from source metadata"
       },
-      "sourceFileSha256": "f4122d54bf0b9e04df2d29ac1a2907b6bf55e56c3ae55a4fa7b7907a7aa6bba4"
+      "sourceFileSha256": "f4122d54bf0b9e04df2d29ac1a2907b6bf55e56c3ae55a4fa7b7907a7aa6bba4",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/ballot-boxes-2008-1440.webp",
+        "masterSha256": "0b610ef3602305c95783c11f60a94730496003fd8ff73857a8ee6656a479e36d",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "wellington-airport-pa01",
@@ -479,10 +628,10 @@
       "height": 3748,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-s06",
-      "fileSha256": "fb6f4240eb2dcfa85a0b888c725ee0d653ac8859e6d0c32a141e4d8fb3531c2f",
+      "fileSha256": "05e9d6ddfe4770377d3b3cb2b331807e2521904ae7252bb9301b84262c6095ce",
       "variantsSha256": {
-        "480": "aa62141357fe3c97cac772c68fecc90762f0be0315f372b51ad212002d1b2501",
-        "960": "fb6f4240eb2dcfa85a0b888c725ee0d653ac8859e6d0c32a141e4d8fb3531c2f",
+        "480": "21b5c625823e7d2f61cd8076f8453d4b517c39b89239dd8a5d15d6ca62e1ab56",
+        "960": "05e9d6ddfe4770377d3b3cb2b331807e2521904ae7252bb9301b84262c6095ce",
         "1440": "f7622eb8689e99b7f624012fbcadf1a4f6ee95ad621a779f79ace3fc3bfc0c40"
       },
       "sourceEvidenceSha256": "ee58932695158f35ceeb73d1a9cf7581f4938c16a1a312d3d8abfb7a4bd26c7c",
@@ -496,7 +645,26 @@
         "orientation": "rotate from source metadata"
       },
       "sourceFileSha256": "724f8b6303850b6aaf9ef009d6694beeb054a4cd7079b005692975d9754ec9b4",
-      "derivativeLicense": "CC0-1.0"
+      "derivativeLicense": "CC0-1.0",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/wellington-airport-pa01-1440.webp",
+        "masterSha256": "f7622eb8689e99b7f624012fbcadf1a4f6ee95ad621a779f79ace3fc3bfc0c40",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     },
     {
       "assetId": "wairakei-geothermal",
@@ -535,10 +703,10 @@
       "height": 1200,
       "verifiedAt": "2026-10-09",
       "fallbackAssetId": "editorial-s17",
-      "fileSha256": "83f5041e6821ba0dc0f09a194b6ab2f7a1cb62d11f370cc6946efc3184023f0f",
+      "fileSha256": "13cc4bb2390dd2a6a960cce4fa65a6dc44cb81c20d6cb3a46cd0e734d405d1d7",
       "variantsSha256": {
-        "480": "4faecc69ace5598a0aafa726d73d0206b81ea824b16fe1cff14ec8d1b5d3fb86",
-        "960": "83f5041e6821ba0dc0f09a194b6ab2f7a1cb62d11f370cc6946efc3184023f0f",
+        "480": "abb452cf2b2d5ee9befc56f5398c26b046d2380baf315ba4766be862adac2e76",
+        "960": "13cc4bb2390dd2a6a960cce4fa65a6dc44cb81c20d6cb3a46cd0e734d405d1d7",
         "1440": "ce0695a3fef0c3166c630a7b14c007931ca744c442071b18887745b5cc52ceac"
       },
       "sourceEvidenceSha256": "ee92a7a34ec203129176073537cad1552e6586ef23b01ef0fb7efa861ea76dd4",
@@ -551,7 +719,26 @@
         "smartSubsample": true,
         "orientation": "rotate from source metadata"
       },
-      "sourceFileSha256": "465e68bc0801e2b9ebfe7d36536e203f262fdd048ec5f73f2ec7e21612be3c18"
+      "sourceFileSha256": "465e68bc0801e2b9ebfe7d36536e203f262fdd048ec5f73f2ec7e21612be3c18",
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/wairakei-geothermal-1440.webp",
+        "masterSha256": "ce0695a3fef0c3166c630a7b14c007931ca744c442071b18887745b5cc52ceac",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
     }
   ]
 }

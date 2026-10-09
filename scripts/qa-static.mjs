@@ -25,6 +25,8 @@ const lock=JSON.parse(fs.readFileSync('assets/photos/photo-catalog.lock.json','u
 const policy=JSON.parse(fs.readFileSync('content/media-policy.json','utf8'));
 const evidence=lock.assets.every(a=>fs.existsSync(a.sourceEvidencePath)&&crypto.createHash('sha256').update(canonicalTextBytes(a.sourceEvidencePath)).digest('hex')===a.sourceEvidenceSha256);
 check('photo source evidence',evidence,`${lock.assets.length} assets`);
+const canonicalMasters=lock.assets.every(a=>a.canonicalRebuild?.method==='checked-in-highest-resolution-WebP'&&a.canonicalRebuild.masterFile===a.variants?.[String(a.canonicalRebuild.masterWidth)]&&a.canonicalRebuild.masterSha256===a.variantsSha256?.[String(a.canonicalRebuild.masterWidth)]);
+check('offline canonical media masters',canonicalMasters,`${lock.assets.length} SHA-256-locked master variants`);
 const storyIds=[...new Set([...html.matchAll(/\{\s*id:'([^']+)'/g)].map(m=>m[1]))].filter(id=>id!=='logo');
 check('photo coverage and exclusions recorded',storyIds.every(id=>policy.storyMedia[id]||policy.coverPreservedForChartStories.includes(id)||policy.unmatchedPhotoStories[id]?.reason),`${Object.keys(policy.storyMedia).length} photos; ${Object.keys(policy.unmatchedPhotoStories).length} NO_APPROVED_PHOTO decisions`);
 const staticCheck=execFileSync(process.execPath,['scripts/media-verify.mjs'],{encoding:'utf8'});check('photo variants and license hashes',staticCheck.includes('PASS:'),staticCheck.trim());
