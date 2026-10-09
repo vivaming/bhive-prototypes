@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:Dairy_cows,_Rotorua,_New_Zealand.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page and original upload reviewed",
+  "creator": "AnnWoolliams",
+  "date": "17 November 2022",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "sourceFileSha256": "44b787bd6a5515ec82174621291ce0f72de3ea770a746e5da9ba6cf170815e23",
+  "sourceDimensions": {
+    "width": 3733,
+    "height": 3021
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "File-description page identifies the depicted place or subject, author, date, and CC BY-SA 4.0 terms. Original file downloaded from upload.wikimedia.org; source bytes are retained locally only in the ignored work directory."
+}

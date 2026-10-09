@@ -1,0 +1,181 @@
+{
+  "policyVersion": 1,
+  "selectionOrder": [
+    "chart",
+    "verified-photo",
+    "text"
+  ],
+  "storyMedia": {
+    "wp6-1": {
+      "preferred": "parliament-chamber",
+      "reason": "Official archive image of New Zealand's parliamentary debating chamber; contextual fallback for a KiwiSaver policy story, clearly labeled archive."
+    },
+    "wp6-3": {
+      "preferred": "paul-henry-archive",
+      "reason": "The pictured person is the named subject, Paul Henry; the photograph is explicitly dated 2008 and labeled archive."
+    },
+    "s11": {
+      "preferred": "nz-parliament-buildings",
+      "reason": "The image identifies New Zealand Parliament Buildings and the Beehive, matching the cabinet reshuffle story; clearly labeled archive."
+    },
+    "wp7-1": {
+      "preferred": "gas-waikari",
+      "reason": "The photo directly depicts a New Zealand petrol station in Waikari. It is an illustrative location image, not the government decision or a 2026 event photograph."
+    },
+    "s15": {
+      "preferred": "dairy-rotorua",
+      "reason": "The photo directly depicts dairy cows in Rotorua and is a relevant New Zealand dairy-sector context image. It does not depict the payout announcement."
+    },
+    "s12": {
+      "preferred": "supermarket-tapawera",
+      "reason": "The photo depicts a New Zealand supermarket and directly fits the Foodstuffs competition story. It is an illustrative local-store image, not a scene from the article’s reported events."
+    },
+    "s09": {
+      "preferred": "house-hutchinson",
+      "reason": "The image directly depicts a house in Auckland, fitting the New Zealand housing-price and inventory story. It is explicitly an archive/context image, not a property in the REINZ dataset."
+    },
+    "wp8-4": {
+      "preferred": "ballot-boxes-2008",
+      "reason": "The photo directly depicts ballot boxes at a New Zealand polling place during the 2008 general election, matching the election-process recommendations story. It is labeled archive, not 2026 campaign coverage."
+    },
+    "s06": {
+      "preferred": "wellington-airport-pa01",
+      "reason": "The image directly depicts Wellington Airport, a relevant New Zealand travel context for the migration story. Its description says it was photographed from a departing flight; it is not evidence of the migration event or arrival flows."
+    },
+    "s17": {
+      "preferred": "wairakei-geothermal",
+      "reason": "The photo directly depicts a New Zealand geothermal power plant, matching the energy-sector subject of the TPM fund story. It is explicitly historical sector context, not a TPM-funded facility or project."
+    },
+    "wp8-1": {
+      "preferred": "david-seymour-2023",
+      "reason": "The archive portrait depicts ACT leader David Seymour, directly matching the ACT fiscal-policy story; it is not a photograph of the reported announcement."
+    },
+    "wp7-2": {
+      "preferred": "winston-peters-2023",
+      "reason": "The archive portrait depicts NZ First leader Winston Peters, directly matching the NZ First immigration-policy story; it is not a photograph of the reported announcement."
+    },
+    "s03": {
+      "preferred": "winston-peters-2023",
+      "reason": "The archive portrait depicts NZ First leader Winston Peters, directly matching the NZ First immigration-policy story; it is not a photograph of the reported announcement."
+    },
+    "wp7-3": {
+      "preferred": "wellington-hospital",
+      "reason": "The archive photograph depicts a New Zealand hospital and gives local health-service context to graduate-nurse jobs and emergency-department capacity; it does not depict the jobs announcement or an individual patient."
+    },
+    "s04": {
+      "preferred": "wellington-hospital",
+      "reason": "The archive photograph depicts a New Zealand hospital and gives local health-service context to graduate-nurse jobs and emergency-department capacity; it does not depict the jobs announcement or an individual patient."
+    },
+    "s10": {
+      "preferred": "wellington-hospital",
+      "reason": "The archive photograph depicts a New Zealand hospital and gives local health-service context to graduate-nurse jobs and emergency-department capacity; it does not depict the jobs announcement or an individual patient."
+    },
+    "wp8-3": {
+      "preferred": "house-hutchinson",
+      "reason": "The approved archive photograph depicts an Auckland house and supplies local housing context for the housing forum or building-consent story; it is not a forum-event photo or a property in the cited dataset."
+    },
+    "s24": {
+      "preferred": "house-hutchinson",
+      "reason": "The approved archive photograph depicts an Auckland house and supplies local housing context for the housing forum or building-consent story; it is not a forum-event photo or a property in the cited dataset."
+    },
+    "s02": {
+      "preferred": "gas-waikari",
+      "reason": "The approved archive photograph depicts a New Zealand petrol station, directly matching fuel tax and petrol-price inflation; it is a sector context image, not a photograph of the reported policy event."
+    },
+    "s05": {
+      "preferred": "gas-waikari",
+      "reason": "The approved archive photograph depicts a New Zealand petrol station, directly matching fuel tax and petrol-price inflation; it is a sector context image, not a photograph of the reported policy event."
+    },
+    "s08": {
+      "preferred": "wairakei-geothermal",
+      "reason": "The approved historical photograph depicts New Zealand geothermal generation, matching the climate/net-zero and economic-growth subject; it is energy-sector context, not evidence of a Green Party project."
+    },
+    "s39": {
+      "preferred": "supermarket-tapawera",
+      "reason": "The approved archive photograph depicts a New Zealand supermarket, matching the grocery-code consultation subject; it is a context image rather than a photograph of the consultation."
+    }
+  },
+  "unmatchedPhotoStories": {
+    "s13": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s14": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s16": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s18": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s19": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s20": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s21": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s22": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s23": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s25": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s26": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s27": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s28": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s29": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s30": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s31": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s32": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s33": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s34": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s35": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s36": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s37": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s38": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    },
+    "s40": {
+      "reason": "NO_APPROVED_PHOTO: no verified image meets the subject and licensing requirements; display a text card without abstract filler artwork."
+    }
+  },
+  "coverAndArticleMediaAreIndependent": true,
+  "photoDoesNotChangeStoryOrder": true,
+  "coverPreservedForChartStories": [
+    "election",
+    "wp6-2",
+    "wp8-2",
+    "s07"
+  ],
+  "allowAbstractIllustrationFallback": false
+}

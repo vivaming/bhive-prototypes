@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:Wellington_Airport_PA01.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page and original upload reviewed",
+  "creator": "Paora",
+  "date": "29 December 2025",
+  "license": "CC0 1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "sourceFileSha256": "724f8b6303850b6aaf9ef009d6694beeb054a4cd7079b005692975d9754ec9b4",
+  "sourceDimensions": {
+    "width": 4477,
+    "height": 3748
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "The Commons file page describes a view of the Wellington airport terminal from a departing flight on 29 December 2025, author Paora, under CC0 1.0."
+}

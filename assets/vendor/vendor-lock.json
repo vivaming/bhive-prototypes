@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "runtime": [
+    {
+      "name": "D3",
+      "version": "7.9.0",
+      "file": "assets/vendor/d3-7.9.0.min.js",
+      "license": "ISC",
+      "licenseFile": "assets/vendor/D3-LICENSE.txt",
+      "source": "https://github.com/d3/d3/tree/v7.9.0",
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    }
+  ],
+  "fonts": [
+    {
+      "family": "Space Grotesk",
+      "source": "Google Fonts Space Grotesk v22 static TTF",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "assets/vendor/fonts/SpaceGrotesk-OFL.txt",
+      "weights": [
+        400,
+        500,
+        700
+      ]
+    },
+    {
+      "family": "Roboto Condensed",
+      "source": "Google Fonts Roboto Condensed v31 static TTF",
+      "license": "SIL Open Font License 1.1",
+      "licenseFile": "assets/vendor/fonts/RobotoCondensed-OFL.txt",
+      "weights": [
+        400,
+        500,
+        600,
+        700
+      ]
+    }
+  ],
+  "files": [
+    {
+      "file": "assets/vendor/d3-7.9.0.min.js",
+      "sha256": "f2094bbf6141b359722c4fe454eb6c4b0f0e42cc10cc7af921fc158fceb86539"
+    },
+    {
+      "file": "assets/vendor/D3-LICENSE.txt",
+      "sha256": "3e6849627f74ff73c257a3ae1efb574015d94fc1035c05ec3c15805165efcbc4"
+    },
+    {
+      "file": "assets/vendor/fonts/roboto-condensed-400.ttf",
+      "sha256": "ef9d48725ff2bd72cd569ca50555fb781f99cf8f3a88a3bb3c8a4c85fd574458"
+    },
+    {
+      "file": "assets/vendor/fonts/roboto-condensed-500.ttf",
+      "sha256": "23ecdb9a0753073f59058c1a8be290cff9146bab9265b7da684d2e4075b4e5d3"
+    },
+    {
+      "file": "assets/vendor/fonts/roboto-condensed-600.ttf",
+      "sha256": "72a060cf1aa155f2a91b967545ca800e0fe7e2ddc0d50e23f141cb096e18c9d5"
+    },
+    {
+      "file": "assets/vendor/fonts/roboto-condensed-700.ttf",
+      "sha256": "35140bfdde80295fbcd04dad086f51688abca96cb8c87529daf781c4462b6e33"
+    },
+    {
+      "file": "assets/vendor/fonts/RobotoCondensed-OFL.txt",
+      "sha256": "8e8a3bebd49e8be1dc3b2c5397de3bca50bfda4ba4f0a47d4665ba58370c01eb"
+    },
+    {
+      "file": "assets/vendor/fonts/space-grotesk-400.ttf",
+      "sha256": "ec926d5065eaca49a48f96e312bbae0bbc5733c24215cf5dfabbdccee926fef7"
+    },
+    {
+      "file": "assets/vendor/fonts/space-grotesk-500.ttf",
+      "sha256": "3e699ead1876244fa392243054ddefe7cf631b488438828a8a100731a22ab995"
+    },
+    {
+      "file": "assets/vendor/fonts/space-grotesk-700.ttf",
+      "sha256": "3e756954468ff1cb302dae0414262e72f76a67d87bef3fa1f3226cd0fb9b2d85"
+    },
+    {
+      "file": "assets/vendor/fonts/SpaceGrotesk-OFL.txt",
+      "sha256": "52e2bc772633f000167bb4e8b146def10169a178bad113efab7a1872208cb0e7"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:Gas_station,_Waikari,_Canterbury,_New_Zealand.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page and original upload reviewed",
+  "creator": "Michal Klajban",
+  "date": "4 January 2021",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "sourceFileSha256": "eda1c13d52e1b6e024ff1d86bd6a12f42f96edaf8880d6adcf116f5c8fa0817f",
+  "sourceDimensions": {
+    "width": 4689,
+    "height": 3538
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "File-description page identifies the depicted place or subject, author, date, and CC BY-SA 4.0 terms. Original file downloaded from upload.wikimedia.org; source bytes are retained locally only in the ignored work directory."
+}

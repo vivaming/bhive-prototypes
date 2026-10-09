@@ -1,0 +1,143 @@
+{
+  "assets": [
+    {
+      "assetId": "parliament-chamber",
+      "storyIds": [
+        "wp6-1"
+      ],
+      "file": "assets/photos/parliament-chamber-960.webp",
+      "license": "CC-BY-4.0",
+      "creator": "Office of the Clerk of the House of Representatives of New Zealand",
+      "source": "https://commons.wikimedia.org/wiki/File:New_Zealand_House_of_Representatives_debating_chamber.jpg"
+    },
+    {
+      "assetId": "paul-henry-archive",
+      "storyIds": [
+        "wp6-3"
+      ],
+      "file": "assets/photos/paul-henry-archive-480.webp",
+      "license": "CC-BY-2.0",
+      "creator": "Vivianne Robinson",
+      "source": "https://commons.wikimedia.org/wiki/File:Paul_Henry_(New_Zealand_broadcaster)_(cropped).jpg"
+    },
+    {
+      "assetId": "nz-parliament-buildings",
+      "storyIds": [
+        "s11"
+      ],
+      "file": "assets/photos/nz-parliament-buildings-960.webp",
+      "license": "CC-BY-SA-4.0",
+      "creator": "Tom Ackroyd / Quilt Phase",
+      "source": "https://commons.wikimedia.org/wiki/File:NZ_Parliament_Buildings_2020-06-26.jpg"
+    },
+    {
+      "assetId": "gas-waikari",
+      "storyIds": [
+        "wp7-1",
+        "s02",
+        "s05"
+      ],
+      "file": "assets/photos/gas-waikari-960.webp",
+      "license": "CC-BY-SA-4.0",
+      "creator": "Michal Klajban",
+      "source": "https://commons.wikimedia.org/wiki/File:Gas_station,_Waikari,_Canterbury,_New_Zealand.jpg"
+    },
+    {
+      "assetId": "dairy-rotorua",
+      "storyIds": [
+        "s15"
+      ],
+      "file": "assets/photos/dairy-rotorua-960.webp",
+      "license": "CC-BY-SA-4.0",
+      "creator": "AnnWoolliams",
+      "source": "https://commons.wikimedia.org/wiki/File:Dairy_cows,_Rotorua,_New_Zealand.jpg"
+    },
+    {
+      "assetId": "supermarket-tapawera",
+      "storyIds": [
+        "s12",
+        "s39"
+      ],
+      "file": "assets/photos/supermarket-tapawera-960.webp",
+      "license": "CC-BY-SA-4.0",
+      "creator": "Michal Klajban",
+      "source": "https://commons.wikimedia.org/wiki/File:Supermarket_in_Tapawera,_New_Zealand.jpg"
+    },
+    {
+      "assetId": "house-hutchinson",
+      "storyIds": [
+        "s09",
+        "wp8-3",
+        "s24"
+      ],
+      "file": "assets/photos/house-hutchinson-960.webp",
+      "license": "CC-BY-4.0",
+      "creator": "Bjankuloski06",
+      "source": "https://commons.wikimedia.org/wiki/File:House_at_12_Hutchinson_Avenue.jpg"
+    },
+    {
+      "assetId": "ballot-boxes-2008",
+      "storyIds": [
+        "wp8-4"
+      ],
+      "file": "assets/photos/ballot-boxes-2008-960.webp",
+      "license": "PD-self",
+      "creator": "SimonLyall",
+      "source": "https://commons.wikimedia.org/wiki/File:BallotBoxes_NZ_2008.jpg"
+    },
+    {
+      "assetId": "wellington-airport-pa01",
+      "storyIds": [
+        "s06"
+      ],
+      "file": "assets/photos/wellington-airport-pa01-960.webp",
+      "license": "CC0-1.0",
+      "creator": "Paora",
+      "source": "https://commons.wikimedia.org/wiki/File:Wellington_Airport_PA01.jpg"
+    },
+    {
+      "assetId": "wairakei-geothermal",
+      "storyIds": [
+        "s17",
+        "s08"
+      ],
+      "file": "assets/photos/wairakei-geothermal-960.webp",
+      "license": "PD-self",
+      "creator": "Ingolfson",
+      "source": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg"
+    },
+    {
+      "assetId": "david-seymour-2023",
+      "storyIds": [
+        "wp8-1"
+      ],
+      "file": "assets/photos/david-seymour-2023-494.webp",
+      "license": "CC0-1.0",
+      "creator": "Doug Mountain / Government House",
+      "source": "https://commons.wikimedia.org/wiki/File:David_Seymour_at_Government_House%2C_Wellington.png"
+    },
+    {
+      "assetId": "winston-peters-2023",
+      "storyIds": [
+        "wp7-2",
+        "s03"
+      ],
+      "file": "assets/photos/winston-peters-2023-266.webp",
+      "license": "CC0-1.0",
+      "creator": "Doug Mountain / Government House",
+      "source": "https://commons.wikimedia.org/wiki/File:Winston_Peters_2023_cropped_headshot.jpg"
+    },
+    {
+      "assetId": "wellington-hospital",
+      "storyIds": [
+        "wp7-3",
+        "s04",
+        "s10"
+      ],
+      "file": "assets/photos/wellington-hospital-960.webp",
+      "license": "CC-BY-SA-4.0",
+      "creator": "Tom Ackroyd / Quilt Phase",
+      "source": "https://commons.wikimedia.org/wiki/File:Wellington_Hospital.jpg"
+    }
+  ]
+}

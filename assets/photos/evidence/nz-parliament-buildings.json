@@ -1,0 +1,19 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:NZ_Parliament_Buildings_2020-06-26.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page review",
+  "creator": "Tom Ackroyd / Quilt Phase",
+  "date": "26 June 2020",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "sourceFileSha1": "eb25c26eaf2fc5600914db1b41b970f40cbd7223",
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "Commons description says the Wellington Parliament Buildings, from left Bowen House, Beehive, Parliament House and Parliamentary Library. Author Tom Ackroyd. CC BY-SA 4.0.",
+  "sourceFileSha256": "4575f6f3986a7cd55bedca4d540cf936147a6620bb20b8ee104b45cc1ee9f1e3"
+}

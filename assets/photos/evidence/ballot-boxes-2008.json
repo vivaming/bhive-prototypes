@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:BallotBoxes_NZ_2008.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons file-description page and original upload reviewed",
+  "creator": "SimonLyall",
+  "date": "8 November 2008",
+  "license": "Public domain (worldwide release)",
+  "licenseUrl": "https://commons.wikimedia.org/wiki/File:BallotBoxes_NZ_2008.jpg",
+  "sourceFileSha256": "f4122d54bf0b9e04df2d29ac1a2907b6bf55e56c3ae55a4fa7b7907a7aa6bba4",
+  "sourceDimensions": {
+    "width": 2048,
+    "height": 1536
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "The Commons file page identifies the ballot boxes at a polling place for the 2008 New Zealand general election, author SimonLyall, and the holder’s worldwide public-domain release."
+}
