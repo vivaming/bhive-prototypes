@@ -7,6 +7,7 @@
   "scripts": {
     "media:verify": "node scripts/media-verify.mjs",
     "media:rebuild": "node scripts/media-build.mjs",
+    "media:sync": "node scripts/sync-photo-map.mjs",
     "build:repro": "node scripts/build-repro.mjs",
     "qa:static": "node scripts/qa-static.mjs",
     "qa:all": "node scripts/qa-report.mjs",

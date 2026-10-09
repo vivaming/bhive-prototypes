@@ -104,7 +104,7 @@
         "x": 0.5,
         "y": 0.24
       },
-      "objectPosition": "center 24%",
+      "objectPosition": "center",
       "width": 480,
       "height": 653,
       "verifiedAt": "2026-10-09",
@@ -139,7 +139,8 @@
           "smartSubsample": true,
           "orientation": "master is pre-oriented; no further rotation"
         }
-      }
+      },
+      "portrait": true
     },
     {
       "assetId": "nz-parliament-buildings",
@@ -218,7 +219,9 @@
     {
       "assetId": "gas-waikari",
       "storyIds": [
-        "wp7-1"
+        "wp7-1",
+        "s02",
+        "s05"
       ],
       "kind": "photo",
       "src": "assets/photos/gas-waikari-960.webp",
@@ -369,7 +372,8 @@
     {
       "assetId": "supermarket-tapawera",
       "storyIds": [
-        "s12"
+        "s12",
+        "s39"
       ],
       "kind": "photo",
       "src": "assets/photos/supermarket-tapawera-960.webp",
@@ -444,7 +448,9 @@
     {
       "assetId": "house-hutchinson",
       "storyIds": [
-        "s09"
+        "s09",
+        "wp8-3",
+        "s24"
       ],
       "kind": "photo",
       "src": "assets/photos/house-hutchinson-960.webp",
@@ -669,7 +675,8 @@
     {
       "assetId": "wairakei-geothermal",
       "storyIds": [
-        "s17"
+        "s17",
+        "s08"
       ],
       "kind": "photo",
       "src": "assets/photos/wairakei-geothermal-960.webp",
@@ -739,6 +746,219 @@
           "orientation": "master is pre-oriented; no further rotation"
         }
       }
+    },
+    {
+      "assetId": "david-seymour-2023",
+      "storyIds": [
+        "wp8-1"
+      ],
+      "kind": "photo",
+      "src": "assets/photos/david-seymour-2023-494.webp",
+      "variants": {
+        "480": "assets/photos/david-seymour-2023-480.webp",
+        "494": "assets/photos/david-seymour-2023-494.webp"
+      },
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:David_Seymour_at_Government_House%2C_Wellington.png",
+      "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/9/91/David_Seymour_at_Government_House%2C_Wellington.png",
+      "creator": "Doug Mountain / Government House",
+      "licenseId": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attributionText": "Photo: Doug Mountain / Government House, CC0 1.0 (27 November 2023); archive/context image.",
+      "modifications": "Resized and encoded as WebP; no content edits. Display framing and backdrop use the same photograph.",
+      "sourceEvidencePath": "assets/photos/evidence/david-seymour-2023.json",
+      "sourceEvidenceSha256": "20b27c8d3360a6eeefa29b7088d4f06103214b6d7b06fb37c2822a743c9beb75",
+      "subjectTags": [
+        "David Seymour at Government House, Wellington"
+      ],
+      "relevanceReason": "The archive portrait depicts ACT leader David Seymour, directly matching the ACT fiscal-policy story; it is not a photograph of the reported announcement.",
+      "archiveDate": "27 November 2023",
+      "alt": "David Seymour at Government House, Wellington; archive/context photograph, 27 November 2023.",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "objectPosition": "center",
+      "portrait": true,
+      "width": 494,
+      "height": 496,
+      "verifiedAt": "2026-10-09",
+      "fallbackAssetId": "text",
+      "fileSha256": "734d9b64eceb39f2eff14e0edc4ca615ce38cbd27dbd95a495ef829143aa1370",
+      "sourceFileSha256": "9b078273278b62040a68208f6b24a4e598086592ee108bfb99f0289c2328ceab",
+      "variantsSha256": {
+        "480": "29bd3ab55bc56ea62cb68c7b077d29aa190ed7d4a9fbffe564164a79606c0f33",
+        "494": "734d9b64eceb39f2eff14e0edc4ca615ce38cbd27dbd95a495ef829143aa1370"
+      },
+      "encoder": {
+        "name": "sharp",
+        "version": "0.35.5",
+        "format": "webp",
+        "quality": 92,
+        "effort": 6,
+        "smartSubsample": true,
+        "orientation": "master is pre-oriented; no further rotation"
+      },
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 494,
+        "masterFile": "assets/photos/david-seymour-2023-494.webp",
+        "masterSha256": "734d9b64eceb39f2eff14e0edc4ca615ce38cbd27dbd95a495ef829143aa1370",
+        "derivedWidths": [
+          480
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
+    },
+    {
+      "assetId": "winston-peters-2023",
+      "storyIds": [
+        "wp7-2",
+        "s03"
+      ],
+      "kind": "photo",
+      "src": "assets/photos/winston-peters-2023-266.webp",
+      "variants": {
+        "266": "assets/photos/winston-peters-2023-266.webp"
+      },
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Winston_Peters_2023_cropped_headshot.jpg",
+      "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Winston_Peters_2023_cropped_headshot.jpg",
+      "creator": "Doug Mountain / Government House",
+      "licenseId": "CC0-1.0",
+      "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+      "attributionText": "Photo: Doug Mountain / Government House, CC0 1.0 (27 November 2023); archive/context image.",
+      "modifications": "Resized and encoded as WebP; no content edits. Display framing and backdrop use the same photograph.",
+      "sourceEvidencePath": "assets/photos/evidence/winston-peters-2023.json",
+      "sourceEvidenceSha256": "32dcea5a522962ef74a6e1085512751f5cdec96a3f94357d5f570a2c176493d2",
+      "subjectTags": [
+        "Winston Peters at Government House, Wellington"
+      ],
+      "relevanceReason": "The archive portrait depicts NZ First leader Winston Peters, directly matching the NZ First immigration-policy story; it is not a photograph of the reported announcement.",
+      "archiveDate": "27 November 2023",
+      "alt": "Winston Peters at Government House, Wellington; archive/context photograph, 27 November 2023.",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "objectPosition": "center",
+      "portrait": true,
+      "width": 266,
+      "height": 355,
+      "verifiedAt": "2026-10-09",
+      "fallbackAssetId": "text",
+      "fileSha256": "b6aaca66207858dbf19bc1ac1d2ac5933ec13da928112bb4c3686c203c433721",
+      "sourceFileSha256": "9cbc9659516f31cd4d9c746dc8f1dcdb8ae5b22175760d7c5ff2f234cfacf782",
+      "variantsSha256": {
+        "266": "b6aaca66207858dbf19bc1ac1d2ac5933ec13da928112bb4c3686c203c433721"
+      },
+      "encoder": {
+        "name": "sharp",
+        "version": "0.35.5",
+        "format": "webp",
+        "quality": 92,
+        "effort": 6,
+        "smartSubsample": true,
+        "orientation": "master is pre-oriented; no further rotation"
+      },
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 266,
+        "masterFile": "assets/photos/winston-peters-2023-266.webp",
+        "masterSha256": "b6aaca66207858dbf19bc1ac1d2ac5933ec13da928112bb4c3686c203c433721",
+        "derivedWidths": [],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      }
+    },
+    {
+      "assetId": "wellington-hospital",
+      "storyIds": [
+        "wp7-3",
+        "s04",
+        "s10"
+      ],
+      "kind": "photo",
+      "src": "assets/photos/wellington-hospital-960.webp",
+      "variants": {
+        "480": "assets/photos/wellington-hospital-480.webp",
+        "960": "assets/photos/wellington-hospital-960.webp",
+        "1440": "assets/photos/wellington-hospital-1440.webp"
+      },
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Wellington_Hospital.jpg",
+      "downloadUrl": "https://upload.wikimedia.org/wikipedia/commons/9/99/Wellington_Hospital.jpg",
+      "creator": "Tom Ackroyd / Quilt Phase",
+      "licenseId": "CC-BY-SA-4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "attributionText": "Photo: Tom Ackroyd / Quilt Phase, CC BY-SA 4.0 (26 April 2020); archive/context image.",
+      "modifications": "Resized and encoded as WebP; no content edits. Display framing and backdrop use the same photograph.",
+      "sourceEvidencePath": "assets/photos/evidence/wellington-hospital.json",
+      "sourceEvidenceSha256": "b9f8410d1209eb19d76c04a9f5e3c1e79979592f39c8f24ea4e4386462f8666b",
+      "subjectTags": [
+        "Wellington Regional Hospital, Wellington, New Zealand"
+      ],
+      "relevanceReason": "The archive photograph depicts a New Zealand hospital and gives local health-service context to graduate-nurse jobs and emergency-department capacity; it does not depict the jobs announcement or an individual patient.",
+      "archiveDate": "26 April 2020",
+      "alt": "Wellington Regional Hospital, Wellington, New Zealand; archive/context photograph, 26 April 2020.",
+      "focalPoint": {
+        "x": 0.5,
+        "y": 0.5
+      },
+      "objectPosition": "center",
+      "portrait": false,
+      "width": 960,
+      "height": 439,
+      "verifiedAt": "2026-10-09",
+      "fallbackAssetId": "text",
+      "fileSha256": "bad06a07bf8474c613b53a87e08ec354d70447407b49fbcffe5eec79b172b003",
+      "sourceFileSha256": "298a96c9d025f7046accb5d63ebae4e6f828ecfaa7e0f5712871fe9a6aa5c436",
+      "variantsSha256": {
+        "480": "8b557c61623aba74ecec6d4383d346e83c7e13115a0b2e2fbbde4371c6c26316",
+        "960": "bad06a07bf8474c613b53a87e08ec354d70447407b49fbcffe5eec79b172b003",
+        "1440": "8e6f2e3d28155ceee4394b9238d79d84d0934e6445c8d62c18595f453e1184d5"
+      },
+      "encoder": {
+        "name": "sharp",
+        "version": "0.35.5",
+        "format": "webp",
+        "quality": 92,
+        "effort": 6,
+        "smartSubsample": true,
+        "orientation": "master is pre-oriented; no further rotation"
+      },
+      "canonicalRebuild": {
+        "method": "checked-in-highest-resolution-WebP",
+        "masterWidth": 1440,
+        "masterFile": "assets/photos/wellington-hospital-1440.webp",
+        "masterSha256": "8e6f2e3d28155ceee4394b9238d79d84d0934e6445c8d62c18595f453e1184d5",
+        "derivedWidths": [
+          480,
+          960
+        ],
+        "encoder": {
+          "name": "sharp",
+          "version": "0.35.5",
+          "format": "webp",
+          "quality": 92,
+          "effort": 6,
+          "smartSubsample": true,
+          "orientation": "master is pre-oriented; no further rotation"
+        }
+      },
+      "derivativeLicense": "CC-BY-SA-4.0"
     }
   ]
 }
