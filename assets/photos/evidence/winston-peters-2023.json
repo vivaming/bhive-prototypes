@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:Winston_Peters_2023_cropped_headshot.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons description and original file reviewed; Government House licensing page also reviewed for the CC0 portraits.",
+  "creator": "Doug Mountain / Government House",
+  "date": "27 November 2023",
+  "license": "CC0 1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "sourceFileSha256": "9cbc9659516f31cd4d9c746dc8f1dcdb8ae5b22175760d7c5ff2f234cfacf782",
+  "sourceDimensions": {
+    "width": 266,
+    "height": 355
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "Winston Peters at Government House, Wellington. The archive portrait depicts NZ First leader Winston Peters, directly matching the NZ First immigration-policy story; it is not a photograph of the reported announcement."
+}

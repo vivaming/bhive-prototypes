@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:David_Seymour_at_Government_House%2C_Wellington.png",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons description and original file reviewed; Government House licensing page also reviewed for the CC0 portraits.",
+  "creator": "Doug Mountain / Government House",
+  "date": "27 November 2023",
+  "license": "CC0 1.0",
+  "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "sourceFileSha256": "9b078273278b62040a68208f6b24a4e598086592ee108bfb99f0289c2328ceab",
+  "sourceDimensions": {
+    "width": 494,
+    "height": 496
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "David Seymour at Government House, Wellington. The archive portrait depicts ACT leader David Seymour, directly matching the ACT fiscal-policy story; it is not a photograph of the reported announcement."
+}

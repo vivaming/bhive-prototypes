@@ -102,8 +102,15 @@
   #grid.desktop .cell.p0 .cell-title { margin-bottom:6px; min-height:22px; }
   #grid.desktop .election-chart { margin:12px 0 8px; flex:0 0 90px; height:90px; min-height:90px; }
   #grid.desktop .gap-callout { white-space:nowrap; margin:10px 0 8px; }
-  #grid.desktop .th-row { margin-bottom:3px; }
+  #grid.desktop .th-row { margin-bottom:0; }
   #grid.desktop .mmp-note { margin-top:4px; }
+  #grid.desktop .hero-compact { padding:6px 12px; }
+  #grid.desktop .hero-compact .badge-row { margin-bottom:4px; }
+  #grid.desktop .hero-compact .cell-title { margin-bottom:4px; font-size:20px !important; }
+  #grid.desktop .hero-compact .tag-row { margin-top:4px; }
+  #grid.desktop .hero-compact .election-chart { margin:4px 0; height:72px; min-height:72px; flex-basis:72px; }
+  #grid.desktop .hero-compact .gap-callout { margin:2px 0; }
+  #grid.desktop .hero-compact .gap-meta { margin-bottom:2px; }
   @media (max-height: 819px) {
     #grid.desktop .mmp-note { font-size:8px; white-space:normal; }
   }
@@ -144,8 +151,7 @@
   /* p3 LOW */
   .cell.p3 { background:var(--surface-p3); border-left:3px solid var(--border-p3);
     border-radius:var(--radius-p1); }
-  /* ── Professional Image Treatment (UIHD) ─────────────────── */
-  /* UI-A1: badge above image; title overlays image bottom */
+  /* Photo and caption share a surface; the fade lives inside the photo. */
 .cell-img-wrap {
     position:relative; width:100%;
     margin:0;
@@ -156,9 +162,6 @@
     background:var(--surface-p2);
     display:flex; flex-direction:column;
     min-height:48px;
-    background-image:
-      linear-gradient(135deg, rgba(255,255,255,0.02) 0%, transparent 50%),
-      radial-gradient(ellipse at 30% 20%, rgba(255,255,255,0.03) 0%, transparent 60%);
   }
   @keyframes imgFadeIn { from { opacity:0; } to { opacity:1; } }
 .cell-img-wrap img { object-position:var(--img-focus,center);
@@ -171,6 +174,19 @@
   .cell-img-wrap::after {
     content:none;
   }
+  .cell-photo { border-radius:7px 7px 0 0; isolation:isolate; }
+  .cell-photo img { position:relative; z-index:1; }
+  .cell-photo::after {
+    content:''; position:absolute; z-index:2; pointer-events:none;
+    left:0; right:0; bottom:0; height:clamp(24px,34%,62px);
+    background:linear-gradient(to bottom,transparent 0%,var(--cell-bg-for-img-mask) 100%);
+  }
+  .has-portrait .cell-photo::before {
+    content:''; position:absolute; z-index:0; inset:-14px;
+    background-image:var(--photo-backdrop); background-position:center; background-size:cover;
+    filter:blur(16px) brightness(.42) saturate(.65);
+  }
+  .has-portrait .cell-photo img { object-fit:contain; object-position:center; }
   /* Cinematic hover: slow breath effect */
   .cell-img-wrap:hover img {
     filter:brightness(0.98) saturate(1.0) contrast(1.02);
@@ -181,6 +197,9 @@
   .cell.p1 { --cell-bg-for-img-mask: var(--surface-p1); }
   .cell.p2 { --cell-bg-for-img-mask: var(--surface-p2); }
   .cell.p3 { --cell-bg-for-img-mask: var(--surface-p3); }
+  .cell.p1:hover { --cell-bg-for-img-mask:var(--surface-hover-p1); }
+  .cell.p2:hover { --cell-bg-for-img-mask:var(--surface-hover-p2); }
+  .cell.p3:hover { --cell-bg-for-img-mask:var(--surface-hover-p3); }
   /* badge row — sits above image on image cells */
   .badge-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
     text-transform:uppercase; letter-spacing:0.08em;
@@ -197,36 +216,35 @@
   .cell.has-img:not(.p0) .cell-img-wrap { flex:0 0 auto; min-height:40px; aspect-ratio:auto !important; }
   .cell.has-img:not(.p0) .cell-img-wrap img { height:100%; }
   .cell-mini-chart { padding:6px 8px; justify-content:center; overflow:hidden; }
-  .inz-mini-title,.threshold-mini-title { font:600 8px/1.2 var(--meta-font); color:#d6dfe6; margin-bottom:4px; }
-  .inz-compact-title { font:600 8px/1.2 var(--meta-font); color:#d6dfe6; margin-bottom:3px; }
-  .inz-compact-row { display:grid; grid-template-columns:minmax(40px,1fr) minmax(22px,1.1fr) 22px; gap:4px; align-items:center; color:#c5cfd8; font:500 7px/1.1 var(--meta-font); margin:2px 0; }
-  .inz-compact-row i { height:5px; background:#71889a; }
+  .inz-mini-title,.threshold-mini-title { font:600 var(--mini-type,9px)/1.2 var(--meta-font); color:#d6dfe6; margin-bottom:4px; }
+  .inz-compact-title { font:600 var(--mini-type,9px)/1.2 var(--meta-font); color:#d6dfe6; margin-bottom:4px; }
+  .inz-compact-row { display:grid; grid-template-columns:minmax(40px,1fr) minmax(22px,1.1fr) 26px; gap:4px; align-items:center; flex:0 0 var(--mini-row,12px); min-height:var(--mini-row,12px); color:#c5cfd8; font:500 var(--mini-type,9px)/1 var(--meta-font); margin:0; }
+  .inz-compact-row span { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .inz-compact-row i { height:var(--mini-bar,11px); background:#71889a; }
   .inz-compact-row.emphasis i { background:#ef6754; }
-  .inz-compact-row b { color:#e7edf2; font-size:8px; text-align:right; }
+  .inz-compact-row b { color:#e7edf2; font-size:var(--mini-type,9px); text-align:right; }
   .threshold-mini-track { position:relative; height:12px; background:linear-gradient(to right,transparent 0,transparent 33.33%,#ef6754 33.33%,#ef6754 34%,transparent 34%),#1d2932; }
   .threshold-mini-track i { display:block; height:100%; background:#8895a7; }
   .threshold-mini-track b { position:absolute; left:33.33%; top:-2px; height:16px; border-left:1px dashed #ef6754; }
   .threshold-mini-labels { display:flex; justify-content:space-between; color:#a6b2bc; font:500 8px var(--meta-font); margin-top:4px; }
-  .poll-mini { gap:2px; }
-  .poll-mini .poll-snapshot-row { grid-template-columns:minmax(40px,1fr) 2fr 30px; gap:4px; font:600 7px var(--meta-font); }
-  .poll-mini .poll-snapshot-track { height:5px; }
+  .cell-mini-chart.poll-mini { display:flex; gap:1px; }
+  .poll-mini .poll-snapshot-row { grid-template-columns:minmax(40px,1fr) 2fr 34px; gap:4px; flex:0 0 var(--mini-row,12px); min-height:var(--mini-row,12px); font:600 var(--mini-type,9px)/1 var(--meta-font); }
+  .poll-mini .poll-snapshot-track { height:var(--mini-bar,11px); }
+  .poll-snapshot-row > span:first-child { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .cell-caption {
     position:relative; isolation:isolate; z-index:1; flex:1 1 auto; min-height:0; width:100%;
-    padding:8px 10px 9px; display:flex; flex-direction:column; overflow:hidden;
+    padding:4px 11px 10px; display:flex; flex-direction:column; overflow:hidden;
     background:var(--cell-bg-for-img-mask, var(--surface-p1));
   }
-  .cell-caption::before {
-    content:''; position:absolute; z-index:0; pointer-events:none; left:0; right:0;
-    top:-24px; height:24px;
-    background:linear-gradient(to bottom,
-      rgba(5,7,10,0), var(--cell-bg-for-img-mask, var(--surface-p1)));
-  }
+  .cell-caption::before { content:none; }
+  .cell-mini-chart + .cell-caption { padding-top:8px; }
   .cell-caption > .cell-title, .cell-caption > .tag-row, .cell-caption > .source {
     position:relative; z-index:1; flex:0 0 auto;
   }
   .cell-caption .cell-title { min-height:0; margin:0; overflow:visible; display:block; }
   .cell-caption .tag-row { margin-top:6px; }
   .cell-caption .source { margin-top:4px; }
+  .cell.mobile-hero .cell-title { flex:0 0 auto; font-size:18px !important; line-height:1.2 !important; }
   /* p0 hero: image as full-bleed background layer; chart floats above */
   .cell.p0.has-img .cell-img-wrap { display:none; }
   .cell.p0.has-img .cell-img-wrap::after {
@@ -267,9 +285,9 @@
   .spark-mini { margin-top:6px; height:48px; }
   .spark-mini svg { width:100%; height:100%; display:block; }
   .thresholds { margin-top:4px; }
-  .th-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
-  .th-name { width:92px; font-size:10px; color:var(--muted); text-align:right; flex-shrink:0; }
-  .th-track { flex:1; height:4px; background:rgba(255,255,255,0.05); position:relative; }
+  .th-row { display:flex; align-items:center; gap:8px; height:12px; margin-bottom:0; }
+  .th-name { width:92px; font:500 10px/12px var(--meta-font); color:var(--muted); text-align:right; flex-shrink:0; white-space:nowrap; }
+  .th-track { flex:1; height:11px; background:rgba(255,255,255,0.05); position:relative; }
   .th-bar { height:100%; }
   .th-bar.below { opacity:.45; }
   .th-line { position:absolute; top:-4px; bottom:-4px; width:0; border-left:1px dashed rgba(255,255,255,0.35); }
@@ -345,15 +363,15 @@
 
   /* UI-A1: image credit pill at bottom-right of image cells */
   .cell-img-credit {
-    position:absolute; bottom:6px; right:8px; z-index:4;
-    background:rgba(10,13,17,0.72); color:var(--ghost);
-    font-size:7.5px; padding:2px 7px; border-radius:10px;
+    position:absolute; top:6px; right:8px; z-index:4;
+    background:rgba(10,13,17,0.72); color:#c7cfd8;
+    font:500 9px/1.2 var(--meta-font); padding:3px 6px; border-radius:3px;
     letter-spacing:.04em; max-width:48%;
     white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    opacity:0; transition:opacity .25s ease-out;
+    opacity:.7; transition:opacity .25s ease-out;
   }
   .cell:hover .cell-img-credit { opacity:1; }
-@media (max-width:480px) { .cell-img-credit { display:block !important; opacity:0.5; font-size:8px; position:absolute; bottom:4px; right:6px; } }
+@media (max-width:480px) { .cell-img-credit { font-size:8px; top:4px; right:6px; } }
   .cell.no-img-fallback .cell-title { position:static !important; background:none !important; color:var(--text); }
   .cell.no-img-fallback .cell-caption::before { display:none; }
 
@@ -390,29 +408,31 @@
   .chart-subtitle,.chart-source { font:400 12px/1.4 var(--meta-font); color:#a6b2bc; }
   .chart-source { margin-top:12px; }
   .inz-chart { color:#e7edf2; font:500 13px/1.3 var(--meta-font); }
-  .inz-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(120px,2fr) 48px; gap:12px; align-items:center; margin:13px 0; }
-  .inz-label { color:#c5cfd8; }
+  .inz-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(120px,2fr) 48px; gap:12px; align-items:center; min-height:21px; margin:0; }
+  .inz-label { color:#c5cfd8; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .inz-track { height:20px; position:relative; background:#1d2932; border-left:1px solid #a6b2bc; }
   .inz-bar { height:100%; background:#71889a; }
   .inz-row.emphasis .inz-bar { background:#ef6754; }
   .inz-value { font-variant-numeric:tabular-nums; text-align:right; color:#e7edf2; }
-  .inz-axis { display:flex; justify-content:space-between; margin:6px 60px 0 0; color:#a6b2bc; font-size:12px; }
+  .inz-axis { display:grid; grid-template-columns:minmax(180px,1fr) minmax(120px,2fr) 48px; gap:12px; margin:6px 0 0; color:#a6b2bc; font-size:12px; }
+  .inz-axis-ticks { grid-column:2; display:flex; justify-content:space-between; }
   .fiscal-group { margin-top:16px; }
   .fiscal-group h3 { font:600 13px var(--meta-font); color:#a6b2bc; margin-bottom:8px; }
   .fiscal-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:8px; }
   .fiscal-kpi { padding:10px 12px; background:#151e25; border-left:2px solid #71889a; }
   .fiscal-kpi b { display:block; font:600 19px var(--meta-font); color:#e7edf2; }
   .fiscal-kpi span { display:block; margin-top:4px; color:#a6b2bc; font:400 12px/1.3 var(--meta-font); }
-  .poll-snapshot { display:grid; gap:7px; }
-  .poll-snapshot-row { display:grid; grid-template-columns:minmax(70px,1fr) 3fr 42px; gap:8px; align-items:center; font:600 12px var(--meta-font); }
-  .poll-snapshot-track { height:11px; background:#1d2932; }
+  .poll-snapshot { display:grid; gap:1px; }
+  .poll-snapshot-row { display:grid; grid-template-columns:minmax(70px,1fr) 3fr 42px; gap:8px; align-items:center; min-height:18px; color:#c7cfd8; font:600 12px/1.2 var(--meta-font); }
+  .poll-snapshot-track { height:17px; background:#1d2932; }
   .poll-snapshot-fill { height:100%; }
   .poll-snapshot-value { text-align:right; font-variant-numeric:tabular-nums; }
   .a-caption { margin:0 0 14px; color:#a6b2bc; font:400 12px/1.4 var(--meta-font); }
   @media(max-width:520px) {
     .a-chart { padding:14px; }
     .inz-row { grid-template-columns:minmax(100px,1.1fr) minmax(80px,1.7fr) 38px; gap:7px; font-size:12px; }
-    .inz-axis { margin-right:45px; font-size:10px; }
+    .inz-label { font-size:11px; }
+    .inz-axis { grid-template-columns:minmax(100px,1.1fr) minmax(80px,1.7fr) 38px; gap:7px; font-size:10px; }
   }
   .a-body { font-size:15px; line-height:1.65; color:var(--text); }
   .a-body p { margin-bottom:14px; }
@@ -670,7 +690,6 @@ var POLL_HISTORY = {
  * Empty when UIA returns zero usable (all-skip) results; mechanism is wired so
  * a future UIA rerun can populate it. Merged in renderGrid: if (extra && !c.img)
  * c.img = extra.img. Tier 3 cells never render images regardless of this map. */
-var IMG_MAP = {"wp6-1":{"img":"./assets/editorial/wp6-1.svg","credit":"Original editorial illustration","alt":"Illustration: KiwiSaver","subject":"KiwiSaver","kind":"illustration","src":"./assets/editorial/wp6-1.svg"},"wp6-3":{"img":"./assets/editorial/wp6-3.svg","credit":"Original editorial illustration","alt":"Illustration: ACT list","subject":"ACT list","kind":"illustration","src":"./assets/editorial/wp6-3.svg"},"wp7-1":{"img":"./assets/editorial/wp7-1.svg","credit":"Original editorial illustration","alt":"Illustration: fuel tax","subject":"fuel tax","kind":"illustration","src":"./assets/editorial/wp7-1.svg"},"wp7-2":{"img":"./assets/editorial/wp7-2.svg","credit":"Original editorial illustration","alt":"Illustration: immigration policy","subject":"immigration policy","kind":"illustration","src":"./assets/editorial/wp7-2.svg"},"wp7-3":{"img":"./assets/editorial/wp7-3.svg","credit":"Original editorial illustration","alt":"Illustration: graduate nurse jobs","subject":"graduate nurse jobs","kind":"illustration","src":"./assets/editorial/wp7-3.svg"},"wp8-1":{"img":"./assets/editorial/wp8-1.svg","credit":"Original editorial illustration","alt":"Illustration: fiscal policy","subject":"fiscal policy","kind":"illustration","src":"./assets/editorial/wp8-1.svg"},"wp8-3":{"img":"./assets/editorial/wp8-3.svg","credit":"Original editorial illustration","alt":"Illustration: housing election forum","subject":"housing election forum","kind":"illustration","src":"./assets/editorial/wp8-3.svg"},"wp8-4":{"img":"./assets/editorial/wp8-4.svg","credit":"Original editorial illustration","alt":"Illustration: election administration","subject":"election administration","kind":"illustration","src":"./assets/editorial/wp8-4.svg"},"s02":{"img":"./assets/editorial/s02.svg","credit":"Original editorial illustration","alt":"Illustration: fuel tax and transport fund","subject":"fuel tax and transport fund","kind":"illustration","src":"./assets/editorial/s02.svg"},"s03":{"img":"./assets/editorial/s03.svg","credit":"Original editorial illustration","alt":"Illustration: immigration platform","subject":"immigration platform","kind":"illustration","src":"./assets/editorial/s03.svg"},"s04":{"img":"./assets/editorial/s04.svg","credit":"Original editorial illustration","alt":"Illustration: graduate nurse jobs","subject":"graduate nurse jobs","kind":"illustration","src":"./assets/editorial/s04.svg"},"s05":{"img":"./assets/editorial/s05.svg","credit":"Original editorial illustration","alt":"Illustration: inflation and petrol prices","subject":"inflation and petrol prices","kind":"illustration","src":"./assets/editorial/s05.svg"},"s06":{"img":"./assets/editorial/s06.svg","credit":"Original editorial illustration","alt":"Illustration: migration flows","subject":"migration flows","kind":"illustration","src":"./assets/editorial/s06.svg"},"s07":{"img":"./assets/editorial/s07.svg","credit":"Original editorial illustration","alt":"Illustration: party vote threshold","subject":"party vote threshold","kind":"illustration","src":"./assets/editorial/s07.svg"},"s08":{"img":"./assets/editorial/s08.svg","credit":"Original editorial illustration","alt":"Illustration: climate and growth","subject":"climate and growth","kind":"illustration","src":"./assets/editorial/s08.svg"},"s09":{"img":"./assets/editorial/s09.svg","credit":"Original editorial illustration","alt":"Illustration: housing prices and inventory","subject":"housing prices and inventory","kind":"illustration","src":"./assets/editorial/s09.svg"},"s10":{"img":"./assets/editorial/s10.svg","credit":"Original editorial illustration","alt":"Illustration: emergency department wait targets","subject":"emergency department wait targets","kind":"illustration","src":"./assets/editorial/s10.svg"},"s11":{"img":"./assets/editorial/s11.svg","credit":"Original editorial illustration","alt":"Illustration: cabinet reshuffle","subject":"cabinet reshuffle","kind":"illustration","src":"./assets/editorial/s11.svg"},"s12":{"img":"./assets/editorial/s12.svg","credit":"Original editorial illustration","alt":"Illustration: grocery competition","subject":"grocery competition","kind":"illustration","src":"./assets/editorial/s12.svg"},"s13":{"img":"./assets/editorial/s13.svg","credit":"Original editorial illustration","alt":"Illustration: Māori electorate polling","subject":"Māori electorate polling","kind":"illustration","src":"./assets/editorial/s13.svg"},"s14":{"img":"./assets/editorial/s14.svg","credit":"Original editorial illustration","alt":"Illustration: cost of living survey","subject":"cost of living survey","kind":"illustration","src":"./assets/editorial/s14.svg"},"s15":{"img":"./assets/editorial/s15.svg","credit":"Original editorial illustration","alt":"Illustration: dairy export payout","subject":"dairy export payout","kind":"illustration","src":"./assets/editorial/s15.svg"},"s16":{"img":"./assets/editorial/s16.svg","credit":"Original editorial illustration","alt":"Illustration: MMP seat allocation","subject":"MMP seat allocation","kind":"illustration","src":"./assets/editorial/s16.svg"},"s17":{"img":"./assets/editorial/s17.svg","credit":"Original editorial illustration","alt":"Illustration: energy fund","subject":"energy fund","kind":"illustration","src":"./assets/editorial/s17.svg"},"s18":{"img":"./assets/editorial/s18.svg","credit":"Original editorial illustration","alt":"Illustration: party polling snapshot","subject":"party polling snapshot","kind":"illustration","src":"./assets/editorial/s18.svg"},"s19":{"img":"./assets/editorial/s19.svg","credit":"Original editorial illustration","alt":"Illustration: voter enrolment","subject":"voter enrolment","kind":"illustration","src":"./assets/editorial/s19.svg"},"s20":{"img":"./assets/editorial/s20.svg","credit":"Original editorial illustration","alt":"Illustration: Pacific aid","subject":"Pacific aid","kind":"illustration","src":"./assets/editorial/s20.svg"},"s21":{"img":"./assets/editorial/s21.svg","credit":"Original editorial illustration","alt":"Illustration: winter energy payment","subject":"winter energy payment","kind":"illustration","src":"./assets/editorial/s21.svg"},"s22":{"img":"./assets/editorial/s22.svg","credit":"Original editorial illustration","alt":"Illustration: KiwiSaver review","subject":"KiwiSaver review","kind":"illustration","src":"./assets/editorial/s22.svg"},"s23":{"img":"./assets/editorial/s23.svg","credit":"Original editorial illustration","alt":"Illustration: China trade talks","subject":"China trade talks","kind":"illustration","src":"./assets/editorial/s23.svg"},"s24":{"img":"./assets/editorial/s24.svg","credit":"Original editorial illustration","alt":"Illustration: building consents","subject":"building consents","kind":"illustration","src":"./assets/editorial/s24.svg"},"s25":{"img":"./assets/editorial/s25.svg","credit":"Original editorial illustration","alt":"Illustration: Māori wards bill","subject":"Māori wards bill","kind":"illustration","src":"./assets/editorial/s25.svg"},"s26":{"img":"./assets/editorial/s26.svg","credit":"Original editorial illustration","alt":"Illustration: fisheries quota","subject":"fisheries quota","kind":"illustration","src":"./assets/editorial/s26.svg"},"s27":{"img":"./assets/editorial/s27.svg","credit":"Original editorial illustration","alt":"Illustration: Pharmac funding","subject":"Pharmac funding","kind":"illustration","src":"./assets/editorial/s27.svg"},"s28":{"img":"./assets/editorial/s28.svg","credit":"Original editorial illustration","alt":"Illustration: tourism recovery","subject":"tourism recovery","kind":"illustration","src":"./assets/editorial/s28.svg"},"s29":{"img":"./assets/editorial/s29.svg","credit":"Original editorial illustration","alt":"Illustration: bank capital rules","subject":"bank capital rules","kind":"illustration","src":"./assets/editorial/s29.svg"},"s30":{"img":"./assets/editorial/s30.svg","credit":"Original editorial illustration","alt":"Illustration: climate pledge","subject":"climate pledge","kind":"illustration","src":"./assets/editorial/s30.svg"},"s31":{"img":"./assets/editorial/s31.svg","credit":"Original editorial illustration","alt":"Illustration: school property budget","subject":"school property budget","kind":"illustration","src":"./assets/editorial/s31.svg"},"s32":{"img":"./assets/editorial/s32.svg","credit":"Original editorial illustration","alt":"Illustration: intelligence oversight","subject":"intelligence oversight","kind":"illustration","src":"./assets/editorial/s32.svg"},"s33":{"img":"./assets/editorial/s33.svg","credit":"Original editorial illustration","alt":"Illustration: EU trade agreement","subject":"EU trade agreement","kind":"illustration","src":"./assets/editorial/s33.svg"},"s34":{"img":"./assets/editorial/s34.svg","credit":"Original editorial illustration","alt":"Illustration: minimum wage review","subject":"minimum wage review","kind":"illustration","src":"./assets/editorial/s34.svg"},"s35":{"img":"./assets/editorial/s35.svg","credit":"Original editorial illustration","alt":"Illustration: Reserve Bank Act review","subject":"Reserve Bank Act review","kind":"illustration","src":"./assets/editorial/s35.svg"},"s36":{"img":"./assets/editorial/s36.svg","credit":"Original editorial illustration","alt":"Illustration: Antarctic treaty","subject":"Antarctic treaty","kind":"illustration","src":"./assets/editorial/s36.svg"},"s37":{"img":"./assets/editorial/s37.svg","credit":"Original editorial illustration","alt":"Illustration: rural broadband","subject":"rural broadband","kind":"illustration","src":"./assets/editorial/s37.svg"},"s38":{"img":"./assets/editorial/s38.svg","credit":"Original editorial illustration","alt":"Illustration: electoral commission fine","subject":"electoral commission fine","kind":"illustration","src":"./assets/editorial/s38.svg"},"s39":{"img":"./assets/editorial/s39.svg","credit":"Original editorial illustration","alt":"Illustration: grocery code consultation","subject":"grocery code consultation","kind":"illustration","src":"./assets/editorial/s39.svg"},"s40":{"img":"./assets/editorial/s40.svg","credit":"Original editorial illustration","alt":"Illustration: Pacific labour scheme","subject":"Pacific labour scheme","kind":"illustration","src":"./assets/editorial/s40.svg"}};
 
 var CELLS = [
   { id:'wp6-1', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#KiwiSaver','#Labour'], title:'Labour: Employer KiwiSaver Contributions to Become Compulsory', wp6:'wp6-1' },
@@ -727,26 +746,213 @@ var CELLS = [
 ];
 /* Verified, locally stored photographs. Subject relevance and license records live in assets/photos/photo-catalog.lock.json. */
 var PHOTO_MEDIA = {
-  'wp6-1':{assetId:'parliament-chamber',src:'./assets/photos/parliament-chamber-960.webp',alt:'New Zealand House of Representatives debating chamber; archive photograph, 2016.',attribution:'Photo: Office of the Clerk of the House of Representatives of New Zealand, CC BY 4.0 (2016); archive image.',source:'https://commons.wikimedia.org/wiki/File:New_Zealand_House_of_Representatives_debating_chamber.jpg',objectPosition:'center'},
-  'wp6-3':{assetId:'paul-henry-archive',src:'./assets/photos/paul-henry-archive-480.webp',alt:'Broadcaster Paul Henry at Venice Beach, California, 9 October 2008; archive photograph.',attribution:'Photo: Vivianne Robinson, CC BY 2.0 (2008); cropped archive image.',source:'https://commons.wikimedia.org/wiki/File:Paul_Henry_(New_Zealand_broadcaster)_(cropped).jpg',objectPosition:'center 24%'},
-  's11':{assetId:'nz-parliament-buildings',src:'./assets/photos/nz-parliament-buildings-960.webp',alt:'New Zealand Parliament Buildings and the Beehive from Parliament Lawn, Wellington; 26 June 2020.',attribution:'Photo: Tom Ackroyd / Quilt Phase, CC BY-SA 4.0 (2020); archive image.',source:'https://commons.wikimedia.org/wiki/File:NZ_Parliament_Buildings_2020-06-26.jpg',objectPosition:'center'},
-  'wp7-1':{assetId:'gas-waikari',src:'./assets/photos/gas-waikari-960.webp',alt:"G.A.S. fuel station in Waikari, Canterbury; archive photograph, 4 January 2021.",attribution:"Photo: Michal Klajban, CC BY-SA 4.0 (4 January 2021); Waikari fuel station, archive/context image.",source:"https://commons.wikimedia.org/wiki/File:Gas_station,_Waikari,_Canterbury,_New_Zealand.jpg",objectPosition:"center"},
-  's15':{assetId:'dairy-rotorua',src:'./assets/photos/dairy-rotorua-960.webp',alt:"Dairy cows in a Rotorua pasture; archive photograph, 17 November 2022.",attribution:"Photo: AnnWoolliams, CC BY-SA 4.0 (17 November 2022); archive/context image.",source:"https://commons.wikimedia.org/wiki/File:Dairy_cows,_Rotorua,_New_Zealand.jpg",objectPosition:"center 70%"},
-  's12':{assetId:'supermarket-tapawera',src:'./assets/photos/supermarket-tapawera-960.webp',alt:"Supermarket in Tapawera, New Zealand; archive photograph, 2 January 2020.",attribution:"Photo: Michal Klajban, CC BY-SA 4.0 (2 January 2020); archive/context image.",source:"https://commons.wikimedia.org/wiki/File:Supermarket_in_Tapawera,_New_Zealand.jpg",objectPosition:"center 72%"},
-  's09':{assetId:'house-hutchinson',src:'./assets/photos/house-hutchinson-960.webp',alt:"House at 12 Hutchinson Avenue, New Lynn, Auckland; archive/context photograph, 7 July 2025.",attribution:"Photo: Bjankuloski06, CC BY 4.0 (7 July 2025); New Lynn Auckland home, archive/context image, not a property in the cited REINZ data.",source:"https://commons.wikimedia.org/wiki/File:House_at_12_Hutchinson_Avenue.jpg",objectPosition:"center"},
-  'wp8-4':{assetId:'ballot-boxes-2008',src:'./assets/photos/ballot-boxes-2008-960.webp',alt:"Ballot boxes for several electorates at a New Zealand polling place during the 2008 general election; archive photograph.",attribution:"Photo: SimonLyall (8 November 2008); released into the public domain worldwide. Archive photograph of ballot boxes.",source:"https://commons.wikimedia.org/wiki/File:BallotBoxes_NZ_2008.jpg",objectPosition:"center 62%"},
-  's06':{assetId:'wellington-airport-pa01',src:'./assets/photos/wellington-airport-pa01-960.webp',alt:"Wellington Airport terminal and airfield viewed from a departing flight; archive/context photograph, 29 December 2025.",attribution:"Photo: Paora, CC0 1.0 (29 December 2025); Wellington Airport terminal, viewed from a departing flight. Illustrative/context image, not an immigration event photograph.",source:"https://commons.wikimedia.org/wiki/File:Wellington_Airport_PA01.jpg",objectPosition:"center 63%"},
-  's17':{assetId:'wairakei-geothermal',src:'./assets/photos/wairakei-geothermal-960.webp',alt:"Wairakei geothermal power plant in Waikato; historical energy-sector context photograph, 25 November 2007.",attribution:"Photo: Ingolfson (25 November 2007); released into the public domain worldwide. Wairakei geothermal plant, historical energy-sector context; not a TPM project.",source:"https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",objectPosition:"center 58%"}
+  "wp6-1": {
+    "assetId": "parliament-chamber",
+    "src": "./assets/photos/parliament-chamber-960.webp",
+    "alt": "New Zealand House of Representatives debating chamber; archive photograph, 2016.",
+    "attribution": "Photo: Office of the Clerk of the House of Representatives of New Zealand, CC BY 4.0 (2016). Archive image; not a 2026 event photograph.",
+    "source": "https://commons.wikimedia.org/wiki/File:New_Zealand_House_of_Representatives_debating_chamber.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "wp6-3": {
+    "assetId": "paul-henry-archive",
+    "src": "./assets/photos/paul-henry-archive-480.webp",
+    "alt": "Broadcaster Paul Henry at Venice Beach, California, 9 October 2008; archive photograph.",
+    "attribution": "Photo: Vivianne Robinson, CC BY 2.0 (2008); cropped archive image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Paul_Henry_(New_Zealand_broadcaster)_(cropped).jpg",
+    "objectPosition": "center",
+    "portrait": true
+  },
+  "s11": {
+    "assetId": "nz-parliament-buildings",
+    "src": "./assets/photos/nz-parliament-buildings-960.webp",
+    "alt": "New Zealand Parliament Buildings and the Beehive from Parliament Lawn, Wellington; 26 June 2020.",
+    "attribution": "Photo: Tom Ackroyd / Quilt Phase, CC BY-SA 4.0 (2020); archive image.",
+    "source": "https://commons.wikimedia.org/wiki/File:NZ_Parliament_Buildings_2020-06-26.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "wp7-1": {
+    "assetId": "gas-waikari",
+    "src": "./assets/photos/gas-waikari-960.webp",
+    "alt": "G.A.S. fuel station in Waikari, Canterbury; archive photograph, 4 January 2021.",
+    "attribution": "Photo: Michal Klajban, CC BY-SA 4.0 (4 January 2021); Waikari fuel station, archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Gas_station,_Waikari,_Canterbury,_New_Zealand.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "s15": {
+    "assetId": "dairy-rotorua",
+    "src": "./assets/photos/dairy-rotorua-960.webp",
+    "alt": "Dairy cows in a Rotorua pasture; archive photograph, 17 November 2022.",
+    "attribution": "Photo: AnnWoolliams, CC BY-SA 4.0 (17 November 2022); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Dairy_cows,_Rotorua,_New_Zealand.jpg",
+    "objectPosition": "center 70%",
+    "portrait": false
+  },
+  "s12": {
+    "assetId": "supermarket-tapawera",
+    "src": "./assets/photos/supermarket-tapawera-960.webp",
+    "alt": "Supermarket in Tapawera, New Zealand; archive photograph, 2 January 2020.",
+    "attribution": "Photo: Michal Klajban, CC BY-SA 4.0 (2 January 2020); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Supermarket_in_Tapawera,_New_Zealand.jpg",
+    "objectPosition": "center 72%",
+    "portrait": false
+  },
+  "s09": {
+    "assetId": "house-hutchinson",
+    "src": "./assets/photos/house-hutchinson-960.webp",
+    "alt": "House at 12 Hutchinson Avenue, New Lynn, Auckland; archive/context photograph, 7 July 2025.",
+    "attribution": "Photo: Bjankuloski06, CC BY 4.0 (7 July 2025); New Lynn Auckland home, archive/context image, not a property in the cited REINZ data.",
+    "source": "https://commons.wikimedia.org/wiki/File:House_at_12_Hutchinson_Avenue.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "wp8-4": {
+    "assetId": "ballot-boxes-2008",
+    "src": "./assets/photos/ballot-boxes-2008-960.webp",
+    "alt": "Ballot boxes for several electorates at a New Zealand polling place during the 2008 general election; archive photograph.",
+    "attribution": "Photo: SimonLyall (8 November 2008); released into the public domain worldwide. Archive photograph of ballot boxes.",
+    "source": "https://commons.wikimedia.org/wiki/File:BallotBoxes_NZ_2008.jpg",
+    "objectPosition": "center 62%",
+    "portrait": false
+  },
+  "s06": {
+    "assetId": "wellington-airport-pa01",
+    "src": "./assets/photos/wellington-airport-pa01-960.webp",
+    "alt": "Wellington Airport terminal and airfield viewed from a departing flight; archive/context photograph, 29 December 2025.",
+    "attribution": "Photo: Paora, CC0 1.0 (29 December 2025); Wellington Airport terminal, viewed from a departing flight. Illustrative/context image, not an immigration event photograph.",
+    "source": "https://commons.wikimedia.org/wiki/File:Wellington_Airport_PA01.jpg",
+    "objectPosition": "center 63%",
+    "portrait": false
+  },
+  "s17": {
+    "assetId": "wairakei-geothermal",
+    "src": "./assets/photos/wairakei-geothermal-960.webp",
+    "alt": "Wairakei geothermal power plant in Waikato; historical energy-sector context photograph, 25 November 2007.",
+    "attribution": "Photo: Ingolfson (25 November 2007); released into the public domain worldwide. Wairakei geothermal plant, historical energy-sector context; not a TPM project.",
+    "source": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",
+    "objectPosition": "center 58%",
+    "portrait": false
+  },
+  "wp8-1": {
+    "assetId": "david-seymour-2023",
+    "src": "./assets/photos/david-seymour-2023-494.webp",
+    "alt": "David Seymour at Government House, Wellington; archive/context photograph, 27 November 2023.",
+    "attribution": "Photo: Doug Mountain / Government House, CC0 1.0 (27 November 2023); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:David_Seymour_at_Government_House%2C_Wellington.png",
+    "objectPosition": "center",
+    "portrait": true
+  },
+  "wp7-2": {
+    "assetId": "winston-peters-2023",
+    "src": "./assets/photos/winston-peters-2023-266.webp",
+    "alt": "Winston Peters at Government House, Wellington; archive/context photograph, 27 November 2023.",
+    "attribution": "Photo: Doug Mountain / Government House, CC0 1.0 (27 November 2023); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Winston_Peters_2023_cropped_headshot.jpg",
+    "objectPosition": "center",
+    "portrait": true
+  },
+  "s03": {
+    "assetId": "winston-peters-2023",
+    "src": "./assets/photos/winston-peters-2023-266.webp",
+    "alt": "Winston Peters at Government House, Wellington; archive/context photograph, 27 November 2023.",
+    "attribution": "Photo: Doug Mountain / Government House, CC0 1.0 (27 November 2023); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Winston_Peters_2023_cropped_headshot.jpg",
+    "objectPosition": "center",
+    "portrait": true
+  },
+  "wp7-3": {
+    "assetId": "wellington-hospital",
+    "src": "./assets/photos/wellington-hospital-960.webp",
+    "alt": "Wellington Regional Hospital, Wellington, New Zealand; archive/context photograph, 26 April 2020.",
+    "attribution": "Photo: Tom Ackroyd / Quilt Phase, CC BY-SA 4.0 (26 April 2020); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Wellington_Hospital.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "s04": {
+    "assetId": "wellington-hospital",
+    "src": "./assets/photos/wellington-hospital-960.webp",
+    "alt": "Wellington Regional Hospital, Wellington, New Zealand; archive/context photograph, 26 April 2020.",
+    "attribution": "Photo: Tom Ackroyd / Quilt Phase, CC BY-SA 4.0 (26 April 2020); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Wellington_Hospital.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "s10": {
+    "assetId": "wellington-hospital",
+    "src": "./assets/photos/wellington-hospital-960.webp",
+    "alt": "Wellington Regional Hospital, Wellington, New Zealand; archive/context photograph, 26 April 2020.",
+    "attribution": "Photo: Tom Ackroyd / Quilt Phase, CC BY-SA 4.0 (26 April 2020); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Wellington_Hospital.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "wp8-3": {
+    "assetId": "house-hutchinson",
+    "src": "./assets/photos/house-hutchinson-960.webp",
+    "alt": "House at 12 Hutchinson Avenue, New Lynn, Auckland; archive/context photograph, 7 July 2025.",
+    "attribution": "Photo: Bjankuloski06, CC BY 4.0 (7 July 2025); New Lynn Auckland home, archive/context image, not a property in the cited REINZ data.",
+    "source": "https://commons.wikimedia.org/wiki/File:House_at_12_Hutchinson_Avenue.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "s24": {
+    "assetId": "house-hutchinson",
+    "src": "./assets/photos/house-hutchinson-960.webp",
+    "alt": "House at 12 Hutchinson Avenue, New Lynn, Auckland; archive/context photograph, 7 July 2025.",
+    "attribution": "Photo: Bjankuloski06, CC BY 4.0 (7 July 2025); New Lynn Auckland home, archive/context image, not a property in the cited REINZ data.",
+    "source": "https://commons.wikimedia.org/wiki/File:House_at_12_Hutchinson_Avenue.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "s02": {
+    "assetId": "gas-waikari",
+    "src": "./assets/photos/gas-waikari-960.webp",
+    "alt": "G.A.S. fuel station in Waikari, Canterbury; archive photograph, 4 January 2021.",
+    "attribution": "Photo: Michal Klajban, CC BY-SA 4.0 (4 January 2021); Waikari fuel station, archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Gas_station,_Waikari,_Canterbury,_New_Zealand.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "s05": {
+    "assetId": "gas-waikari",
+    "src": "./assets/photos/gas-waikari-960.webp",
+    "alt": "G.A.S. fuel station in Waikari, Canterbury; archive photograph, 4 January 2021.",
+    "attribution": "Photo: Michal Klajban, CC BY-SA 4.0 (4 January 2021); Waikari fuel station, archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Gas_station,_Waikari,_Canterbury,_New_Zealand.jpg",
+    "objectPosition": "center",
+    "portrait": false
+  },
+  "s08": {
+    "assetId": "wairakei-geothermal",
+    "src": "./assets/photos/wairakei-geothermal-960.webp",
+    "alt": "Wairakei geothermal power plant in Waikato; historical energy-sector context photograph, 25 November 2007.",
+    "attribution": "Photo: Ingolfson (25 November 2007); released into the public domain worldwide. Wairakei geothermal plant, historical energy-sector context; not a TPM project.",
+    "source": "https://commons.wikimedia.org/wiki/File:Wairakei_Geothermal_Power_Plant.jpg",
+    "objectPosition": "center 58%",
+    "portrait": false
+  },
+  "s39": {
+    "assetId": "supermarket-tapawera",
+    "src": "./assets/photos/supermarket-tapawera-960.webp",
+    "alt": "Supermarket in Tapawera, New Zealand; archive photograph, 2 January 2020.",
+    "attribution": "Photo: Michal Klajban, CC BY-SA 4.0 (2 January 2020); archive/context image.",
+    "source": "https://commons.wikimedia.org/wiki/File:Supermarket_in_Tapawera,_New_Zealand.jpg",
+    "objectPosition": "center 72%",
+    "portrait": false
+  }
 };
-/* Original local editorial media and data visuals are merged into story records. */
+/* Cover media is restricted to verified photographs or an actual data chart. */
 (function mergeImgMap(){
   for (var i = 0; i < CELLS.length; i++) {
     var c = CELLS[i];
-    var extra = IMG_MAP[c.id];
-    if (extra) { c.img = extra.img; c.imgCredit = extra.credit || ''; c.imgAlt = extra.alt || c.title || ''; }
+    c.img = null; c.mediaKind = 'text';
     var photo = PHOTO_MEDIA[c.id];
-    if (photo) { c.imgFallback=c.img; c.img=photo.src; c.imgCredit=photo.attribution; c.imgAlt=photo.alt; c.mediaAssetId=photo.assetId; c.mediaSource=photo.source; c.imgFocus=photo.objectPosition; c.mediaKind='photo'; }
-    if (['wp6-2','wp8-2','election','s07','s18'].includes(c.id)) c.img = null;
+    if (photo) { c.imgFallback=''; c.img=photo.src; c.imgCredit=photo.attribution; c.imgAlt=photo.alt; c.mediaAssetId=photo.assetId; c.mediaSource=photo.source; c.imgFocus=photo.objectPosition; c.imgPortrait=photo.portrait; c.mediaKind='photo'; }
+    if (['wp6-2','wp8-2','election','s07','s18'].includes(c.id)) { c.img = null; c.mediaKind='chart'; }
   }
 })();
 
@@ -917,7 +1123,7 @@ function renderGrid(cat) {
   grid.classList.toggle('desktop', !narrow);
     var W = grid.clientWidth, H = grid.clientHeight;
   var heroStory = narrow ? items.filter(function(c){ return c.full; })[0] : null;
-  var heroH = 130;
+  var heroH = 160;
   if (narrow && heroStory) H = Math.max(240, H - heroH);
   else heroH = 0;
   var layoutItems = narrow ? items.filter(function(c){ return !c.full; }) : items;
@@ -944,7 +1150,7 @@ function renderGrid(cat) {
 
   if (heroStory) {
     var hel = document.createElement('div');
-    hel.className = 'cell p0';
+    hel.className = 'cell p0 mobile-hero';
     hel.style.left='0px'; hel.style.top='0px';
     hel.setAttribute('data-id', heroStory.id);
     hel.style.width=W+'px'; hel.style.height=heroH+'px';
@@ -971,7 +1177,7 @@ function renderGrid(cat) {
       el.style.top = (parseFloat(el.style.top||n.y0)+heroH)+'px';
     }
     if (c.logo) {
-      if (narrow || (n.x1-n.x0) < 96) {
+      if (narrow || (n.x1-n.x0) < 96 || (n.y1-n.y0) < 28) {
         el.style.padding='0';
         el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;">BIHIVE</div>';
         grid.appendChild(el);
@@ -984,24 +1190,36 @@ function renderGrid(cat) {
     }
     var w = n.x1-n.x0, h = n.y1-n.y0;
     var big = c.full && !narrow;
+    if (big && h < 420) el.classList.add('hero-compact');
     var tagsHtml = (c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('');
     var showTagRow = c.tier !== 3 || w >= 88;
     var showSource = c.tier !== 3 || w >= 118;
     var chartKind = c.wp6 === 'wp6-2' ? 'inz' : (c.wp8 === 'wp8-2' ? 'poll' : (c.id === 's07' ? 'threshold' : ''));
+    var miniType = w >= 300 ? 11 : (w >= 180 ? 10 : 9), miniRow = miniType + 3;
+    var chartMin = chartKind === 'poll' ? 6 * miniRow + 17 : (chartKind === 'inz' ? 4 * miniRow + miniType + 20 : 56);
     var mediaRoom = w >= 96 && h >= (w < 150 ? 132 : 112);
-    var showMedia = (chartKind && w >= 120 && h >= 118) || (!!c.img && mediaRoom);
+    var showMedia = (chartKind && w >= 120 && h >= chartMin + (w >= 300 ? 76 : 100)) || (!!c.img && mediaRoom);
+    el.dataset.mediaKind = c.mediaKind;
     var imgHtml = '';
     if (showMedia) {
       el.classList.add('has-img');
-      var mediaHeight = Math.min(w>=300?200:(w>=170?128:(w>=100?92:42)), Math.max(42, Math.floor(h * (w>=300?.42:(w>=170?.36:.30)))));
+      var mediaHeight = Math.min(w>=300?Math.min(420,w*.6):(w>=170?168:(w>=100?110:42)), Math.max(42, Math.floor(h * (w>=300?.42:(w>=170?.36:.30)))));
+      if (chartKind) {
+        mediaHeight = Math.max(mediaHeight,chartMin);
+        el.style.setProperty('--mini-type',miniType+'px');
+        el.style.setProperty('--mini-row',miniRow+'px');
+        el.style.setProperty('--mini-bar',(miniRow-1)+'px');
+      }
       if (chartKind === 'inz') imgHtml = '<div class="cell-img-wrap cell-mini-chart inz-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
       else if (chartKind === 'poll') imgHtml = '<div class="cell-img-wrap cell-mini-chart poll-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
       else if (chartKind === 'threshold') imgHtml = '<div class="cell-img-wrap cell-mini-chart threshold-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
       else {
+        el.classList.add('has-photo');
+        if (c.imgPortrait) el.classList.add('has-portrait');
         var fetchPrio = c.tier === 0 ? 'fetchpriority="high"' : 'fetchpriority="low"';
-        imgHtml = '<div class="cell-img-wrap" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px;--img-focus:'+escAttr(c.imgFocus||'center')+'">' +
+        imgHtml = '<div class="cell-img-wrap cell-photo" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px;--img-focus:'+escAttr(c.imgFocus||'center')+';--photo-backdrop:url('+escAttr(c.img)+')">' +
           '<img src="' + escAttr(c.img) + '" data-fallback="'+escAttr(c.imgFallback||'')+'" alt="' + escAttr(c.imgAlt || (c.title||'Editorial illustration')) + '" loading="lazy" decoding="async" ' + fetchPrio + ' onerror="if(this.dataset.fallback&&!this.dataset.retried){this.dataset.retried=\'1\';this.src=this.dataset.fallback;}else{this.parentElement.style.display=\'none\';this.closest(\'.cell\').classList.add(\'no-img-fallback\');}" />' +
-          (c.imgCredit ? '<div class="cell-img-credit">' + escAttr(c.imgCredit) + '</div>' : '') +
+          (c.imgCredit ? '<div class="cell-img-credit" title="' + escAttr(c.imgCredit) + '">Archive photo</div>' : '') +
           '</div>';
       }
     }
@@ -1032,7 +1250,7 @@ function renderGrid(cat) {
     }
     if (chartKind === 'inz' && el.querySelector('.inz-mini')) drawInzBars(el.querySelector('.inz-mini'), true);
     if (chartKind === 'poll' && el.querySelector('.poll-mini')) drawPollSnapshot(el.querySelector('.poll-mini'), true);
-    if (chartKind === 'threshold' && el.querySelector('.threshold-mini')) drawThresholdMini(el.querySelector('.threshold-mini'));
+    if (chartKind === 'threshold' && el.querySelector('.threshold-mini')) drawThresholdMini(el.querySelector('.threshold-mini'), true);
   });
   updatePager();
   requestAnimationFrame(function(){
@@ -1540,22 +1758,22 @@ function drawThresholdArithmetic(container, h) {
 function drawInzBars(container, h) {
   var rows = [
     { label: 'OFS forecast savings', value: 453 },
-    { label: 'Benefits now ruled unlikely', value: 134, emphasis:true },
+    { label: 'Benefits ruled unlikely', value: 134, emphasis:true },
     { label: 'OFS cost to date', value: 336 },
-    { label: 'BCU cost (closed after 7 years)', value: 36 }
+    { label: 'BCU cost (7 years)', value: 36 }
   ];
   var compact = h === true;
   var max = 500;
   container.classList.add('inz-chart');
   if (compact) {
     container.innerHTML = '<div class="inz-compact-title">INZ · NZ$ million</div>'+rows.map(function(r){
-      return '<div class="inz-compact-row'+(r.emphasis?' emphasis':'')+'"><span>'+escAttr(r.label)+'</span><i style="width:'+r.value/max*100+'%"></i><b>'+r.value+'</b></div>';
+      return '<div class="inz-compact-row'+(r.emphasis?' emphasis':'')+'" title="'+escAttr(r.label+' · NZ$'+r.value+' million')+'"><span>'+escAttr(r.label)+'</span><i style="width:'+r.value/max*100+'%"></i><b>'+r.value+'</b></div>';
     }).join('');
     return;
   }
   container.innerHTML = '<div class="chart-title">Immigration systems: benefits and costs</div><div class="chart-subtitle">NZ$ million · common 0–500 scale</div>' + rows.map(function(r){
     return '<div class="inz-row'+(r.emphasis?' emphasis':'')+'"><div class="inz-label">'+escAttr(r.label)+'</div><div class="inz-track"><div class="inz-bar" style="width:'+r.value/max*100+'%"></div></div><div class="inz-value">'+r.value+'</div></div>';
-  }).join('') + '<div class="inz-axis"><span>0</span><span>100</span><span>200</span><span>300</span><span>400</span><span>500</span></div><div class="chart-source">Source: Cabinet paper, as reported by RNZ · values are separate reported items and are not a total.</div>';
+  }).join('') + '<div class="inz-axis"><div class="inz-axis-ticks"><span>0</span><span>100</span><span>200</span><span>300</span><span>400</span><span>500</span></div></div><div class="chart-source">Source: Cabinet paper, as reported by RNZ · values are separate reported items and are not a total.</div>';
 }
 
 function drawPollSnapshot(container, compact) {
@@ -1859,7 +2077,7 @@ function goToPage(np, dir) {
 
 /* ── Boot ──────────────────────────────────────────────────── */
 var currentStoryId=null;
-window.BIHIVE_QA={getSnapshot:function(){return {category:activeCat,page:pageNum,pageCount:pageCount(),view:document.getElementById('article-view').classList.contains('active')?'article':'treemap',storyId:currentStoryId,cards:Array.from(document.querySelectorAll('#grid .cell')).map(function(el){var r=el.getBoundingClientRect(),c=CELLS.find(function(x){return x.id===el.dataset.id});return {id:el.dataset.id,rect:{x:r.x,y:r.y,width:r.width,height:r.height},assetId:c&&c.mediaAssetId||null,mediaKind:c&&c.mediaKind||'illustration',fallbackReason:c&&c.mediaKind==='photo'?null:'NO_APPROVED_PHOTO',title:el.querySelector('.cell-title')&&el.querySelector('.cell-title').textContent};}),motion:{transactionId:motionSequence,reducedMotion:reduced,flipping:flipping},chart:{storyId:currentStoryId,sourceId:currentStoryId==='s18'?'nz-herald-poll-of-polls':null,dataVersion:currentStoryId==='s18'?'herald-aggregate-2026-09-16':null}};}};
+window.BIHIVE_QA={getSnapshot:function(){return {category:activeCat,page:pageNum,pageCount:pageCount(),view:document.getElementById('article-view').classList.contains('active')?'article':'treemap',storyId:currentStoryId,cards:Array.from(document.querySelectorAll('#grid .cell')).map(function(el){var r=el.getBoundingClientRect(),c=CELLS.find(function(x){return x.id===el.dataset.id});return {id:el.dataset.id,rect:{x:r.x,y:r.y,width:r.width,height:r.height},assetId:c&&c.mediaAssetId||null,mediaKind:c&&c.mediaKind||'text',fallbackReason:c&&c.mediaKind==='text'?'NO_APPROVED_PHOTO':null,title:el.querySelector('.cell-title')&&el.querySelector('.cell-title').textContent};}),motion:{transactionId:motionSequence,reducedMotion:reduced,flipping:flipping},chart:{storyId:currentStoryId,sourceId:currentStoryId==='s18'?'nz-herald-poll-of-polls':null,dataVersion:currentStoryId==='s18'?'herald-aggregate-2026-09-16':null}};}};
 document.getElementById('grid').addEventListener('click', function(e){
   if (!e.target.closest('.cell')) clearMq(document.querySelector('.cell.armed'));
 });

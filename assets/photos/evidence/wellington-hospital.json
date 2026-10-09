@@ -1,0 +1,22 @@
+{
+  "sourcePage": "https://commons.wikimedia.org/wiki/File:Wellington_Hospital.jpg",
+  "retrievedAt": "2026-10-09",
+  "retrievalMethod": "Wikimedia Commons description and original file reviewed; Government House licensing page also reviewed for the CC0 portraits.",
+  "creator": "Tom Ackroyd / Quilt Phase",
+  "date": "26 April 2020",
+  "license": "CC BY-SA 4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "sourceFileSha256": "298a96c9d025f7046accb5d63ebae4e6f828ecfaa7e0f5712871fe9a6aa5c436",
+  "sourceDimensions": {
+    "width": 4032,
+    "height": 1846
+  },
+  "verifiedFields": [
+    "depicted subject",
+    "creator",
+    "date",
+    "license",
+    "source file dimensions"
+  ],
+  "notes": "Wellington Regional Hospital, Wellington, New Zealand. The archive photograph depicts a New Zealand hospital and gives local health-service context to graduate-nurse jobs and emergency-department capacity; it does not depict the jobs announcement or an individual patient."
+}

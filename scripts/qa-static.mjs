@@ -23,6 +23,10 @@ check('reduced-motion changes are observed',/prefers-reduced-motion: reduce/.tes
 check('QA snapshot API',/window\.BIHIVE_QA=\{getSnapshot:function/.test(html));
 const lock=JSON.parse(fs.readFileSync('assets/photos/photo-catalog.lock.json','utf8'));
 const policy=JSON.parse(fs.readFileSync('content/media-policy.json','utf8'));
+const mapMatch=html.match(/var PHOTO_MEDIA = (\{[\s\S]*?\});\s*\/\* Cover media/);
+const photoMap=mapMatch?JSON.parse(mapMatch[1]):{};
+check('rendered photo map matches locked media policy',Object.keys(photoMap).length===Object.keys(policy.storyMedia).length&&Object.entries(policy.storyMedia).every(([id,p])=>photoMap[id]?.assetId===p.preferred&&photoMap[id]?.src==='./'+lock.assets.find(a=>a.assetId===p.preferred)?.src));
+check('abstract cover fillers disabled',policy.allowAbstractIllustrationFallback===false&&!html.includes('var IMG_MAP')&&!html.includes('c.imgFallback=c.img'));
 const evidence=lock.assets.every(a=>fs.existsSync(a.sourceEvidencePath)&&crypto.createHash('sha256').update(canonicalTextBytes(a.sourceEvidencePath)).digest('hex')===a.sourceEvidenceSha256);
 check('photo source evidence',evidence,`${lock.assets.length} assets`);
 const canonicalMasters=lock.assets.every(a=>a.canonicalRebuild?.method==='checked-in-highest-resolution-WebP'&&a.canonicalRebuild.masterFile===a.variants?.[String(a.canonicalRebuild.masterWidth)]&&a.canonicalRebuild.masterSha256===a.variantsSha256?.[String(a.canonicalRebuild.masterWidth)]);
