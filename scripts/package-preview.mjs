@@ -9,5 +9,6 @@ const stage=path.resolve('work/preview-site'),dest=path.join(outputs,'bihive-tre
 execFileSync(process.execPath,['scripts/build-repro.mjs',stage],{stdio:'inherit'});
 fs.rmSync(dest,{recursive:true,force:true});fs.mkdirSync(path.dirname(dest),{recursive:true});fs.cpSync(stage,dest,{recursive:true});
 fs.copyFileSync(reportPath,path.join(dest,'QA_STATUS.json'));
-fs.writeFileSync(path.join(dest,'QA_NOT_ACCEPTED.txt'),'Diagnostic preview. Q3-Q5 and Q7-Q8 are BLOCKED pending an explicitly permitted browser QA target. Do not treat this bundle as visually accepted.\n');
+const note=report.status==='PASS'?'Automated reproducible QA passed, including Chromium Playwright tests. Screenshot-based visual review is not claimed.\n':`Diagnostic preview; automated QA status is ${report.status}. Inspect QA_STATUS.json for failed or blocked checks. Screenshot-based visual review is not claimed.\n`;
+fs.writeFileSync(path.join(dest,'QA_STATUS_NOTE.txt'),note);
 console.log(JSON.stringify({previewDirectory:dest,status:report.status,qaReport:path.join(dest,'QA_STATUS.json')},null,2));

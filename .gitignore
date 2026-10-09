@@ -1,3 +1,5 @@
 /node_modules/
 /work/
 /dist/
+/test-results/
+/qa/work/

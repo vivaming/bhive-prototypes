@@ -113,7 +113,7 @@
   .cell {
     position:absolute; overflow:hidden; cursor:pointer;
     display:flex; flex-direction:column;
-    max-width:100%;
+    min-width:0; min-height:0; max-width:100%;
         padding:12px 14px;
     transition:background-color .12s ease-out, box-shadow .12s ease-out;
     touch-action:manipulation; -webkit-tap-highlight-color:transparent; user-select:none;
@@ -448,6 +448,9 @@
     <div class="a-date" id="a-date"></div>
     <div class="a-people" id="a-people"></div>
     <figure class="a-media" id="a-media" hidden></figure>
+    <div class="a-chart" id="a-chart" style="display:none"></div>
+    <div class="a-caption" id="a-caption" style="display:none"></div>
+    <div class="a-body" id="a-body"></div>
     <div class="a-img-credits" id="a-img-credits"></div>
   </div>
 </div>
@@ -844,7 +847,7 @@ function legendRow() {
 /* ── Treemap layout ────────────────────────────────────────── */
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var motionSequence = 0, motionTimer = null;
-function beginMotion() { motionSequence++; clearTimeout(motionTimer); document.querySelectorAll('#grid .cell').forEach(function(el){if(el.getAnimations)el.getAnimations().forEach(function(a){a.cancel();});el.style.transform='';el.style.opacity='';}); return motionSequence; }
+function beginMotion() { motionSequence++; clearTimeout(motionTimer); flipping=false; document.querySelectorAll('#grid .cell').forEach(function(el){if(el.getAnimations)el.getAnimations().forEach(function(a){a.cancel();});el.style.transform='';el.style.opacity='';}); return motionSequence; }
 function settleMotion(id, callback, delay) { clearTimeout(motionTimer); motionTimer=setTimeout(function(){ if(id===motionSequence) callback(); },reduced?0:delay); }
 window.matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change',function(e){ reduced=e.matches;beginMotion();document.querySelectorAll('#grid .cell').forEach(function(el){el.style.transform='';el.style.opacity='';}); });
 
@@ -951,6 +954,7 @@ function renderGrid(cat) {
     }
     if (c.logo) {
       if (narrow || (n.x1-n.x0) < 96) {
+        el.style.padding='0';
         el.innerHTML = '<div class="logo" style="font-size:8px;white-space:nowrap;overflow:hidden;">BIHIVE</div>';
         grid.appendChild(el);
         return;
