@@ -174,11 +174,25 @@
   .date-dim.old-date { opacity:0.45; }
   .source { font-family:var(--meta-font); font-size:10px; line-height:1.2; color:#8d99a7; margin-top:4px; }
   .cell.has-img:not(.p0) { padding:0; }
-  .cell.has-img:not(.p0) .cell-img-wrap { flex:1 1 auto; min-height:32px; aspect-ratio:auto !important; }
+  .cell.has-img:not(.p0) .cell-img-wrap { flex:0 0 auto; min-height:40px; aspect-ratio:auto !important; }
   .cell.has-img:not(.p0) .cell-img-wrap img { height:100%; }
+  .cell-mini-chart { padding:6px 8px; justify-content:center; overflow:hidden; }
+  .inz-mini-title,.threshold-mini-title { font:600 8px/1.2 var(--meta-font); color:#d6dfe6; margin-bottom:4px; }
+  .inz-compact-title { font:600 8px/1.2 var(--meta-font); color:#d6dfe6; margin-bottom:3px; }
+  .inz-compact-row { display:grid; grid-template-columns:minmax(40px,1fr) minmax(22px,1.1fr) 22px; gap:4px; align-items:center; color:#c5cfd8; font:500 7px/1.1 var(--meta-font); margin:2px 0; }
+  .inz-compact-row i { height:5px; background:#71889a; }
+  .inz-compact-row.emphasis i { background:#ef6754; }
+  .inz-compact-row b { color:#e7edf2; font-size:8px; text-align:right; }
+  .threshold-mini-track { position:relative; height:12px; background:linear-gradient(to right,transparent 0,transparent 33.33%,#ef6754 33.33%,#ef6754 34%,transparent 34%),#1d2932; }
+  .threshold-mini-track i { display:block; height:100%; background:#8895a7; }
+  .threshold-mini-track b { position:absolute; left:33.33%; top:-2px; height:16px; border-left:1px dashed #ef6754; }
+  .threshold-mini-labels { display:flex; justify-content:space-between; color:#a6b2bc; font:500 8px var(--meta-font); margin-top:4px; }
+  .poll-mini { gap:2px; }
+  .poll-mini .poll-snapshot-row { grid-template-columns:minmax(40px,1fr) 2fr 30px; gap:4px; font:600 7px var(--meta-font); }
+  .poll-mini .poll-snapshot-track { height:5px; }
   .cell-caption {
-    position:relative; isolation:isolate; z-index:1; flex:0 0 auto; width:100%;
-    padding:10px 12px 11px; display:flex; flex-direction:column;
+    position:relative; isolation:isolate; z-index:1; flex:1 1 auto; min-height:0; width:100%;
+    padding:8px 10px 9px; display:flex; flex-direction:column; overflow:hidden;
     background:var(--cell-bg-for-img-mask, var(--surface-p1));
   }
   .cell-caption::before {
@@ -195,7 +209,7 @@
   .cell-caption .tag-row { margin-top:6px; }
   .cell-caption .source { margin-top:4px; }
   /* p0 hero: image as full-bleed background layer; chart floats above */
-  .cell.p0.has-img .cell-img-wrap { position:absolute; inset:0; z-index:0; aspect-ratio:auto !important; }
+  .cell.p0.has-img .cell-img-wrap { display:none; }
   .cell.p0.has-img .cell-img-wrap::after {
     content:''; position:absolute; inset:0; pointer-events:none; z-index:1;
     background:linear-gradient(to bottom,rgba(5,7,10,.18) 0%,rgba(5,7,10,.5) 54%,rgba(5,7,10,.86) 100%);
@@ -234,7 +248,7 @@
   .spark-mini svg { width:100%; height:100%; display:block; }
   .thresholds { margin-top:4px; }
   .th-row { display:flex; align-items:center; gap:8px; margin-bottom:5px; }
-  .th-name { width:64px; font-size:10px; color:var(--muted); text-align:right; flex-shrink:0; }
+  .th-name { width:92px; font-size:10px; color:var(--muted); text-align:right; flex-shrink:0; }
   .th-track { flex:1; height:4px; background:rgba(255,255,255,0.05); position:relative; }
   .th-bar { height:100%; }
   .th-bar.below { opacity:.45; }
@@ -336,22 +350,48 @@
     text-transform:uppercase; border:1px solid rgba(192,48,32,.65); padding:3px 8px; margin-bottom:14px; }
 .a-title { font-family:var(--pixel-font); font-size:clamp(24px,3vw,34px); font-weight:700; color:#ffffff; line-height:1.24; margin-bottom:12px; letter-spacing:0; }
   .a-date { font-size:13px; color:var(--ghost); margin-bottom:32px; }
-  /* related people — copyright-free portraits (CC0 / CC BY-SA, Wikimedia Commons) */
+  /* Fictional author byline and original pixel avatar. */
   .a-people { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:28px; }
   .a-person { display:flex; align-items:center; gap:10px; background:#0d1117;
     border:1px solid #1e2733; border-radius:10px; padding:8px 12px 8px 8px;
     box-shadow:var(--shadow-sm); }
-  .a-person img { width:44px; height:44px; border-radius:50%; object-fit:cover;
-    border:1px solid #2a3542; background:#10151c; }
+  .a-person img { width:44px; height:44px; border-radius:6px; object-fit:cover;
+    image-rendering:pixelated; border:1px solid #2a3542; background:#10151c; }
   .a-person .who { line-height:1.25; }
   .a-person .who b { display:block; font-size:13px; color:#e8edf2; font-weight:600; }
   .a-person .who span { font-size:10px; color:var(--ghost); letter-spacing:.02em; display:block; }
   .a-person .credit { font-size:9px; color:var(--subtle); }
-  .a-person .credit a { color:var(--ghost); text-decoration:none; border-bottom:1px dotted #3a4552; }
-  .a-person .credit a:hover { color:var(--text2); }
-  .a-chart { margin:0 0 8px 0; border:1px solid #1e2733; padding:12px; background:#0d1117;
-    border-radius:4px; box-shadow:var(--shadow-sm); }
-  .a-chart svg { width:100%; height:260px; display:block; }
+  .a-chart { margin:0 0 8px 0; border:1px solid #27323b; padding:20px; background:#10171d;
+    border-radius:6px; box-shadow:none; }
+  .a-chart svg { width:100%; height:auto; display:block; }
+  .chart-title { font:600 18px/1.25 var(--meta-font); color:#e7edf2; margin:0 0 4px; }
+  .chart-subtitle,.chart-source { font:400 12px/1.4 var(--meta-font); color:#a6b2bc; }
+  .chart-source { margin-top:12px; }
+  .inz-chart { color:#e7edf2; font:500 13px/1.3 var(--meta-font); }
+  .inz-row { display:grid; grid-template-columns:minmax(180px,1fr) minmax(120px,2fr) 48px; gap:12px; align-items:center; margin:13px 0; }
+  .inz-label { color:#c5cfd8; }
+  .inz-track { height:20px; position:relative; background:#1d2932; border-left:1px solid #a6b2bc; }
+  .inz-bar { height:100%; background:#71889a; }
+  .inz-row.emphasis .inz-bar { background:#ef6754; }
+  .inz-value { font-variant-numeric:tabular-nums; text-align:right; color:#e7edf2; }
+  .inz-axis { display:flex; justify-content:space-between; margin:6px 60px 0 0; color:#a6b2bc; font-size:12px; }
+  .fiscal-group { margin-top:16px; }
+  .fiscal-group h3 { font:600 13px var(--meta-font); color:#a6b2bc; margin-bottom:8px; }
+  .fiscal-kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(135px,1fr)); gap:8px; }
+  .fiscal-kpi { padding:10px 12px; background:#151e25; border-left:2px solid #71889a; }
+  .fiscal-kpi b { display:block; font:600 19px var(--meta-font); color:#e7edf2; }
+  .fiscal-kpi span { display:block; margin-top:4px; color:#a6b2bc; font:400 12px/1.3 var(--meta-font); }
+  .poll-snapshot { display:grid; gap:7px; }
+  .poll-snapshot-row { display:grid; grid-template-columns:minmax(70px,1fr) 3fr 42px; gap:8px; align-items:center; font:600 12px var(--meta-font); }
+  .poll-snapshot-track { height:11px; background:#1d2932; }
+  .poll-snapshot-fill { height:100%; }
+  .poll-snapshot-value { text-align:right; font-variant-numeric:tabular-nums; }
+  .a-caption { margin:0 0 14px; color:#a6b2bc; font:400 12px/1.4 var(--meta-font); }
+  @media(max-width:520px) {
+    .a-chart { padding:14px; }
+    .inz-row { grid-template-columns:minmax(100px,1.1fr) minmax(80px,1.7fr) 38px; gap:7px; font-size:12px; }
+    .inz-axis { margin-right:45px; font-size:10px; }
+  }
   .a-body { font-size:15px; line-height:1.65; color:var(--text); }
   .a-body p { margin-bottom:14px; }
   .a-body p:last-child { margin-bottom:0; }
@@ -596,20 +636,20 @@ var POLL_HISTORY = {
  * Empty when UIA returns zero usable (all-skip) results; mechanism is wired so
  * a future UIA rerun can populate it. Merged in renderGrid: if (extra && !c.img)
  * c.img = extra.img. Tier 3 cells never render images regardless of this map. */
-var IMG_MAP = {"wp8-2":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Opinion_polling_for_the_2026_New_Zealand_election_%28minor_parties%29.svg/1280px-Opinion_polling_for_the_2026_New_Zealand_election_%28minor_parties%29.svg.png","credit":"CC Public domain, Nixinova"},"wp8-3":{"img":"https://upload.wikimedia.org/wikipedia/commons/4/45/View_of_suburban_house_and_street_%28AM_80785-1%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled","credit":"CC BY 4.0, Wikimedia Commons"},"wp8-4":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/53/Advance_voting_booth_in_Wellington_%281%29.jpg/1280px-Advance_voting_booth_in_Wellington_%281%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY-SA 4.0, Wikimedia Commons"},"s11":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/New_Zealand_House_%28historic%29%2C_Haymarket%2C_London.jpg/1280px-New_Zealand_House_%28historic%29%2C_Haymarket%2C_London.jpg","credit":"CC CC BY-SA 2.0, Archives New Zealand"},"s12":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Mt_cook_vista_%2847799974161%29.jpg/1280px-Mt_cook_vista_%2847799974161%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY 2.0, Wikimedia Commons"},"s17":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/00_3571_Geothermal_power_plant_in_New_Zealand.jpg/1280px-00_3571_Geothermal_power_plant_in_New_Zealand.jpg","credit":"CC CC BY-SA 4.0, W. Bulach"},"s33":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/80/Flag_of_Europe_%28larger_stars%29.svg/1280px-Flag_of_Europe_%28larger_stars%29.svg.png","credit":"CC CC0, ConflictFan"},"s35":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/7f/1909_Commerical_Bank_building_in_Mannum_%289156260353%29.jpg/1280px-1909_Commerical_Bank_building_in_Mannum_%289156260353%29.jpg","credit":"CC CC BY-SA 2.0, denisbin from Adelaide, Australia"},"s36":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f7/Cracked_glacier_ice_%288141642993%29.jpg/1280px-Cracked_glacier_ice_%288141642993%29.jpg","credit":"CC Public domain, NASA ICE"},"s37":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/Landscape_-_Countryside_and_sea%2C_1033472.jpg/1280px-Landscape_-_Countryside_and_sea%2C_1033472.jpg","credit":"CC Public domain"},"s02":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d6/Soviet_fuel_pump_in_fire_station_Vidnoe.jpg/1280px-Soviet_fuel_pump_in_fire_station_Vidnoe.jpg","credit":"CC CC0, Svetlov Artem"},"s03":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/26/Somaliland_Immigration_and_Border_Control_Building.jpg/1280px-Somaliland_Immigration_and_Border_Control_Building.jpg","credit":"CC Public domain, Somaliland Immigration and Border Control"},"s09":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/72/Aerial_view_of_Seagrove_Aerodrome%2C_Manukau_Harbour%2C_Auckland_%281946%29.jpg/1280px-Aerial_view_of_Seagrove_Aerodrome%2C_Manukau_Harbour%2C_Auckland_%281946%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY 4.0, Wikimedia Commons"},"s10":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Ewart_Hospital_Nurses%27_Home_%28Former%29_2026-06-12_01.jpg/1280px-Ewart_Hospital_Nurses%27_Home_%28Former%29_2026-06-12_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY-SA 4.0, Wikimedia Commons"},"s13":{"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/New_Zealand_Maori_Culture_009_%285418324230%29.jpg/1280px-New_Zealand_Maori_Culture_009_%285418324230%29.jpg","credit":"CC CC BY 2.0, Steve Evans from Citizen of the World"},"s14":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d0/Reconstruction_of_the_Signing_of_the_Treaty_of_Waitangi%2C_Marcus_King_%2816044258961%29.jpg/1280px-Reconstruction_of_the_Signing_of_the_Treaty_of_Waitangi%2C_Marcus_King_%2816044258961%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY-SA 2.0, Wikimedia Commons"},"s15":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/Cow_with_Halter_Collar.jpg/1280px-Cow_with_Halter_Collar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY 4.0, Wikimedia Commons"},"s23":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/AucklandPano_MC.jpg/1280px-AucklandPano_MC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY 2.5, Wikimedia Commons"},"s24":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f6/Crane_at_construction_site_-_geograph.org.uk_-_7593527.jpg/1280px-Crane_at_construction_site_-_geograph.org.uk_-_7593527.jpg","credit":"CC CC BY-SA 2.0, Kevin Waterhouse"},"s25":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f0/Te_Paranihi_-_M%C4%81ori_waka_taua_%28war_canoe%29_from_the_Otago_Museum_01.jpg/1280px-Te_Paranihi_-_M%C4%81ori_waka_taua_%28war_canoe%29_from_the_Otago_Museum_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC0, Wikimedia Commons"},"s26":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Mozambique_-_traditional_sailboat.jpg/1280px-Mozambique_-_traditional_sailboat.jpg","credit":"CC CC BY 2.0, Steve Evans from Bangalore, India"},"s38":{"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Electoral_Commission_%28United_States%29.jpg/1280px-Electoral_Commission_%28United_States%29.jpg","credit":"CC Public domain, Painter: Cornelia Adèle Strong Fassett (1831-1898)"},"s39":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b0/Grocery_Store_display--03.jpg/1280px-Grocery_Store_display--03.jpg","credit":"CC CC0, Gary Hoover"},"s04":{"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Oaxacan_Nurse_and_Doctor_Providing_Healthcare_in_Sinaloa.jpg/1280px-Oaxacan_Nurse_and_Doctor_Providing_Healthcare_in_Sinaloa.jpg","credit":"CC CC0, Miguel1050"},"s05":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/51/Petrol_prices_in_Russia.jpg/1280px-Petrol_prices_in_Russia.jpg","credit":"CC CC BY-SA 3.0, kallerna"},"s06":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/30/Register_of_immigrant_ships_showing_dates_of_arrival_and_departure%2C_number_of_immigrants_carried%2C_race_and_destination_File_22.jpg/1280px-Register_of_immigrant_ships_showing_dates_of_arrival_and_departure%2C_number_of_immigrants_carried%2C_race_and_destination_File_22.jpg","credit":"CC CC BY 2.0, Archives New Zealand"},"s07":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/06/New_MPs_-_54th_Parliament_of_New_Zealand.jpg/1280px-New_MPs_-_54th_Parliament_of_New_Zealand.jpg","credit":"CC CC BY 4.0, Office of the Clerk of the House of Representatives of New Zealand"},"s08":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a8/Biogas_Photovoltaik_Wind.jpg/1280px-Biogas_Photovoltaik_Wind.jpg","credit":"CC CC BY-SA 3.0, Florian Gerlach (Nawaro)"},"s16":{"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/New_Zealand_MMP_voting_paper.jpg/1280px-New_Zealand_MMP_voting_paper.jpg","credit":"CC Public domain, New Zealand Parliament"},"s18":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Opinion_polling_for_the_2026_New_Zealand_election_%28minor_parties%29.svg/1280px-Opinion_polling_for_the_2026_New_Zealand_election_%28minor_parties%29.svg.png","credit":"CC Public domain, Nixinova"},"s19":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Election_Card_Enrolment_and_Awareness_Program_Telangana.jpg/1280px-Election_Card_Enrolment_and_Awareness_Program_Telangana.jpg","credit":"CC CC BY-SA 4.0, Satyaviswakarma"},"s32":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8c/National_Security_Agency%2C_2013.jpg/1280px-National_Security_Agency%2C_2013.jpg","credit":"CC CC0, Trevor Paglen"},"s34":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cc/Wage_labour_2.svg/1280px-Wage_labour_2.svg.png","credit":"CC Public domain, Vargklo at English Wikipedia &amp; Yupi666 at English Wikipedia / http://www.coroflot.com/yupi666"},"s21":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Anchor_pylon_of_high-voltage_overhead_power_line_750_kV.jpg/1280px-Anchor_pylon_of_high-voltage_overhead_power_line_750_kV.jpg","credit":"CC CC0, Novoklimov"},"s27":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6f/Bao_cao_su_%E1%BB%9F_pharmacity_%28condoms%29.jpg/1280px-Bao_cao_su_%E1%BB%9F_pharmacity_%28condoms%29.jpg","credit":"CC CC0, Tranhoangnam4320"},"s28":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/41/Mt_Technical_from_Lewis_tops%2C_Lewis_Pass_Scenic_Reserve%2C_New_Zealand_06.jpg/1280px-Mt_Technical_from_Lewis_tops%2C_Lewis_Pass_Scenic_Reserve%2C_New_Zealand_06.jpg","credit":"CC CC BY-SA 4.0, Michal Klajban"},"s29":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/23/Bank_of_New_Zealand_Building%2C_125_Queen_Street%2C_Auckland.jpg/1280px-Bank_of_New_Zealand_Building%2C_125_Queen_Street%2C_Auckland.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY-SA 4.0, Wikimedia Commons"},"s30":{"img":"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Fox_Glacier_in_Westland_National_Park_01.jpg/1280px-Fox_Glacier_in_Westland_National_Park_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail","credit":"CC BY-SA 4.0, Wikimedia Commons"},"s31":{"img":"https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Primary_school_at_Avaroa%2C_Rarotonga%2C_capital_of_the_Cook_Islands%2C_1965.jpg/1280px-Primary_school_at_Avaroa%2C_Rarotonga%2C_capital_of_the_Cook_Islands%2C_1965.jpg","credit":"CC CC BY 2.0, Photographer: Unknown"}};
+var IMG_MAP = {"wp6-1":{"img":"./assets/editorial/wp6-1.svg","credit":"Original editorial illustration","alt":"Illustration: KiwiSaver","subject":"KiwiSaver","kind":"illustration","src":"./assets/editorial/wp6-1.svg"},"wp6-3":{"img":"./assets/editorial/wp6-3.svg","credit":"Original editorial illustration","alt":"Illustration: ACT list","subject":"ACT list","kind":"illustration","src":"./assets/editorial/wp6-3.svg"},"wp7-1":{"img":"./assets/editorial/wp7-1.svg","credit":"Original editorial illustration","alt":"Illustration: fuel tax","subject":"fuel tax","kind":"illustration","src":"./assets/editorial/wp7-1.svg"},"wp7-2":{"img":"./assets/editorial/wp7-2.svg","credit":"Original editorial illustration","alt":"Illustration: immigration policy","subject":"immigration policy","kind":"illustration","src":"./assets/editorial/wp7-2.svg"},"wp7-3":{"img":"./assets/editorial/wp7-3.svg","credit":"Original editorial illustration","alt":"Illustration: graduate nurse jobs","subject":"graduate nurse jobs","kind":"illustration","src":"./assets/editorial/wp7-3.svg"},"wp8-1":{"img":"./assets/editorial/wp8-1.svg","credit":"Original editorial illustration","alt":"Illustration: fiscal policy","subject":"fiscal policy","kind":"illustration","src":"./assets/editorial/wp8-1.svg"},"wp8-3":{"img":"./assets/editorial/wp8-3.svg","credit":"Original editorial illustration","alt":"Illustration: housing election forum","subject":"housing election forum","kind":"illustration","src":"./assets/editorial/wp8-3.svg"},"wp8-4":{"img":"./assets/editorial/wp8-4.svg","credit":"Original editorial illustration","alt":"Illustration: election administration","subject":"election administration","kind":"illustration","src":"./assets/editorial/wp8-4.svg"},"s02":{"img":"./assets/editorial/s02.svg","credit":"Original editorial illustration","alt":"Illustration: fuel tax and transport fund","subject":"fuel tax and transport fund","kind":"illustration","src":"./assets/editorial/s02.svg"},"s03":{"img":"./assets/editorial/s03.svg","credit":"Original editorial illustration","alt":"Illustration: immigration platform","subject":"immigration platform","kind":"illustration","src":"./assets/editorial/s03.svg"},"s04":{"img":"./assets/editorial/s04.svg","credit":"Original editorial illustration","alt":"Illustration: graduate nurse jobs","subject":"graduate nurse jobs","kind":"illustration","src":"./assets/editorial/s04.svg"},"s05":{"img":"./assets/editorial/s05.svg","credit":"Original editorial illustration","alt":"Illustration: inflation and petrol prices","subject":"inflation and petrol prices","kind":"illustration","src":"./assets/editorial/s05.svg"},"s06":{"img":"./assets/editorial/s06.svg","credit":"Original editorial illustration","alt":"Illustration: migration flows","subject":"migration flows","kind":"illustration","src":"./assets/editorial/s06.svg"},"s07":{"img":"./assets/editorial/s07.svg","credit":"Original editorial illustration","alt":"Illustration: party vote threshold","subject":"party vote threshold","kind":"illustration","src":"./assets/editorial/s07.svg"},"s08":{"img":"./assets/editorial/s08.svg","credit":"Original editorial illustration","alt":"Illustration: climate and growth","subject":"climate and growth","kind":"illustration","src":"./assets/editorial/s08.svg"},"s09":{"img":"./assets/editorial/s09.svg","credit":"Original editorial illustration","alt":"Illustration: housing prices and inventory","subject":"housing prices and inventory","kind":"illustration","src":"./assets/editorial/s09.svg"},"s10":{"img":"./assets/editorial/s10.svg","credit":"Original editorial illustration","alt":"Illustration: emergency department wait targets","subject":"emergency department wait targets","kind":"illustration","src":"./assets/editorial/s10.svg"},"s11":{"img":"./assets/editorial/s11.svg","credit":"Original editorial illustration","alt":"Illustration: cabinet reshuffle","subject":"cabinet reshuffle","kind":"illustration","src":"./assets/editorial/s11.svg"},"s12":{"img":"./assets/editorial/s12.svg","credit":"Original editorial illustration","alt":"Illustration: grocery competition","subject":"grocery competition","kind":"illustration","src":"./assets/editorial/s12.svg"},"s13":{"img":"./assets/editorial/s13.svg","credit":"Original editorial illustration","alt":"Illustration: Māori electorate polling","subject":"Māori electorate polling","kind":"illustration","src":"./assets/editorial/s13.svg"},"s14":{"img":"./assets/editorial/s14.svg","credit":"Original editorial illustration","alt":"Illustration: cost of living survey","subject":"cost of living survey","kind":"illustration","src":"./assets/editorial/s14.svg"},"s15":{"img":"./assets/editorial/s15.svg","credit":"Original editorial illustration","alt":"Illustration: dairy export payout","subject":"dairy export payout","kind":"illustration","src":"./assets/editorial/s15.svg"},"s16":{"img":"./assets/editorial/s16.svg","credit":"Original editorial illustration","alt":"Illustration: MMP seat allocation","subject":"MMP seat allocation","kind":"illustration","src":"./assets/editorial/s16.svg"},"s17":{"img":"./assets/editorial/s17.svg","credit":"Original editorial illustration","alt":"Illustration: energy fund","subject":"energy fund","kind":"illustration","src":"./assets/editorial/s17.svg"},"s18":{"img":"./assets/editorial/s18.svg","credit":"Original editorial illustration","alt":"Illustration: party polling snapshot","subject":"party polling snapshot","kind":"illustration","src":"./assets/editorial/s18.svg"},"s19":{"img":"./assets/editorial/s19.svg","credit":"Original editorial illustration","alt":"Illustration: voter enrolment","subject":"voter enrolment","kind":"illustration","src":"./assets/editorial/s19.svg"},"s20":{"img":"./assets/editorial/s20.svg","credit":"Original editorial illustration","alt":"Illustration: Pacific aid","subject":"Pacific aid","kind":"illustration","src":"./assets/editorial/s20.svg"},"s21":{"img":"./assets/editorial/s21.svg","credit":"Original editorial illustration","alt":"Illustration: winter energy payment","subject":"winter energy payment","kind":"illustration","src":"./assets/editorial/s21.svg"},"s22":{"img":"./assets/editorial/s22.svg","credit":"Original editorial illustration","alt":"Illustration: KiwiSaver review","subject":"KiwiSaver review","kind":"illustration","src":"./assets/editorial/s22.svg"},"s23":{"img":"./assets/editorial/s23.svg","credit":"Original editorial illustration","alt":"Illustration: China trade talks","subject":"China trade talks","kind":"illustration","src":"./assets/editorial/s23.svg"},"s24":{"img":"./assets/editorial/s24.svg","credit":"Original editorial illustration","alt":"Illustration: building consents","subject":"building consents","kind":"illustration","src":"./assets/editorial/s24.svg"},"s25":{"img":"./assets/editorial/s25.svg","credit":"Original editorial illustration","alt":"Illustration: Māori wards bill","subject":"Māori wards bill","kind":"illustration","src":"./assets/editorial/s25.svg"},"s26":{"img":"./assets/editorial/s26.svg","credit":"Original editorial illustration","alt":"Illustration: fisheries quota","subject":"fisheries quota","kind":"illustration","src":"./assets/editorial/s26.svg"},"s27":{"img":"./assets/editorial/s27.svg","credit":"Original editorial illustration","alt":"Illustration: Pharmac funding","subject":"Pharmac funding","kind":"illustration","src":"./assets/editorial/s27.svg"},"s28":{"img":"./assets/editorial/s28.svg","credit":"Original editorial illustration","alt":"Illustration: tourism recovery","subject":"tourism recovery","kind":"illustration","src":"./assets/editorial/s28.svg"},"s29":{"img":"./assets/editorial/s29.svg","credit":"Original editorial illustration","alt":"Illustration: bank capital rules","subject":"bank capital rules","kind":"illustration","src":"./assets/editorial/s29.svg"},"s30":{"img":"./assets/editorial/s30.svg","credit":"Original editorial illustration","alt":"Illustration: climate pledge","subject":"climate pledge","kind":"illustration","src":"./assets/editorial/s30.svg"},"s31":{"img":"./assets/editorial/s31.svg","credit":"Original editorial illustration","alt":"Illustration: school property budget","subject":"school property budget","kind":"illustration","src":"./assets/editorial/s31.svg"},"s32":{"img":"./assets/editorial/s32.svg","credit":"Original editorial illustration","alt":"Illustration: intelligence oversight","subject":"intelligence oversight","kind":"illustration","src":"./assets/editorial/s32.svg"},"s33":{"img":"./assets/editorial/s33.svg","credit":"Original editorial illustration","alt":"Illustration: EU trade agreement","subject":"EU trade agreement","kind":"illustration","src":"./assets/editorial/s33.svg"},"s34":{"img":"./assets/editorial/s34.svg","credit":"Original editorial illustration","alt":"Illustration: minimum wage review","subject":"minimum wage review","kind":"illustration","src":"./assets/editorial/s34.svg"},"s35":{"img":"./assets/editorial/s35.svg","credit":"Original editorial illustration","alt":"Illustration: Reserve Bank Act review","subject":"Reserve Bank Act review","kind":"illustration","src":"./assets/editorial/s35.svg"},"s36":{"img":"./assets/editorial/s36.svg","credit":"Original editorial illustration","alt":"Illustration: Antarctic treaty","subject":"Antarctic treaty","kind":"illustration","src":"./assets/editorial/s36.svg"},"s37":{"img":"./assets/editorial/s37.svg","credit":"Original editorial illustration","alt":"Illustration: rural broadband","subject":"rural broadband","kind":"illustration","src":"./assets/editorial/s37.svg"},"s38":{"img":"./assets/editorial/s38.svg","credit":"Original editorial illustration","alt":"Illustration: electoral commission fine","subject":"electoral commission fine","kind":"illustration","src":"./assets/editorial/s38.svg"},"s39":{"img":"./assets/editorial/s39.svg","credit":"Original editorial illustration","alt":"Illustration: grocery code consultation","subject":"grocery code consultation","kind":"illustration","src":"./assets/editorial/s39.svg"},"s40":{"img":"./assets/editorial/s40.svg","credit":"Original editorial illustration","alt":"Illustration: Pacific labour scheme","subject":"Pacific labour scheme","kind":"illustration","src":"./assets/editorial/s40.svg"}};
 
 var CELLS = [
-  { id:'wp6-1', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#KiwiSaver','#Labour'], title:'Labour: Employer KiwiSaver Contributions to Become Compulsory', wp6:'wp6-1', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/New_Zealand_House_of_Representatives_debating_chamber.jpg/1280px-New_Zealand_House_of_Representatives_debating_chamber.jpg', imgCredit:'CC BY 4.0, Office of the Clerk of the House of Representatives' },
-  { id:'wp6-2', tier:1, priority:'HIGH', date:'14 SEP', cat:'politics', tags:['#Immigration','#Accountability'], title:"Immigration NZ: $134m of Forecast Benefits Ruled Flawed", wp6:'wp6-2', img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Gas_station%2C_Waikari%2C_Canterbury%2C_New_Zealand_02.jpg/1280px-Gas_station%2C_Waikari%2C_Canterbury%2C_New_Zealand_02.jpg', imgCredit:'CC BY-SA 4.0, Wikimedia Commons contributor' },
-  { id:'wp6-3', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#ACT','#PartyList'], title:'Act List: Paul Henry at Fourth, Sitting MPs at Risk', wp6:'wp6-3', img:'https://upload.wikimedia.org/wikipedia/commons/b/bd/Paul_Henry_%28New_Zealand_broadcaster%29_%28cropped%29.jpg', imgCredit:'CC BY 2.0, Vivianne Robinson' },
-  { id:'wp7-1', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Fiscal'], title:'Government Scraps 2027 Fuel Tax Hike, Tops Up Transport Fund', wp7:'wp7-1', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/New_Zealand_Fuel_%2840795697180%29.jpg/1280px-New_Zealand_Fuel_%2840795697180%29.jpg', imgCredit:'CC BY-SA 2.0, Michael Coghlan' },
-  { id:'wp7-2', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Unveils Sweeping Immigration Overhaul', wp7:'wp7-2', img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/NZ_Parliament_Buildings_2020-06-26.jpg/1280px-NZ_Parliament_Buildings_2020-06-26.jpg', imgCredit:'CC BY-SA 4.0, Quilt Phase' },
-  { id:'wp7-3', tier:1, priority:'HIGH', date:'01 SEP', cat:'health', tags:['#Health','#Jobs'], title:'Labour Guarantees Jobs for NZ-Trained Graduate Nurses', wp7:'wp7-3', img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4d/Health_choices_depicted_with_a_nurse_holding_an_apple_and_a_donut_in_a_modern_hospital_setting.jpg/1280px-Health_choices_depicted_with_a_nurse_holding_an_apple_and_a_donut_in_a_modern_hospital_setting.jpg', imgCredit:'CC BY 2.0, Wikimedia Commons contributor' },
-  { id:'wp8-1', tier:1, priority:'HIGH', date:'10 AUG', cat:'finance', tags:['#ACT','#Fiscal'], title:'ACT Pledges Faster Path to Surplus, No New Taxes', wp8:'wp8-1', img:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/John_Key_placing_vote_in_ballot_box.jpg/1280px-John_Key_placing_vote_in_ballot_box.jpg', imgCredit:'CC BY-SA 2.0, kelvinhu' },
+  { id:'wp6-1', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#KiwiSaver','#Labour'], title:'Labour: Employer KiwiSaver Contributions to Become Compulsory', wp6:'wp6-1' },
+  { id:'wp6-2', tier:1, priority:'HIGH', date:'14 SEP', cat:'politics', tags:['#Immigration','#Accountability'], title:"Immigration NZ: $134m of Forecast Benefits Ruled Flawed", wp6:'wp6-2' },
+  { id:'wp6-3', tier:1, priority:'HIGH', date:'13 SEP', cat:'politics', tags:['#ACT','#PartyList'], title:'Act List: Paul Henry at Fourth, Sitting MPs at Risk', wp6:'wp6-3' },
+  { id:'wp7-1', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Fiscal'], title:'Government Scraps 2027 Fuel Tax Hike, Tops Up Transport Fund', wp7:'wp7-1' },
+  { id:'wp7-2', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Unveils Sweeping Immigration Overhaul', wp7:'wp7-2' },
+  { id:'wp7-3', tier:1, priority:'HIGH', date:'01 SEP', cat:'health', tags:['#Health','#Jobs'], title:'Labour Guarantees Jobs for NZ-Trained Graduate Nurses', wp7:'wp7-3' },
+  { id:'wp8-1', tier:1, priority:'HIGH', date:'10 AUG', cat:'finance', tags:['#ACT','#Fiscal'], title:'ACT Pledges Faster Path to Surplus, No New Taxes', wp8:'wp8-1' },
   { id:'wp8-2', tier:1, priority:'HIGH', date:'03 SEP', cat:'politics', tags:['#Polls','#Coalition'], title:'Coalition Returned in Curia Poll; Opportunity Loses Kingmaker Bid', wp8:'wp8-2' },
   { id:'wp8-3', tier:2, date:'14 SEP', cat:'economy', tags:['#Housing','#Election'], title:'Housing Election Forum: Parties to Face Direct Questions', wp8:'wp8-3' },
   { id:'wp8-4', tier:2, date:'08 SEP', cat:'politics', tags:['#Election','#Reform'], title:'Government Accepts 65 Election-Process Changes', wp8:'wp8-4' },
-  { id:'election', tier:0, priority:'HIGH', date:'12 SEP 2026', cat:'politics', tags:['#Polls','#MMP'], title:'ELECTION 2026 — Polls & the 5% Threshold', full:true, img:'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/36/Beehive_and_Parliament_House_-_Wellington_-_New_Zealand_-_DSC00165.jpg/1280px-Beehive_and_Parliament_House_-_Wellington_-_New_Zealand_-_DSC00165.jpg', imgCredit:'CC BY-SA 4.0, Daderot' },
+  { id:'election', tier:0, priority:'HIGH', date:'12 SEP 2026', cat:'politics', tags:['#Polls','#MMP'], title:'ELECTION 2026 — Polls & the 5% Threshold', full:true },
   { id:'s02', tier:1, priority:'HIGH', date:'11 SEP', cat:'economy', tags:['#FuelTax','#Coalition'], title:'Fuel Tax Retreat: The $1.4B Land Transport Fund Hole' },
   { id:'s03', tier:1, priority:'HIGH', date:'11 SEP', cat:'politics', tags:['#NZFirst','#Immigration'], title:'NZ First Immigration Platform Lands' },
   { id:'s04', tier:2, date:'10 SEP', cat:'politics', tags:['#Health','#Jobs'], title:'Labour Guarantees Graduate Nurse Jobs' },
@@ -651,61 +691,55 @@ var CELLS = [
   { id:'s40', tier:3, cat:'international', tags:['#Migration','#Pacific'], date:'12 AUG', title:'Pacific Labour Scheme Extended' },
   { id:'logo', tier:3, logo:true }
 ];
-/* UIB: merge IMG_MAP into CELLS — tier2 cells reference-only until runtime */
+/* Original local editorial media and data visuals are merged into story records. */
 (function mergeImgMap(){
   for (var i = 0; i < CELLS.length; i++) {
     var c = CELLS[i];
-    if (!c.img && c.tier !== 3) {
-      var extra = IMG_MAP[c.id];
-      if (extra) { c.img = extra.img; c.imgCredit = extra.credit || ''; }
-    }
+    var extra = IMG_MAP[c.id];
+    if (extra) { c.img = extra.img; c.imgCredit = extra.credit || ''; c.imgAlt = extra.alt || c.title || ''; }
+    if (['wp6-2','wp8-2','election','s07','s18'].includes(c.id)) c.img = null;
   }
 })();
 
 /* ── Charts ────────────────────────────────────────────────── */
 function drawPollChart(container, h, opts) {
-  /* Cover card: brief-page main chart DNA — TWO MAJOR PARTIES ONLY (National vs Labour),
-     model lines + confidence bands + poll dots + right-edge name/value labels,
-     dashed % gridlines, Today anchor, teal under-5% zone. Mini-sparkline projection style.
-     opts.nogrid: skip dashed gridlines (narrow hero — they read as clutter at 110px). */
+  /* Shared cover/detail poll chart. Points are the recorded values, not a model or interval. */
   opts = opts || {};
   var w = container.clientWidth || 400;
-  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h)
-    .attr('preserveAspectRatio','none');
-  var labelW = w < 340 ? 56 : 92;
-  var x = d3.scaleLinear().domain([0, 9]).range([8, w-labelW]);
-  var y = d3.scaleLinear().domain([20, 42]).range([h-16, 8]);
-  // dashed gridlines with % labels on right (house style) — domain fits the two majors
+  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h).attr('width',w).attr('height',h)
+    .attr('preserveAspectRatio','xMidYMid meet');
+  var labelW = w < 340 ? 66 : 100;
+  var series = ['national','labour'];
+  var maxPoints = Math.max.apply(null, series.map(function(k){return POLL_HISTORY[k].length;}));
+  var lastIndex = maxPoints - 1;
+  var x = d3.scaleLinear().domain([0, lastIndex]).range([12, Math.max(20,w-labelW)]);
+  var y = d3.scaleLinear().domain([20, 42]).range([h-23, 19]);
   if (!opts.nogrid) [20,25,30,35,40].forEach(function(v){
     svg.append('line').attr('x1',10).attr('x2',w-labelW).attr('y1',y(v)).attr('y2',y(v))
-      .attr('stroke','rgba(255,255,255,0.14)').attr('stroke-dasharray','2,4');
+      .attr('stroke','#2a3640').attr('stroke-width',1);
     svg.append('text').attr('x',w-labelW+6).attr('y',y(v)+3)
-      .attr('font-size',8).attr('fill','#6b7684').text(v+'%');
+      .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').text(v+'%');
   });
-  svg.append('line').attr('x1',x(8.6)).attr('x2',x(8.6)).attr('y1',6).attr('y2',h-16)
-    .attr('stroke','rgba(255,255,255,0.5)');
-  svg.append('text').attr('x',x(8.6)).attr('y',4).attr('text-anchor','middle')
-    .attr('font-size',8).attr('letter-spacing','0.1em').attr('fill','#9aa7b4').text('3 SEP');
+  svg.append('line').attr('x1',x(lastIndex)).attr('x2',x(lastIndex)).attr('y1',12).attr('y2',h-20)
+    .attr('stroke','#a6b2bc').attr('stroke-width',1);
+  svg.append('text').attr('x',x(lastIndex)).attr('y',10).attr('text-anchor','middle')
+    .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').text('3 SEP');
   ['national','labour'].forEach(function(k){
     var c = PARTY[k].color;
     var data = POLL_HISTORY[k];
-    svg.append('path').datum(data)
-      .attr('d', d3.area().x(function(d,i){return x(i);})
-        .y0(function(d){return y(d-1.3);}).y1(function(d){return y(d+1.3);})
-        .curve(d3.curveMonotoneX))
-      .attr('fill',c).attr('opacity',0.16).attr('fill-opacity',0.12);
     svg.selectAll(null).data(data).enter().append('circle')
       .attr('cx',function(d,i){return x(i);}).attr('cy',function(d){return y(d);})
       .attr('r',2.2).attr('fill',c).attr('opacity',0.45);
     svg.append('path').datum(data)
       .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
-        .curve(d3.curveMonotoneX))
-      .attr('fill','none').attr('stroke',c).attr('stroke-width',2);
-    var last = data[data.length-1];
+        .curve(d3.curveLinear))
+      .attr('fill','none').attr('stroke',c).attr('stroke-width',2.5);
+    var lastIndex = data.length - 1;
+    var last = data[lastIndex];
     var ly = y(last);
-    svg.append('circle').attr('cx',x(9)).attr('cy',ly).attr('r',3.2).attr('fill',c);
-    var nameFs = w < 340 ? 8 : 10;
-    var valFs = w < 340 ? 8.5 : 9.5;
+    svg.append('circle').attr('cx',x(lastIndex)).attr('cy',ly).attr('r',3.7).attr('fill',c);
+    var nameFs = w < 340 ? 9 : 12;
+    var valFs = w < 340 ? 10 : 12;
     svg.append('text').attr('x',w-labelW+6).attr('y',ly-2)
       .attr('font-size',nameFs).attr('font-weight',600).attr('fill',c).text(PARTY[k].name);
     svg.append('text').attr('x',w-labelW+6).attr('y',ly+9)
@@ -714,7 +748,7 @@ function drawPollChart(container, h, opts) {
   var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'];
   months.forEach(function(m,i){
     svg.append('text').attr('x', x(i)).attr('y', h-4)
-      .attr('font-size',8).attr('fill','#6b7684').attr('text-anchor','middle').text(m);
+    .attr('font-size',w<340?9:11).attr('fill','#a6b2bc').attr('text-anchor','middle').text(m);
   });
 }
 
@@ -724,15 +758,10 @@ function drawMiniSpark(container, partyKey, h) {
   var w = container.clientWidth || 120;
   var c = PARTY[partyKey] ? PARTY[partyKey].color : '#8895a7';
   var svg = d3.select(container).append('svg').attr('viewBox','0 0 '+w+' '+h)
-    .attr('preserveAspectRatio','none');
+    .attr('preserveAspectRatio','xMidYMid meet');
   var x = d3.scaleLinear().domain([0, data.length-1]).range([2, w-46]);
   var lo = Math.min.apply(null, data) - 1.5, hi = Math.max.apply(null, data) + 1.5;
   var y = d3.scaleLinear().domain([lo, hi]).range([h-3, 3]);
-  svg.append('path').datum(data)
-    .attr('d', d3.area().x(function(d,i){return x(i);})
-      .y0(function(d){return y(d-0.9);}).y1(function(d){return y(d+0.9);})
-      .curve(d3.curveMonotoneX))
-    .attr('fill',c).attr('opacity',0.10);
   svg.append('path').datum(data)
     .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
       .curve(d3.curveMonotoneX))
@@ -745,15 +774,13 @@ function drawMiniSpark(container, partyKey, h) {
 
 function thresholdBars(container) {
   var html = '<div class="th-line" style="left:'+(5/45*100)+'%"></div>' +
-    '<div class="th-label" style="left:'+(5/45*100)+'%">5%</div>';
-  var abbrMap = {national:'NAT', labour:'LAB', green:'GRN', act:'ACT', nzfirst:'NZF'};
+    '<div class="th-label" style="left:'+(5/45*100)+'%">5% threshold</div>';
   Object.keys(PARTY).forEach(function(k){
     var p = PARTY[k];
     var w = Math.min(100, p.poll/45*100);
-    var abbr = abbrMap[k] || k.toUpperCase().substring(0,3);
-    html += '<div class="th-row"><div class="th-name">'+p.name+' <span class="th-abbr">'+abbr+' '+p.poll+'</span></div>' +
+    html += '<div class="th-row"><div class="th-name">'+p.name+'</div>' +
       '<div class="th-track"><div class="th-bar'+(p.reached?'':' below')+
-      '" style="width:'+w+'%; background:'+p.color+'"></div></div>' +
+      '" style="width:'+w+'%; background:'+(p.reached?p.color:'#66727e')+'"></div></div>' +
       '<div class="th-val">'+p.poll+'%</div></div>';
   });
   html += '<div class="mmp-note">MMP: a party enters Parliament by clearing 5% party vote OR winning one electorate seat.</div>';
@@ -778,7 +805,7 @@ function pageSize(){ var n = window.innerWidth < 480 || /[?&]narrow=1/.test(loca
 function catStories(cat) {
   var k = cat === undefined ? activeCat : cat;
   var s = CELLS.filter(function(c){ return !c.logo && (k === 'all' || c.cat === k); });
-  var hasImg = function(c){ return c.img || (typeof IMG_MAP !== 'undefined' && IMG_MAP[c.id]); };
+  var hasImg = function(c){ return c.img || !!c.wp6 || c.wp8 === 'wp8-2' || c.id === 'election' || c.id === 's07' || c.id === 's18' || (typeof IMG_MAP !== 'undefined' && IMG_MAP[c.id]); };
   s.sort(function(a,b){
     var ai = hasImg(a) ? 0 : 1, bi = hasImg(b) ? 0 : 1;
     if (ai !== bi) return ai - bi;           /* image-first: cards with photos rise above empty ones */
@@ -867,7 +894,7 @@ function renderGrid(cat) {
     var n = rect[i];
     if (!n) return;
     var el = document.createElement('div');
-    el.className = 'cell p' + c.tier + (c.img && c.tier !== 3 && !narrow ? ' has-img' : '');
+    el.className = 'cell p' + c.tier;
     el.setAttribute('data-id', c.id);
     el.style.left = n.x0+'px'; el.style.top = n.y0+'px';
     el.style.width = (n.x1-n.x0)+'px'; el.style.height = (n.y1-n.y0)+'px';
@@ -888,16 +915,25 @@ function renderGrid(cat) {
     var w = n.x1-n.x0, h = n.y1-n.y0;
     var big = c.full && !narrow;
     var tagsHtml = (c.tags||[]).map(function(t){return '<span>'+t+'</span>';}).join('');
-    var showTagRow = !(c.tier === 3 && w < 148);
-    var showSource = !(c.tier === 3 && w < 148);
+    var showTagRow = c.tier !== 3 || w >= 104;
+    var showSource = c.tier !== 3 || w >= 118;
+    var chartKind = c.wp6 === 'wp6-2' ? 'inz' : ((c.wp8 === 'wp8-2' || c.id === 's18') ? 'poll' : (c.id === 's07' ? 'threshold' : ''));
+    var mediaRoom = w >= 96 && h >= (w < 150 ? 132 : 112);
+    var showMedia = (chartKind && w >= 120 && h >= 118) || (!!c.img && mediaRoom);
     var imgHtml = '';
-    if (!narrow && c.img && c.tier !== 3) {
-      var imgAsp = c.tier === 0 ? '16/9' : (c.tier === 1 ? '16/10' : '1/1');
-      var fetchPrio = c.tier === 0 ? 'fetchpriority="high"' : 'fetchpriority="lazy"';
-      imgHtml = '<div class="cell-img-wrap" style="aspect-ratio:' + imgAsp + ';">' +
-        '<img src="' + c.img + '" alt="' + escAttr(c.title||'') + '" loading="lazy" decoding="async" ' + fetchPrio + ' onerror="this.parentElement.style.display=\'none\';this.closest(\'.cell\').classList.add(\'no-img-fallback\');" />' +
-        (c.imgCredit ? '<div class="cell-img-credit">' + escAttr(c.imgCredit) + '</div>' : '') +
-        '</div>';
+    if (showMedia) {
+      el.classList.add('has-img');
+      var mediaHeight = Math.min(112, Math.max(42, Math.floor(h * 0.34)));
+      if (chartKind === 'inz') imgHtml = '<div class="cell-img-wrap cell-mini-chart inz-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
+      else if (chartKind === 'poll') imgHtml = '<div class="cell-img-wrap cell-mini-chart poll-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
+      else if (chartKind === 'threshold') imgHtml = '<div class="cell-img-wrap cell-mini-chart threshold-mini" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px"></div>';
+      else {
+        var fetchPrio = c.tier === 0 ? 'fetchpriority="high"' : 'fetchpriority="lazy"';
+        imgHtml = '<div class="cell-img-wrap" style="height:'+mediaHeight+'px;flex-basis:'+mediaHeight+'px">' +
+          '<img src="' + escAttr(c.img) + '" alt="' + escAttr((IMG_MAP[c.id] && IMG_MAP[c.id].alt) || (c.title||'Editorial illustration')) + '" loading="lazy" decoding="async" ' + fetchPrio + ' onerror="this.parentElement.style.display=\'none\';this.closest(\'.cell\').classList.add(\'no-img-fallback\');" />' +
+          (c.imgCredit ? '<div class="cell-img-credit">' + escAttr(c.imgCredit) + '</div>' : '') +
+          '</div>';
+      }
     }
     var html;
     if (imgHtml) {
@@ -923,6 +959,9 @@ function renderGrid(cat) {
       drawPollChart(el.querySelector('.election-chart'), Math.max(150, h*0.55));
       thresholdBars(el.querySelector('.thresholds'));
     }
+    if (chartKind === 'inz' && el.querySelector('.inz-mini')) drawInzBars(el.querySelector('.inz-mini'), true);
+    if (chartKind === 'poll' && el.querySelector('.poll-mini')) drawPollSnapshot(el.querySelector('.poll-mini'), true);
+    if (chartKind === 'threshold' && el.querySelector('.threshold-mini')) drawThresholdMini(el.querySelector('.threshold-mini'));
   });
   updatePager();
   requestAnimationFrame(function(){
@@ -932,37 +971,19 @@ function renderGrid(cat) {
   });
 }
 
-/* ── WP6 sample articles (2026-09-13/14 news) ──────────────── */
-/* Related people — copyright-free portraits (CC0 / CC BY-SA, Wikimedia Commons) */
-var PEOPLE = {
-  'wp6-1': [{
-    name: 'Chris Hipkins', role: 'Leader of the Opposition · Labour',
-    img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/57/Chris_Hipkins_NZ_Labour_%28cropped%29.jpg/500px-Chris_Hipkins_NZ_Labour_%28cropped%29.jpg',
-    credit: 'CC BY-SA 4.0 · NZ Labour',
-    href: 'https://commons.wikimedia.org/wiki/File:Chris_Hipkins_NZ_Labour_(cropped).jpg'
-  }],
-  'wp6-2': [{
-    name: 'Erica Stanford', role: 'Minister of Immigration',
-    img: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5a/Erica_Stanford_2025_%28cropped%29.jpg/1280px-Erica_Stanford_2025_%28cropped%29.jpg',
-    credit: 'CC0 · Government House',
-    href: 'https://commons.wikimedia.org/wiki/File:Erica_Stanford_2025_(cropped).jpg'
-  }],
-  'wp6-3': [{
-    name: 'David Seymour', role: 'Leader · ACT',
-    img: 'https://upload.wikimedia.org/wikipedia/commons/9/91/David_Seymour_at_Government_House%2C_Wellington.png',
-    credit: 'CC0 · Doug Mountain',
-    href: 'https://commons.wikimedia.org/wiki/File:David_Seymour_at_Government_House,_Wellington.png'
-  }]
+/* Fictional bylines identify the site's virtual editorial voice. */
+var AUTHORS = {
+  politics:{name:'Alex Reed',desk:'Politics desk',avatar:'./assets/editorial/avatar-alex.svg'},
+  economy:{name:'Maya Cole',desk:'Economy & finance desk',avatar:'./assets/editorial/avatar-maya.svg'},
+  finance:{name:'Maya Cole',desk:'Economy & finance desk',avatar:'./assets/editorial/avatar-maya.svg'},
+  health:{name:'Sam Ellis',desk:'Health desk',avatar:'./assets/editorial/avatar-sam.svg'},
+  international:{name:'Sam Ellis',desk:'International desk',avatar:'./assets/editorial/avatar-sam.svg'}
 };
-function renderPeople(wp6) {
+function renderAuthor(story) {
   var el = document.getElementById('a-people');
-  var list = PEOPLE[wp6] || [];
-  if (!list.length) { el.innerHTML = ''; return; }
-  el.innerHTML = list.map(function (p) {
-    return '<div class="a-person"><img src="' + p.img + '" alt="' + p.name + '" loading="lazy" decoding="async">' +
-      '<div class="who"><b>' + p.name + '</b><span>' + p.role + '</span>' +
-      '<span class="credit">Photo: <a href="' + p.href + '" target="_blank" rel="noopener">' + p.credit + '</a></span></div></div>';
-  }).join('');
+  var author = AUTHORS[(story && story.cat) || 'politics'] || AUTHORS.politics;
+  el.innerHTML = '<div class="a-person"><img src="'+author.avatar+'" alt="Pixel avatar for '+author.name+'" width="44" height="44">'+
+    '<div class="who"><b>'+author.name+'</b><span>'+author.desk+'</span><span class="credit">BIHIVE · Virtual author</span></div></div>';
 }
 var ARTICLE_DATA = {
  "art-s12": {
@@ -1152,11 +1173,11 @@ var ARTICLE_DATA = {
   "art-s07": {
    "title": "Threshold Review: What 8.4% NZF Means Now",
    "sections": [
-    { "h": "The green party is now the most interesting seat in the poll", "p": "The latest poll in the Beehive series puts National at 29.0%, down 2.0 points from the previous reading of 31.0%. Labour is on 25.9%, down 1.9 points from 27.8%. The Green Party is on 13.9%, up 3.8 points from 10.1%, the largest single-party gain in the series. ACT is on 10.5%, up 3.2 points from 7.3%. NZ First is on 8.4%, down 0.7 points from 9.1%. Read together, the coalition configuration is intact and the left bloc is now larger than the right, which is the structural fact the campaign has been avoiding." },
+    { "h": "The green party is now the most interesting seat in the poll", "p": "The latest poll in the BIHIVE series puts National at 29.0%, down 2.0 points from the previous reading of 31.0%. Labour is on 25.9%, down 1.9 points from 27.8%. The Green Party is on 13.9%, up 3.8 points from 10.1%, the largest single-party gain in the series. ACT is on 10.5%, up 3.2 points from 7.3%. NZ First is on 8.4%, down 0.7 points from 9.1%. Read together, the coalition configuration is intact and the left bloc is now larger than the right, which is the structural fact the campaign has been avoiding." },
     { "h": "NZ First is above the line, but the question is what it buys", "p": "NZ First's 8.4% sits 3.4 points above the 5% party-vote threshold, so the party is projecting an electorate and list position that matters. What it buys is a seat at the coalition table, not a position of power. A party with 8.4% that is not needed to hold a majority is a participant in the outcome, and a party that is needed to hold one is the outcome. The gap between those two positions is the entire argument NZ First is having to make, and the poll gives it a margin it can work with." },
     { "h": "The two gains are not the same gain", "p": "Green's 3.8-point rise and ACT's 3.2-point rise are the same size of movement and the opposite direction of politics. ACT gains by taking the middle, which is the vote a party at 7.3% can afford to chase without being written off as minor. Green gains by taking the left of it, which is a vote that has to come from somewhere and is visibly coming from Labour, whose reading fell 1.9 points. The party losing the most absolute ground is not the party losing the most votes, because the gains are concentrated: National gave up 2.0 points and Labour 1.9, and the two left and right challengers took 7.0 of them." },
     { "h": "The political read-through", "p": "The configuration is the same as the one the previous reading suggested, with the difference that the challenger margin is now real rather than directional. National is still leading by a comfortable margin, but the party sitting just above the threshold has moved from a footnote to the most consequential number in the poll. NZ First at 8.4% is three and a half points clear of the line, and the immigration platform it is running on lands in the same week as the migration data release that put annual net migration at 20,300. The party with the specific policy on the live number is the party sitting furthest above the threshold, and that is a position that did not exist a month ago." },
-    { "as_of": true, "p": "As of 1 September 2026. Source: poll series as recorded in the Beehive POLL_HISTORY series, most recent two readings." }
+    { "as_of": true, "p": "As of 1 September 2026. Source: poll series as recorded in the BIHIVE POLL_HISTORY series, most recent two readings." }
    ]
   },
   "art-s08": {
@@ -1257,7 +1278,7 @@ function drawPollTable(container) {
   ];
   var w = container.clientWidth || 400, h = 240;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
-    .attr('preserveAspectRatio', 'none');
+    .attr('preserveAspectRatio', 'xMidYMid meet');
   var barH = 20, gap = 14, top = 12;
   var labelW = w < 380 ? 70 : 90;
   var threshX = labelW + (5 / 30) * (w - labelW - 60);
@@ -1277,67 +1298,37 @@ function drawPollTable(container) {
   svg.append('text').attr('x', threshX + 4).attr('y', top + 2).attr('font-size', 8)
     .attr('fill', '#d23528').text('5% threshold');
   svg.append('text').attr('x', 0).attr('y', h - 6).attr('font-size', 8.5)
-    .attr('fill', '#6b7684').text("Taxpayers' Union–Curia, 1–3 Sep 2026 · Beehive chart");
+    .attr('fill', '#6b7684').text("Taxpayers' Union–Curia, 1–3 Sep 2026 · BIHIVE visualization");
 }
 
-/* fiscal source-table: house-style horizontal bars with labels (wp7 cards) */
-function drawFiscalTable(container, wp7) {
-  /* FIX(wpn): C高3 — wp8-1/wp8-3/wp8-4 were falling into the nurse rows; add wp8 data branches */
-  var rows;
-  if (/^wp8-/.test(wp7)) {
-    rows = wp7 === 'wp8-1' ? [
-      { label: 'Debt interest / day', value: 24.8, unit: '$m', color: '#d23528' },
-      { label: 'Cuts over 3 budgets', value: 14, unit: '$b', color: '#5a94d4' },
-      { label: 'Spending, % of GDP', value: 32.6, unit: '%', color: '#8895a7' },
-      { label: 'Surplus target', value: 2027, unit: '', color: '#3d9e5c' }
-    ] : wp7 === 'wp8-3' ? [
-      { label: 'First-home deposit', value: 5, unit: '%', color: '#5a94d4' },
-      { label: 'OPP near threshold', value: 4.5, unit: '%', color: '#c9b026' },
-      { label: 'Forum date', value: 14, unit: ' Sep', color: '#8895a7' },
-      { label: 'MMP threshold', value: 5, unit: '%', color: '#6b7684' }
-    ] : [
-      { label: 'Changes accepted', value: 65, unit: '', color: '#5a94d4' },
-      { label: 'Election date', value: 7, unit: ' Nov', color: '#3d9e5c' },
-      { label: 'Writ day', value: 4, unit: ' Oct', color: '#8895a7' },
-      { label: 'Nominations close', value: 8, unit: ' Oct', color: '#c9b026' }
-    ];
-  } else rows = wp7 === 'wp7-1' ? [
-    { label: 'Cancelled 2027 hike', value: 12, unit: 'c/L', color: '#d23528' },
-    { label: 'NLTF top-up', value: 1.476, unit: '$b', color: '#5a94d4' },
-    { label: 'From contingency', value: 450, unit: '$m', color: '#8895a7' },
-    { label: "Labour freeze gap", value: 4.6, unit: '$b', color: '#c9b026' }
-  ] : [
-    { label: 'Graduate nurses/yr', value: 2400, unit: '', color: '#5a94d4' },
-    { label: 'Annual cost', value: 525, unit: '$m', color: '#d23528' },
-    { label: 'Recruitment subsidy', value: 2, unit: 'x', color: '#3d9e5c' }
-  ];
-  var w = container.clientWidth || 400, h = 200;
-  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
-    .attr('preserveAspectRatio', 'none');
-  var maxv = Math.max.apply(null, rows.map(function(r){ return r.value; }));
-  var barH = 26, gap = 18, top = 14;
-  var labelW = w < 380 ? 130 : 170;
-  rows.forEach(function (r, i) {
-    var yy = top + i * (barH + gap);
-    svg.append('text').attr('x', 0).attr('y', yy + barH / 2 + 3)
-      .attr('font-size', 10).attr('fill', '#9aa7b4').text(r.label);
-    var bw = (r.value / maxv) * (w - labelW - 56);
-    svg.append('rect').attr('x', labelW).attr('y', yy).attr('width', Math.max(2, bw)).attr('height', barH)
-      .attr('fill', r.color).attr('opacity', 0.85).attr('rx', 2);
-    svg.append('text').attr('x', labelW + bw + 6).attr('y', yy + barH / 2 + 3.5)
-      .attr('font-size', 11).attr('font-weight', 600).attr('fill', '#c7cfd8').text(r.value + r.unit);
-  });
-  svg.append('line').attr('x1', 0).attr('x2', w).attr('y1', h - 6).attr('y2', h - 6)
-    .attr('stroke', 'rgba(255,255,255,0.14)');
-  svg.append('text').attr('x', 0).attr('y', h - 8).attr('font-size', 8.5)
-    .attr('fill', '#6b7684').text(/^wp8-/.test(wp7) ? 'Source: NZ Herald reporting · figures illustrative · Beehive chart' : 'Source: RNZ / NZ Herald reporting · Beehive chart');
+/* Mixed indicators remain separate KPIs; currency values are normalized and grouped by unit. */
+function drawFiscalTable(container, storyId) {
+  var specs = {
+    'wp7-1': {title:'Transport funding measures', groups:[
+      {label:'Fuel-tax change',items:[['12 c/L','Cancelled 2027 fuel-tax increase']]},
+      {label:'Funding amounts',unit:'NZ$ million',items:[['1,476','Land Transport Fund top-up'],['450','From contingency'],['4,600','Labour freeze gap']]}]},
+    'wp7-3': {title:'Graduate nurse jobs proposal',groups:[
+      {label:'Workforce and programme measures',items:[['2,400 / year','NZ-trained graduate nurses'],['NZ$525 million / year','Estimated annual cost'],['2×','Recruitment subsidy']]}]},
+    'wp8-1': {title:'Fiscal commitments and targets',groups:[
+      {label:'Reported figures',items:[['NZ$24.8 million / day','Debt-interest cost'],['NZ$14 billion over three budgets','Proposed spending reductions'],['32.6% of GDP','Spending measure'],['2027','Surplus target year']]}]},
+    'wp8-3': {title:'Housing forum and election context',groups:[
+      {label:'Proposal and context',items:[['5%','First-home deposit proposal'],['4.5%','Opportunity Party polling'],['14 September 2026','Housing forum date'],['5%','MMP party-vote threshold']]}]},
+    'wp8-4': {title:'Election-process changes',groups:[
+      {label:'Accepted changes and dates',items:[['65','Election-process changes accepted'],['7 November 2026','Election date'],['4 October 2026','Writ day'],['8 October 2026','Nominations close']]}]}
+  };
+  var spec = specs[storyId] || specs['wp7-1'];
+  container.innerHTML = '<div class="chart-title">'+escAttr(spec.title)+'</div>' + spec.groups.map(function(group){
+    return '<section class="fiscal-group"><h3>'+escAttr(group.label)+(group.unit?' · '+escAttr(group.unit):'')+'</h3><div class="fiscal-kpis">'+group.items.map(function(item){
+      return '<div class="fiscal-kpi"><b>'+escAttr(item[0])+'</b><span>'+escAttr(item[1])+'</span></div>';
+    }).join('')+'</div></section>';
+  }).join('') + '<div class="chart-source">Reported measures · units and time periods shown with each figure.</div>';
 }
 
 /* house-style party trend chart for a single party (colour + band + snapshot date) */
 function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
   var w = container.clientWidth || 400;
-  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
-    .attr('preserveAspectRatio', 'none');
+  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h).attr('width',w).attr('height',h)
+    .attr('preserveAspectRatio', 'xMidYMid meet');
   var labelW = w < 340 ? 56 : 92;
   var hist = POLL_HISTORY[partyKey] || [30, 30, 30];
   var lo = Math.max(0, Math.min.apply(null, hist) - 4);
@@ -1355,17 +1346,12 @@ function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
     .attr('y1', 6).attr('y2', h - 16).attr('stroke', 'rgba(255,255,255,0.5)');
   svg.append('text').attr('x', x(hist.length - 1)).attr('y', 4).attr('text-anchor', 'middle')
     .attr('font-size', 8).attr('letter-spacing', '0.1em').attr('fill', '#9aa7b4').text('3 SEP');
-  svg.append('path').datum(hist)
-    .attr('d', d3.area().x(function (d, i) { return x(i); })
-      .y0(function (d) { return y(d - 1.3); }).y1(function (d) { return y(d + 1.3); })
-      .curve(d3.curveMonotoneX))
-    .attr('fill', color).attr('opacity', 0.16);
   svg.selectAll(null).data(hist).enter().append('circle')
     .attr('cx', function (d, i) { return x(i); }).attr('cy', function (d) { return y(d); })
     .attr('r', 2.2).attr('fill', color).attr('opacity', 0.45);
   svg.append('path').datum(hist)
     .attr('d', d3.line().x(function (d, i) { return x(i); }).y(function (d) { return y(d); })
-      .curve(d3.curveMonotoneX))
+      .curve(d3.curveLinear))
     .attr('fill', 'none').attr('stroke', color).attr('stroke-width', 2);
   var last = hist[hist.length - 1];
   var ly = y(last);
@@ -1383,7 +1369,7 @@ function drawPartyTrend(container, partyKey, partyLabel, latestVal, h) {
 function drawKiwiSaverTrend(container, h) {
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 '+w+' '+h)
-    .attr('preserveAspectRatio','none');
+    .attr('width',w).attr('height',h).attr('preserveAspectRatio','xMidYMid meet');
   var labelW = w < 340 ? 56 : 92;
   var years = [2021,2022,2023,2024,2025,2026];
   var values = [78.1,83.4,91.0,100.3,123.1,124.5];
@@ -1398,16 +1384,10 @@ function drawKiwiSaverTrend(container, h) {
     svg.append('text').attr('x',w-labelW+6).attr('y',y(v)+3)
       .attr('font-size',8).attr('fill','#6b7684').text(v);
   });
-  // area band (±0.5)
-  svg.append('path').datum(values)
-    .attr('d', d3.area().x(function(d,i){return x(i);})
-      .y0(function(d){return y(d-0.5);}).y1(function(d){return y(d+0.5);})
-      .curve(d3.curveMonotoneX))
-    .attr('fill',color).attr('opacity',0.16);
   // line
   svg.append('path').datum(values)
     .attr('d', d3.line().x(function(d,i){return x(i);}).y(function(d){return y(d);})
-      .curve(d3.curveMonotoneX))
+      .curve(d3.curveLinear))
     .attr('fill','none').attr('stroke',color).attr('stroke-width',2);
   // points
   svg.selectAll(null).data(values).enter().append('circle')
@@ -1431,7 +1411,7 @@ function drawKiwiSaverTrend(container, h) {
   });
   // source row
   svg.append('text').attr('x',0).attr('y',h-4)
-    .attr('font-size',8).attr('fill','#6b7684').text('Source: FMA / FSC · as of 31 Mar 2026 · Beehive chart');
+    .attr('font-size',8).attr('fill','#6b7684').text('Source: FMA / FSC · as of 31 Mar 2026 · BIHIVE visualization');
 }
 
 /* 538-style frame: dashed grid + baseline + source row (reused by charts) */
@@ -1451,7 +1431,7 @@ function draw538Grid(svg, w, h, yTicks, labelW) {
 function drawThresholdArithmetic(container, h) {
   var w = container.clientWidth || 400;
   var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
-    .attr('preserveAspectRatio', 'none');
+    .attr('preserveAspectRatio','xMidYMid meet');
   var parties = [
     { key: 'national', name: 'NAT', poll: 29.0, color: '#5a94d4' },
     { key: 'labour', name: 'LAB', poll: 25.9, color: '#D82A20' },
@@ -1482,38 +1462,46 @@ function drawThresholdArithmetic(container, h) {
   svg.append('text').attr('x', thresholdX + 3).attr('y', top + 2)
     .attr('font-size', 7.5).attr('fill', '#d23528').text('5% THRESHOLD');
   svg.append('text').attr('x', 0).attr('y', h - 3).attr('font-size', 8)
-    .attr('fill', '#6b7684').text('Party vote, latest polls · dimmed = below threshold · Beehive chart');
+    .attr('fill', '#6b7684').text('Party vote, latest polls · dimmed = below threshold · BIHIVE visualization');
 }
 
 /* Poll-table mini chart: Labour volatile 2026 (Feb 37.4 peak, May 26.5 trough, Jun 35.3) */
 
 /* INZ accountability: house-style horizontal bar table (forecast vs reality) */
 function drawInzBars(container, h) {
-  var w = container.clientWidth || 400;
-  var svg = d3.select(container).append('svg').attr('viewBox', '0 0 ' + w + ' ' + h)
-    .attr('preserveAspectRatio', 'none');
   var rows = [
-    { label: 'OFS forecast savings', value: 453, color: '#5a94d4' },
-    { label: 'Benefits now ruled unlikely', value: 134, color: '#d23528' },
-    { label: 'OFS cost to date', value: 336, color: '#8895a7' },
-    { label: 'BCU cost (axed after 7 yrs)', value: 36, color: '#6b7684' }
+    { label: 'OFS forecast savings', value: 453 },
+    { label: 'Benefits now ruled unlikely', value: 134, emphasis:true },
+    { label: 'OFS cost to date', value: 336 },
+    { label: 'BCU cost (closed after 7 years)', value: 36 }
   ];
-  var max = 460;
-  var barH = 16, gap = 14, top = 10;
-  var labelW = w < 380 ? 120 : 170;
-  rows.forEach(function (r, i) {
-    var yy = top + i * (barH + gap);
-    svg.append('text').attr('x', 0).attr('y', yy + barH / 2 + 3)
-      .attr('font-size', 8).attr('fill', '#9aa7b4').text(r.label.slice(0, w < 380 ? 20 : 30));
-    svg.append('rect').attr('x', labelW).attr('y', yy)
-      .attr('width', (r.value / max) * (w - labelW - 40)).attr('height', barH)
-      .attr('fill', r.color).attr('opacity', 0.85);
-    svg.append('text').attr('x', labelW + (r.value / max) * (w - labelW - 40) + 4)
-      .attr('y', yy + barH / 2 + 3).attr('font-size', 9).attr('font-weight', 600)
-      .attr('fill', '#c7cfd8').text('$' + r.value + 'm');
-  });
-  svg.append('text').attr('x', 0).attr('y', h - 3).attr('font-size', 8)
-    .attr('fill', '#6b7684').text('Source: Cabinet paper via RNZ · Beehive chart');
+  var compact = h === true;
+  var max = 500;
+  container.classList.add('inz-chart');
+  if (compact) {
+    container.innerHTML = '<div class="inz-compact-title">INZ · NZ$ million</div>'+rows.map(function(r){
+      return '<div class="inz-compact-row'+(r.emphasis?' emphasis':'')+'"><span>'+escAttr(r.label)+'</span><i style="width:'+r.value/max*100+'%"></i><b>'+r.value+'</b></div>';
+    }).join('');
+    return;
+  }
+  container.innerHTML = '<div class="chart-title">Immigration systems: benefits and costs</div><div class="chart-subtitle">NZ$ million · common 0–500 scale</div>' + rows.map(function(r){
+    return '<div class="inz-row'+(r.emphasis?' emphasis':'')+'"><div class="inz-label">'+escAttr(r.label)+'</div><div class="inz-track"><div class="inz-bar" style="width:'+r.value/max*100+'%"></div></div><div class="inz-value">'+r.value+'</div></div>';
+  }).join('') + '<div class="inz-axis"><span>0</span><span>100</span><span>200</span><span>300</span><span>400</span><span>500</span></div><div class="chart-source">Source: Cabinet paper, as reported by RNZ · values are separate reported items and are not a total.</div>';
+}
+
+function drawPollSnapshot(container, compact) {
+  var keys = ['national','labour','green','act','nzfirst','opp'];
+  container.classList.add('poll-snapshot');
+  container.innerHTML = (compact ? '' : '<div class="chart-title">Latest party-vote snapshot</div><div class="chart-subtitle">Curia poll · 3 September 2026</div>') + keys.map(function(key){
+    var p = PARTY[key];
+    return '<div class="poll-snapshot-row"><span>'+escAttr(p.name)+'</span><div class="poll-snapshot-track"><div class="poll-snapshot-fill" style="width:'+Math.min(100,p.poll/30*100)+'%;background:'+(p.reached?p.color:'#66727e')+'"></div></div><span class="poll-snapshot-value">'+p.poll.toFixed(1)+'%</span></div>';
+  }).join('') + (compact ? '' : '<div class="chart-source">Source: Curia poll, 3 September 2026 · BIHIVE visualization.</div>');
+}
+
+function drawThresholdMini(container, compact) {
+  var p = PARTY.nzfirst;
+  container.classList.add('threshold-snapshot');
+  container.innerHTML = (compact ? '<div class="threshold-mini-title">NZ First · party vote</div>' : '<div class="chart-title">NZ First party vote and 5% threshold</div><div class="chart-subtitle">Current Curia snapshot · percentage of party vote</div>') + '<div class="threshold-mini-track"><i style="width:'+Math.min(100,p.poll/15*100)+'%"></i><b></b></div><div class="threshold-mini-labels"><span>0%</span><strong>'+p.poll.toFixed(1)+'%</strong><span>5% threshold</span><span>15%</span></div>' + (compact ? '' : '<div class="chart-source">Source: Curia poll, 3 September 2026 · BIHIVE visualization.</div>');
 }
 
 /* ── JS string escaper (XSS prevention) ───────────────────── */
@@ -1534,37 +1522,50 @@ function escAttr(s) {
 /* ── Article view ──────────────────────────────────────────── */
 function openArticle(c) {
   clearTimeout(armTimer); clearMq(document.querySelector('.cell.armed')); armedId = null;
+  var chartHost = document.getElementById('a-chart');
+  var captionHost = document.getElementById('a-caption');
+  var creditsHost = document.getElementById('a-img-credits');
+  var extraChart = document.getElementById('a-chart-extra');
+  if (extraChart) extraChart.remove();
+  chartHost.innerHTML = ''; chartHost.style.display = 'none';
+  captionHost.textContent = ''; captionHost.style.display = 'none';
+  creditsHost.innerHTML = '';
+  document.getElementById('a-body').innerHTML = '';
+  document.getElementById('a-people').innerHTML = '';
   document.getElementById('treemap-view').classList.remove('active');
   var av = document.getElementById('article-view');
   av.classList.add('active');
   av.querySelector('.a-badge').textContent = c.tier===0 ? 'ELECTION 2026' : (c.priority || 'STORY');
   document.getElementById('a-title').textContent = c.title;
-  document.getElementById('a-date').textContent = (c.date||'') + ' 2026 · Beehive Political Intelligence';
+  var articleDate = c.date || '';
+  if (articleDate && !/\b20\d{2}\b/.test(articleDate)) articleDate += ' 2026';
+  document.getElementById('a-date').textContent = articleDate + ' · BIHIVE Political Intelligence';
   var bodyEl = document.getElementById('a-body');
   if (c.wp6) {
     var art = ARTICLE_DATA['art-' + c.wp6];
     document.getElementById('a-badge').textContent = (c.cat||'politics').toUpperCase();
-    renderPeople(c.wp6);
+    renderAuthor(c);
     var html = '';
     art.sections.forEach(function (s) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
-    captionEl.innerHTML = 'Party-vote snapshot · Curia poll 3 Sep 2026 · 5% = MMP threshold';
     var ch = document.getElementById('a-chart');
-    ch.innerHTML = '';
     document.getElementById('a-chart').style.display = '';
     if (c.wp6 === 'wp6-1') {
       drawKiwiSaverTrend(ch, 260);
+      captionHost.textContent = 'KiwiSaver funds under management · FMA / FSC data to 31 March 2026.'; captionHost.style.display = '';
     } else if (c.wp6 === 'wp6-3') {
       drawPartyTrend(ch, 'act', 'ACT', 10.5, 180); /* FIX(wpn): B3 */
       var ch2 = document.createElement('div');
-      ch2.style.marginTop = '8px'; /* FIX(wpn): restore live spacing line (glm-5.3 final review) */
+      ch2.className = 'a-chart';
+      ch2.id = 'a-chart-extra';
       ch.parentNode.insertBefore(ch2, ch.nextSibling);
       drawThresholdArithmetic(ch2, 200);
+      captionHost.textContent = 'ACT polling history and current party-vote threshold context · Taxpayers’ Union–Curia, 1–3 September 2026.'; captionHost.style.display = '';
     } else {
       drawInzBars(ch, 180);
+      captionHost.textContent = 'Immigration New Zealand systems review · NZ$ million · Cabinet paper as reported by RNZ.'; captionHost.style.display = '';
     }
     var aCredits = document.getElementById('a-img-credits');
     if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>'; }
@@ -1575,19 +1576,17 @@ function openArticle(c) {
   if (c.wp7) {
     var art = ARTICLE_DATA['art-' + c.wp7];
     document.getElementById('a-badge').textContent = (c.cat||'politics').toUpperCase();
-    renderPeople(c.wp7 || '');
+    renderAuthor(c);
     var html = '';
     art.sections.forEach(function (s) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
-    captionEl.innerHTML = 'Party-vote snapshot · Curia poll 3 Sep 2026 · 5% = MMP threshold';
     var ch = document.getElementById('a-chart');
-    ch.innerHTML = '';
     if (c.wp7 !== 'wp7-2') { /* FIX(content): wp7-2 chart removed — party trend irrelevant to immigration policy piece; wp7-1/wp7-3 fiscal tables stay */
       document.getElementById('a-chart').style.display = '';
       drawFiscalTable(ch, c.wp7);
+      captionHost.textContent = c.wp7 === 'wp7-1' ? 'Transport funding figures reported by RNZ; each measure retains its own unit.' : 'Graduate-nurse programme figures reported by RNZ; workforce, annual cost and subsidy are separate measures.'; captionHost.style.display = '';
     } else {
       document.getElementById('a-chart').style.display = 'none';
     }
@@ -1600,24 +1599,23 @@ function openArticle(c) {
   if (c.wp8) {
     var art = ARTICLE_DATA['art-' + c.wp8];
     document.getElementById('a-badge').textContent = (c.cat||'politics').toUpperCase();
-    renderPeople('');
+    renderAuthor(c);
     var html = '';
     art.sections.forEach(function (s) {
       html += '<p><strong style="color:#e8edf2">' + s.h + '</strong><br>' + s.p + '</p>';
     });
     bodyEl.innerHTML = html;
-    var captionEl = document.querySelector('.a-caption'); /* FIX(wpn): B2/C22 — dead first assignment removed */
-    captionEl.innerHTML = 'Party-vote snapshot · Curia poll 3 Sep 2026 · 5% = MMP threshold';
     var ch = document.getElementById('a-chart');
-    ch.innerHTML = '';
     if (c.wp8 === 'wp8-2') {
       document.getElementById('a-chart').style.display = '';
-      drawPollTable(ch);
+      drawPollSnapshot(ch, false);
+      captionHost.textContent = 'Latest party-vote snapshot · Curia poll, 3 September 2026.'; captionHost.style.display = '';
     } else if (c.wp8 === 'wp8-3') { /* FIX(content): wp8-3 fiscal table removed — bars didn't match the housing forum piece */
       document.getElementById('a-chart').style.display = 'none';
     } else {
       document.getElementById('a-chart').style.display = '';
       drawFiscalTable(ch, 'wp8-' + c.wp8.slice(-1));
+      captionHost.textContent = c.wp8 === 'wp8-1' ? 'Fiscal claims and target year as reported by NZ Herald.' : 'Election-process dates and changes as reported by NZ Herald.'; captionHost.style.display = '';
     }
     var aCredits = document.getElementById('a-img-credits');
     if (c.img) { aCredits.innerHTML = '<img src="' + c.img + '" alt="" loading="lazy" /><span>' + escAttr(c.imgCredit || '') + '</span>'; }
@@ -1628,11 +1626,13 @@ function openArticle(c) {
   if (/^s\d+$/.test(c.id) || ARTICLE_DATA['art-' + c.id]) {
     var sArt = ARTICLE_DATA['art-' + c.id];
     document.getElementById('a-badge').textContent = c.priority || 'STORY';
-    renderPeople('');
-    document.getElementById('a-chart').style.display = 'none';
+    renderAuthor(c);
+    if (c.id === 's18') { chartHost.style.display = ''; drawPollSnapshot(chartHost, false); captionHost.textContent = 'Party-vote snapshot · Curia poll, 3 September 2026.'; captionHost.style.display = ''; }
+    else if (c.id === 's07') { chartHost.style.display = ''; drawThresholdMini(chartHost, false); captionHost.textContent = 'NZ First share compared with the 5% MMP party-vote threshold · Curia poll, 3 September 2026.'; captionHost.style.display = ''; }
+    else chartHost.style.display = 'none';
     var srcEl = getSourceHtml(c);
     if (sArt) {
-      document.getElementById('a-date').textContent = (c.date || '') + ' · Beehive Political Intelligence' + srcEl;
+      document.getElementById('a-date').textContent = articleDate + ' · BIHIVE Political Intelligence' + srcEl;
       var sHtml = '';
       sArt.sections.forEach(function (s) {
         if (s.as_of) {
@@ -1643,7 +1643,7 @@ function openArticle(c) {
       });
       bodyEl.innerHTML = sHtml;
     } else {
-      document.getElementById('a-date').textContent = (c.date || '') + ' · Beehive Political Intelligence';
+      document.getElementById('a-date').textContent = articleDate + ' · BIHIVE Political Intelligence';
       bodyEl.textContent = 'No full article has been produced for this story.';
     }
     av.scrollTop = 0;
