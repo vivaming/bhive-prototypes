@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bihive:analytics-evidence-bundle:v1",
+  "title": "BIHIVE analytics evidence bundle v1",
+  "type": "object",
+  "required": ["schemaVersion", "bundleId", "releaseGate", "sources", "snapshot", "dataDictionary", "analysisPlan", "analysisResults", "claimLedger"],
+  "properties": {
+    "schemaVersion": {"const": 1},
+    "bundleId": {"type": "string", "minLength": 1},
+    "releaseGate": {"const": "HOLD"},
+    "sources": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/source"}},
+    "snapshot": {"$ref": "#/$defs/snapshot"},
+    "dataDictionary": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/dictionaryField"}},
+    "analysisPlan": {"$ref": "#/$defs/analysisPlan"},
+    "analysisResults": {"type": "array", "items": {"$ref": "#/$defs/result"}},
+    "claimLedger": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/claim"}}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "source": {
+      "type": "object", "required": ["sourceId", "kind", "title", "url", "retrievedAt", "rawSnapshotText", "rawSnapshotSha256"],
+      "properties": {
+        "sourceId": {"type": "string", "minLength": 1},
+        "kind": {"enum": ["synthetic", "official", "research", "news", "other"]},
+        "title": {"type": "string", "minLength": 1},
+        "url": {"type": ["string", "null"]},
+        "retrievedAt": {"type": "string", "format": "date-time"},
+        "rawSnapshotText": {"type": "string", "minLength": 1},
+        "rawSnapshotSha256": {"$ref": "#/$defs/sha256"},
+        "syntheticNotice": {"type": "string"}
+      },
+      "allOf": [
+        {"if": {"properties": {"kind": {"const": "synthetic"}}, "required": ["kind"]}, "then": {"properties": {"url": {"type": "null"}, "syntheticNotice": {"type": "string", "minLength": 1}}, "required": ["syntheticNotice"]}},
+        {"if": {"properties": {"kind": {"not": {"const": "synthetic"}}}, "required": ["kind"]}, "then": {"properties": {"url": {"type": "string", "format": "uri", "pattern": "^https://"}}}}
+      ],
+      "additionalProperties": false
+    },
+    "snapshot": {
+      "type": "object", "required": ["snapshotId", "sourceId", "vintage", "publishedAt", "capturedAt", "rows", "snapshotHash"],
+      "properties": {
+        "snapshotId": {"type": "string", "minLength": 1}, "sourceId": {"type": "string", "minLength": 1},
+        "vintage": {"type": "string", "minLength": 1}, "publishedAt": {"type": "string", "format": "date-time"},
+        "capturedAt": {"type": "string", "format": "date-time"}, "snapshotHash": {"$ref": "#/$defs/sha256"},
+        "rows": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["rowId", "sourceId", "vintage", "sourceLocator", "fields"], "properties": {"rowId": {"type": "string"}, "sourceId": {"type": "string"}, "vintage": {"type": "string"}, "sourceLocator": {"type": "string", "minLength": 1}, "fields": {"type": "object", "minProperties": 1}}, "additionalProperties": false}}
+      },
+      "additionalProperties": false
+    },
+    "dictionaryField": {"type": "object", "required": ["field", "description", "type", "unit", "required"], "properties": {"field": {"type": "string"}, "description": {"type": "string"}, "type": {"enum": ["string", "number", "boolean"]}, "unit": {"type": "string"}, "denominator": {"type": ["string", "null"]}, "periodicity": {"type": "string"}, "temporalRole": {"type": "string"}, "required": {"type": "boolean"}}, "additionalProperties": true},
+    "analysisPlan": {"type": "object", "required": ["planId", "planHash", "question", "snapshotId", "transformations", "limitations"], "properties": {"planId": {"type": "string"}, "planHash": {"$ref": "#/$defs/sha256"}, "question": {"type": "string", "minLength": 1}, "snapshotId": {"type": "string"}, "transformations": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["id", "type", "inputs", "precision"], "properties": {"id": {"type": "string"}, "type": {"enum": ["sum", "difference", "percentage_points", "percent_change"]}, "inputs": {"type": "array", "minItems": 1, "items": {"type": "object", "required": ["rowId", "field"], "properties": {"rowId": {"type": "string"}, "field": {"type": "string"}}, "additionalProperties": false}}, "outputUnit": {"type": "string"}, "precision": {"type": "integer", "minimum": 0, "maximum": 8}}, "additionalProperties": false}}, "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}}}, "additionalProperties": false},
+    "result": {"type": "object", "required": ["resultId", "value", "unit", "snapshotHash", "planHash", "sourceRowIds"], "properties": {"resultId": {"type": "string"}, "value": {"type": "number"}, "unit": {"type": "string"}, "snapshotHash": {"$ref": "#/$defs/sha256"}, "planHash": {"$ref": "#/$defs/sha256"}, "sourceRowIds": {"type": "array", "minItems": 1, "items": {"type": "string"}}}, "additionalProperties": false},
+    "claim": {"type": "object", "required": ["claimId", "kind", "text", "evidenceRefs"], "properties": {"claimId": {"type": "string"}, "kind": {"enum": ["fact", "quote", "calculation", "interpretation"]}, "text": {"type": "string", "minLength": 1}, "evidenceRefs": {"type": "array", "minItems": 1, "items": {"type": "object"}}, "numericAssertions": {"type": "array", "items": {"type": "object"}}, "exactQuote": {"type": "string"}, "sourceLocator": {"type": "string"}}, "additionalProperties": false}
+  },
+  "additionalProperties": false
+}

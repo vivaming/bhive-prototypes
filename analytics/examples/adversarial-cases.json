@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "cases": [
+    {"id":"stale-snapshot-hash","mutation":"change locked snapshot value without recomputing hash","expected":"snapshot.snapshotHash"},
+    {"id":"stale-source-bytes-hash","mutation":"change retained source bytes without updating hash","expected":"sources[0].rawSnapshotSha256"},
+    {"id":"unlocated-row","mutation":"remove exact source row locator","expected":"snapshot.rows[0]"},
+    {"id":"undefined-field","mutation":"add row field missing from dictionary","expected":"snapshot.rows[0].fields.extra"},
+    {"id":"dictionary-unit-missing","mutation":"remove a numeric field unit","expected":"dataDictionary[1]"},
+    {"id":"mixed-vintage","mutation":"combine vintages without explicit comparison contract","expected":"snapshot.rows[1].vintage"},
+    {"id":"unknown-operation","mutation":"request an unapproved transform","expected":"Unsupported transform"},
+    {"id":"zero-baseline-percent-change","mutation":"compute percent change from a non-positive baseline","expected":"baseline must be positive"},
+    {"id":"wrong-calculation","mutation":"edit stored result while retaining locked inputs","expected":"analysisResults.index-difference"},
+    {"id":"wrong-result-snapshot","mutation":"point a calculation result at a different snapshot hash","expected":"analysisResults.index-difference.snapshotHash"},
+    {"id":"unknown-claim-row","mutation":"point prose at a missing row","expected":"exact snapshot row and field"},
+    {"id":"unsupported-numeric-claim","mutation":"change claim value or unit without changing its source/result","expected":"numeric claim does not match"},
+    {"id":"quote-not-in-snapshot","mutation":"supply quotation text absent from exact retained bytes","expected":"exactQuote"},
+    {"id":"plan-snapshot-mismatch","mutation":"analyze a different snapshot from the one locked","expected":"analysisPlan"},
+    {"id":"no-limitations","mutation":"omit all stated analysis limitations","expected":"analysisPlan.limitations"},
+    {"id":"insecure-source-url","mutation":"use HTTP for a non-synthetic source","expected":"HTTPS source URL"},
+    {"id":"percentage-points-misuse","mutation":"apply percentage-points arithmetic to an index unit","expected":"requires percent inputs"},
+    {"id":"duplicate-source-id","mutation":"duplicate a provenance record ID","expected":"source IDs must be unique"},
+    {"id":"missing-claim-evidence","mutation":"remove every evidence reference from an important claim","expected":"at least one exact evidence reference"},
+    {"id":"attempted-release","mutation":"promote offline synthetic data to PASS","expected":"must remain HOLD"}
+  ]
+}

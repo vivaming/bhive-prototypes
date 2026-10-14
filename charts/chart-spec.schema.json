@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:bihive:chart-spec:v1",
+  "title": "BIHIVE ChartSpec v1",
+  "type": "object",
+  "required": ["schemaVersion", "specId", "datasetId", "datasetHash", "question", "unit", "period", "templateId", "snapshotView", "scalePolicy", "dataset", "annotations", "sourceIds", "provenance", "themeVersion", "rendererVersion", "releaseGate"],
+  "properties": {
+    "schemaVersion": { "const": 1 },
+    "specId": { "type": "string", "minLength": 1 },
+    "datasetId": { "type": "string", "minLength": 1 },
+    "datasetHash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "question": { "type": "string", "minLength": 1 },
+    "unit": { "type": "string", "minLength": 1 },
+    "period": {
+      "type": "object",
+      "required": ["displayLabels", "displayRange", "observationDates", "note"],
+      "properties": {
+        "displayLabels": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "displayRange": { "type": "string", "minLength": 1 },
+        "observationDates": { "type": ["array", "null"] },
+        "note": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "templateId": { "type": "string", "minLength": 1 },
+    "snapshotView": {
+      "type": "object",
+      "required": ["templateId", "seriesIds", "scalePolicy"],
+      "properties": {
+        "templateId": { "const": "horizontal-bar" },
+        "seriesIds": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string" } },
+        "scalePolicy": { "$ref": "#/$defs/scalePolicy" }
+      },
+      "additionalProperties": false
+    },
+    "scalePolicy": { "$ref": "#/$defs/scalePolicy" },
+    "dataset": {
+      "type": "object",
+      "required": ["partySnapshot", "series"],
+      "properties": {
+        "partySnapshot": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/snapshot" } },
+        "series": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/series" } }
+      },
+      "additionalProperties": false
+    },
+    "annotations": { "type": "array", "items": { "type": "object" } },
+    "sourceIds": { "type": "array", "items": { "type": "string" } },
+    "provenance": {
+      "type": "object",
+      "required": ["status", "claimedSourceLabel", "sourceUrl", "sourceRecordPath", "reason"],
+      "properties": {
+        "status": { "enum": ["VERIFIED", "UNVERIFIED_LEGACY_FIXTURE", "SYNTHETIC"] },
+        "claimedSourceLabel": { "type": ["string", "null"] },
+        "sourceUrl": { "type": ["string", "null"], "format": "uri" },
+        "sourceRecordPath": { "type": ["string", "null"] },
+        "reason": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "themeVersion": { "type": "string" },
+    "rendererVersion": { "type": "string" },
+    "releaseGate": { "enum": ["PASS", "HOLD"] }
+  },
+  "$defs": {
+    "scalePolicy": {
+      "type": "object",
+      "required": ["kind", "domain", "baseline"],
+      "properties": { "kind": { "enum": ["fixed-domain", "zero-baseline"] }, "domain": { "type": "array", "minItems": 2, "maxItems": 2, "items": { "type": "number" } }, "baseline": { "type": ["number", "null"] }, "reason": { "type": "string" } },
+      "additionalProperties": true
+    },
+    "snapshot": {
+      "type": "object",
+      "required": ["id", "label", "color", "value", "reachesThreshold"],
+      "properties": { "id": { "type": "string" }, "label": { "type": "string" }, "color": { "type": "string", "pattern": "^#[a-fA-F0-9]{6}$" }, "value": { "type": "number" }, "reachesThreshold": { "type": "boolean" } },
+      "additionalProperties": false
+    },
+    "series": {
+      "type": "object",
+      "required": ["id", "label", "color", "trendVisible", "values"],
+      "properties": { "id": { "type": "string" }, "label": { "type": "string" }, "color": { "type": "string", "pattern": "^#[a-fA-F0-9]{6}$" }, "trendVisible": { "type": "boolean" }, "values": { "type": "array", "minItems": 1, "items": { "type": "number" } } },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

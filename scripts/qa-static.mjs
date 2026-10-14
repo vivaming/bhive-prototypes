@@ -14,7 +14,9 @@ check('unique DOM IDs',new Set(ids).size===ids.length,`found ${ids.length} ids`)
 check('no invalid fetchpriority',!html.includes('fetchpriority="lazy"'));
 check('s18 Herald aggregate only',/drawHeraldCoalitionMetric/.test(html)&&/nz-herald-poll-of-polls/.test(html)&&!/if \(c\.id === 's18'\) \{[^}]*drawPollSnapshot/.test(html));
 check('story ordering ignores image presence',!/hasImg\s*=/.test(html)&&/return a\.tier - b\.tier/.test(html));
-check('baseline values remain literal data', ['453','134','336','36','29.0','25.9'].every(value=>html.includes(value)));
+const chartSpec=JSON.parse(fs.readFileSync('charts/specs/legacy-curia-fixture.json','utf8'));
+check('legacy poll remains a separate unverified fixture',chartSpec.provenance.status==='UNVERIFIED_LEGACY_FIXTURE'&&chartSpec.releaseGate==='HOLD'&&/charts\/specs\/legacy-curia-fixture\.js/.test(html)&&!/var POLL_HISTORY = \{/.test(html));
+check('chart fixture loads without runtime network fetch',/window\.BIHIVE_CHART_SPEC/.test(html)&&!html.includes("fetch('./charts/specs/legacy-curia-fixture.json')"));
 check('s18 explanatory copy avoids Curia substitution',(()=>{const start=html.indexOf('"art-s18":'),end=html.indexOf('\n "art-',start+1);const section=html.slice(start,end);return start>=0&&end>start&&!/Curia|National 29|Labour 25/.test(section);})());
 const vendor=JSON.parse(fs.readFileSync('assets/vendor/vendor-lock.json','utf8'));
 check('runtime libraries and fonts are locally locked',vendor.runtime.every(v=>fs.existsSync(v.file)&&fs.existsSync(v.licenseFile))&&vendor.fonts.every(f=>fs.existsSync(f.licenseFile))&&vendor.files.every(f=>fs.existsSync(f.file)&&crypto.createHash('sha256').update(fs.readFileSync(f.file)).digest('hex')===f.sha256)&&!/(?:fonts\.googleapis\.com|cdn\.jsdelivr\.net|gsap\.)/.test(html));
